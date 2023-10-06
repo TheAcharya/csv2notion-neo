@@ -1,4 +1,4 @@
-# csv2notion
+# csv2notion neo
 
 [![PyPI version](https://img.shields.io/pypi/v/csv2notion?label=version)](https://pypi.python.org/pypi/csv2notion)
 [![Python Version](https://img.shields.io/pypi/pyversions/csv2notion.svg)](https://pypi.org/project/csv2notion/)
