@@ -257,8 +257,22 @@ If you want to ensure that specific columns always have value and are not allowe
 - [Importing rows with emoji icons](https://github.com/vzhd1701/csv2notion/raw/master/examples/icon_column.png)
 - [Updating emoji icon only for all rows](https://github.com/vzhd1701/csv2notion/raw/master/examples/default_icon_only.png)
 
-## Getting help
+## Credits
 
-If you found a bug or have a feature request, please [open a new issue](https://github.com/vzhd1701/csv2notion/issues/new/choose).
+Original Idea and Workflow by [Vigneswaran Rajkumar](https://twitter.com/IAmVigneswaran)
 
-If you have a question about the program or have difficulty using it, you are welcome to [the discussions page](https://github.com/vzhd1701/csv2notion/discussions). You can also mail me directly, I'm always happy to help.
+Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
+
+Initial Work by [Vladilen Zhdanov](https://github.com/vzhd1701) ([0.1.0 ... 0.1.1](https://github.com/vzhd1701/csv2notion))
+
+## License
+
+Licensed under the MIT license. See [LICENSE](https://github.com/TheAcharya/csv2notion-neo/blob/master/LICENSE) for details.
+
+## Reporting Bugs
+
+For bug reports, feature requests and other suggestions you can create [a new issue](https://github.com/TheAcharya/csv2notion-neo/issues) to discuss.
+
+## Contributing
+
+Code contributions are welcome. See [CONTRIBUTING](https://github.com/TheAcharya/MarkersExtractor/blob/master/CONTRIBUTING.md) for details before contributing.
