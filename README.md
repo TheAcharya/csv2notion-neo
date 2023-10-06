@@ -272,7 +272,3 @@ Licensed under the MIT license. See [LICENSE](https://github.com/TheAcharya/csv2
 ## Reporting Bugs
 
 For bug reports, feature requests and other suggestions you can create [a new issue](https://github.com/TheAcharya/csv2notion-neo/issues) to discuss.
-
-## Contributing
-
-Code contributions are welcome. See [CONTRIBUTING](https://github.com/TheAcharya/MarkersExtractor/blob/master/CONTRIBUTING.md) for details before contributing.
