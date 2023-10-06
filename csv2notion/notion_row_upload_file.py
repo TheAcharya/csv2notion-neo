@@ -9,6 +9,7 @@ from notion.block import Block
 from csv2notion.utils_exceptions import NotionError
 from csv2notion.utils_file import get_file_sha256
 from csv2notion.utils_static import FileType
+from urllib.parse import urlparse
 
 Meta = Dict[str, str]
 
@@ -64,9 +65,12 @@ def _upload_file(block: Block, file_path: Path) -> str:
 
 
 def get_file_id(image_url: str) -> Optional[str]:
-    match = re.search("secure.notion-static.com/([^/]+)", image_url)
+    
+    parsed_url = urlparse(image_url)
+    match = parsed_url.path.split("/")[-2]
+
     if match:
-        return match[1]
+        return match
     return None
 
 
