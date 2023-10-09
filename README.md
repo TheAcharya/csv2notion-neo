@@ -274,9 +274,9 @@ csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```
-![example_02.png](assets/example_02.png)
+![example_03.gif](assets/example_03.gif)
 
 </p>
 </details>
@@ -285,9 +285,9 @@ csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```
-![example_03.gif](assets/example_03.gif)
+![example_04.gif](assets/example_04.gif)
 
 </p>
 </details>
