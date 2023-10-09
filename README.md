@@ -307,8 +307,9 @@ csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-co
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 ```
+![example_06.gif](assets/example_06.gif)
 
 </p>
 </details>
