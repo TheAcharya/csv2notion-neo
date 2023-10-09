@@ -168,7 +168,20 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 </details>
 
 
-The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option. For information on how to get it, see [this article](https://vzhd1701.notion.site/Find-Your-Notion-Token-5f57951434c1414d84ac72f88226eede).
+The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option.
+
+<details><summary>Obtaining Notion Session Token (Safari)</summary>
+<p>
+
+Enable Web Inspector
+
+- If you don’t see the Develop menu in the menu bar, choose Safari, Settings, click Advanced, then select “Show features for web developers”.
+- Press `⌥ + ⌘ + i` to show Web Inspector
+  
+![notion_token_safari.gif](assets/notion_token_safari.gif)
+
+</p>
+</details>
 
 **Important notice**. `token_v2` cookie provides complete access to your Notion account. Handle it with caution.
 
