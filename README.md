@@ -318,8 +318,9 @@ csv2notion-neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 ```
+![example_07.gif](assets/example_07.gif)
 
 </p>
 </details>
