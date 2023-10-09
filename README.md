@@ -183,6 +183,16 @@ Enable Web Inspector
 </p>
 </details>
 
+<details><summary>Obtaining Notion Session Token (Brave, Chrome or Edge)</summary>
+<p>
+
+Go to Setting, Privacy and security
+  
+![notion_token_brave.gif](assets/notion_token_brave.gif)
+
+</p>
+</details>
+
 **Important notice**. `token_v2` cookie provides complete access to your Notion account. Handle it with caution.
 
 ### Upload Speed
