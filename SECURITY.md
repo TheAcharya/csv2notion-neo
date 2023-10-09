@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-If you find a Security vulnerability, please create [a new issue](https://github.com/TheAcharya/MarkerData/issues) on GitHub. A fix will be issued as soon as possible.
+If you find a Security vulnerability, please create [a new issue](https://github.com/TheAcharya/csv2notion-neo/issues) on GitHub. A fix will be issued as soon as possible.
