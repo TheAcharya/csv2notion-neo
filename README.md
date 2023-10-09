@@ -50,15 +50,9 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 
 ## Installation
 
-### Using portable binary
+### Pre-compiled Binary (Recommended)
 
-[**Download the latest binary release**](https://github.com/vzhd1701/csv2notion/releases/latest) for your OS.
-
-### With [Homebrew](https://brew.sh/) (Recommended for macOS)
-
-```bash
-$ brew install vzhd1701/tap/csv2notion
-```
+Download the latest release of the latest binary release [here](https://github.com/TheAcharya/csv2notion-neo/releases).
 
 ### With [PIPX](https://github.com/pypa/pipx) (Recommended for Linux & Windows)
 
@@ -167,7 +161,8 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 
 <details><summary>Obtaining Database URL</summary>
 <p>
-
+  
+![database_url.png](assets/database_url.png)
 
 </p>
 </details>
