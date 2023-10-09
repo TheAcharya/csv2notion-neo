@@ -329,8 +329,9 @@ csv2notion-neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
 ```
+![example_08.gif](assets/example_08.gif)
 
 </p>
 </details>
