@@ -33,7 +33,7 @@ Due to current limitations of the official Notion SDK this tool is using the uno
   - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
   - [From Source](#from-source)
 - [Usage](#usage)
-  - [Input](#input)
+  - [Prerequisite](#prerequisite)
   - [Upload Speed](#upload-speed)
   - [Duplicate CSV Columns](#duplicate-csv-columns)
   - [Missing Columns](#missing-columns)
@@ -159,7 +159,7 @@ validation options:
                                      otherwise those values will be replaced with default status
 ```
 
-### Input
+### Prerequisite
 
 You must pass a single `*.csv` file for upload. The CSV file must contain at least 2 rows. The first row will be used as a header.
 
