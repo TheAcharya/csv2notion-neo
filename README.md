@@ -248,14 +248,75 @@ If you want to ensure that specific columns always have value and are not allowe
 
 ## Examples
 
-- [Importing CSV into new DB](https://github.com/vzhd1701/csv2notion/raw/master/examples/new_db.png)
-- [Using custom column types](https://github.com/vzhd1701/csv2notion/raw/master/examples/new_db_types.png)
-- [Importing CSV into existing DB](https://github.com/vzhd1701/csv2notion/raw/master/examples/add_new.png)
-- [Merging CSV with existing DB](https://github.com/vzhd1701/csv2notion/raw/master/examples/merge.png)
-- [Merging CSV with select columns in existing DB](https://github.com/vzhd1701/csv2notion/raw/master/examples/merge_only.png)
-- [Importing rows with images](https://github.com/vzhd1701/csv2notion/raw/master/examples/image_column.png)
-- [Importing rows with emoji icons](https://github.com/vzhd1701/csv2notion/raw/master/examples/icon_column.png)
-- [Updating emoji icon only for all rows](https://github.com/vzhd1701/csv2notion/raw/master/examples/default_icon_only.png)
+<details><summary>Importing CSV into New Database</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
+
+<details><summary>Using Custom Column Types</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
+
+<details><summary>Merging CSV with Existing Database</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
+
+<details><summary>Merging CSV with Select Columns in Existing Database</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
+
+<details><summary>Importing Rows with Images</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
+
+<details><summary>Importing Rows with Emoji Icons</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
+
+<details><summary>Updating Emoji Icon Only for All Rows</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+```
+
+</p>
+</details>
 
 ## Credits
 
