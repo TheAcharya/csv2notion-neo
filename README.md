@@ -270,6 +270,17 @@ csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 </p>
 </details>
 
+<details><summary>Importing CSV into Existing Database</summary>
+<p>
+
+```shell
+csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
+```
+![example_02.png](assets/example_02.png)
+
+</p>
+</details>
+
 <details><summary>Merging CSV with Existing Database</summary>
 <p>
 
