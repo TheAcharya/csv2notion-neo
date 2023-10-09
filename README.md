@@ -296,7 +296,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "col 2" --merge-onLy-column "col 3" test.csv
+csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
 ```
 ![example_05.gif](assets/example_05.gif)
 
