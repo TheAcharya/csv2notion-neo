@@ -167,7 +167,8 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 
 <details><summary>Obtaining Database URL</summary>
 <p>
-
+  
+![database_url.png](assets/database_url.png)
 
 </p>
 </details>
