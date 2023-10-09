@@ -54,12 +54,6 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 
 [**Download the latest binary release**](https://github.com/vzhd1701/csv2notion/releases/latest) for your OS.
 
-### With [Homebrew](https://brew.sh/) (Recommended for macOS)
-
-```bash
-$ brew install vzhd1701/tap/csv2notion
-```
-
 ### With [PIPX](https://github.com/pypa/pipx) (Recommended for Linux & Windows)
 
 ```shell
