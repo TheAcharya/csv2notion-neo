@@ -52,7 +52,7 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 
 ### Pre-compiled Binary (Recommended)
 
-[**Download the latest binary release**](https://github.com/vzhd1701/csv2notion/releases/latest) for your OS.
+Download the latest release of the latest binary release [here](https://github.com/TheAcharya/csv2notion-neo/releases).
 
 ### With [PIPX](https://github.com/pypa/pipx) (Recommended for Linux & Windows)
 
