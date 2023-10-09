@@ -254,6 +254,7 @@ If you want to ensure that specific columns always have value and are not allowe
 ```shell
 csv2notion-neo --token YOUR_TOKEN_HERE test.csv
 ```
+![example_01.png](assets/example_01.png)
 
 </p>
 </details>
