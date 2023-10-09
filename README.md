@@ -222,7 +222,7 @@ If the tool cannot convert the column value type properly, it will replace it wi
 
 The table below describes available codes for `--column-types` and what values are supported by each column type:
 
-<details><summary>Show table</summary>
+<details><summary>Support Table</summary>
 <p>
 
 | Column Type<br />Name   | Column Type<br />Code   | Supported Values | Multiple Values<br />(Comma Separated) |
@@ -231,18 +231,18 @@ The table below describes available codes for `--column-types` and what values a
 | Text                    | `text`                  | string           | ❌                                     |
 | Number                  | `number`                | numerical        | ❌                                     |
 | Select                  | `select`                | string           | ❌                                     |
-| Multi-select            | `multi_select`          | string           | ✔️                                     |
+| Multi-select            | `multi_select`          | string           | ✅                                     |
 | Status                  | `status`                | string           | ❌                                     |
-| Date                    | `date`                  | any date format  | ✔️ (range)                             |
-| Person                  | `person`                | username, email  | ✔️                                     |
-| Files & media           | `file`                  | file name, URL   | ✔️                                     |
+| Date                    | `date`                  | any date format  | ✅ (range)                             |
+| Person                  | `person`                | username, email  | ✅                                     |
+| Files & media           | `file`                  | file name, URL   | ✅                                     |
 | Checkbox                | `checkbox`              | `true`, `false`  | ❌                                     |
 | URL                     | `url`                   | string           | ❌                                     |
 | Email                   | `email`                 | string           | ❌                                     |
 | Phone                   | `phone_number`          | string           | ❌                                     |
 | **Advanced**            |                         |                  |                                        |
 | Formula                 | `formula`               | `---`            | `---`                                  |
-| Relation                | `---`                   | key, Notion URL  | ✔️                                     |
+| Relation                | `---`                   | key, Notion URL  | ✅                                     |
 | Rollup                  | `rollup`                | `---`            | `---`                                  |
 | Created time            | `created_time`          | any date format  | ❌                                     |
 | Created by              | `created_by`            | `---`            | `---`                                  |
