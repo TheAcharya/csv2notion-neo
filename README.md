@@ -50,7 +50,7 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 
 ## Installation
 
-### Using portable binary
+### Pre-compiled Binary (Recommended)
 
 [**Download the latest binary release**](https://github.com/vzhd1701/csv2notion/releases/latest) for your OS.
 
