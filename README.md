@@ -170,6 +170,9 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 
 The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option.
 
+1. Login to your [Notion](https://www.notion.so/login) account via a web browser.
+2. Find and copy the entire `token_v2` value including `v02%3Auser_token_or_cookies%` from your Notion session.
+
 <details><summary>Obtaining Notion Session Token (Safari)</summary>
 <p>
 
