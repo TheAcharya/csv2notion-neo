@@ -285,8 +285,9 @@ csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```
+![example_04.gif](assets/example_04.gif)
 
 </p>
 </details>
