@@ -27,6 +27,24 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 - Slower speed, since every row is imported separately
   - this is mitigated by multithreaded upload
 
+## Table of contents
+
+- [Installation](#Installation)
+  - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
+  - [From Source](#from-source)
+- [Usage](#usage)
+  - [Input](#examples)
+  - [Upload Speed](#upload-spped)
+  - [Duplicate CSV Columns](#Duplicatecsv-columns)
+  - [Duplicate CSV Columns](#Duplicatecsv-columns)
+  - [Duplicate CSV Columns](#Duplicatecsv-columns)
+  - [Duplicate CSV Columns](#Duplicatecsv-columns)
+  - [Duplicate CSV Columns](#Duplicatecsv-columns)
+  - [Duplicate CSV Columns](#Duplicatecsv-columns)
+- [Credits](#Credits)
+- [License](#License)
+- [Reporting Bugs](#reporting-bugs)
+
 ## Installation
 
 ### Using portable binary
@@ -148,19 +166,19 @@ The tool also requires you to provide a `token_v2` cookie for the Notion website
 
 **Important notice**. `token_v2` cookie provides complete access to your Notion account. Handle it with caution.
 
-### Upload speed
+### Upload Speed
 
 Due to API limitations, the upload is performed one row at a time. To speed things up, this tool uses multiple parallel threads. Use the `--max-threads` option to control how fast it will go. Try not to set it too high to avoid rate limiting by the Notion server.
 
-### Duplicate CSV columns
+### Duplicate CSV Columns
 
 Notion does not allow the database to have multiple columns with the same name. Therefore CSV columns will be treated as unique. Only the **last** column will be used if CSV has multiple columns with the same name. If you want the program to stop if it finds duplicate columns, use the `--fail-on-duplicate-csv-columns` flag.
 
-### Missing columns
+### Missing Columns
 
 If a CSV file has columns absent from Notion DB, they will be ignored by default. Use the `--add-missing-columns` flag if you want the tool to add missing columns into Notion DB. Use the `--fail-on-missing-columns` flag if you want the program to stop if it finds a column mismatch.
 
-### Column types
+### Column Types
 
 By default, the tool will try to guess column types based on their content. Alternatively, you can provide a comma-separated list of column types with the `--column-types` option when creating a new database or adding new columns with the `--add-missing-columns` flag. Since the first column in Notion DB is always text, the tool will use the list to set types for the rest of the columns.
 
@@ -212,7 +230,7 @@ If you want only select columns to be updated, use the `--merge-only-column` opt
 
 If you don't want the tool to add any new rows not already present in the Notion DB during merge, use the `--merge-skip-new` flag.
 
-### Relation columns
+### Relation Columns
 
 Notion database has a `relation` column type, which allows you to link together entries from different databases. The tool will try to match column data with keys from a linked database.
 
@@ -224,7 +242,7 @@ Since the tool treats rows in the linked DB as unique you can prevent ambiguous 
 
 If linked DB is not accessible (linked DB is deleted or your account doesn't have access to it), columns that point to it will be ignored. If you prefer the program to stop in this case, use the `--fail-on-inaccessible-relations` flag.
 
-### Cover image / Embedded image
+### Cover Image & Embedded Image
 
 The tool allows you to add an image to each row with the `--image-column` option. It will use one column from CSV as a data source for the image. It can be either a URL or a file name. The file name must be either an absolute path or a path relative to the CSV file. The tool will upload the file to the Notion server.
 
@@ -234,7 +252,7 @@ Column specified with the `--image-column` option will not be treated as a regul
 
 To add custom caption to image block uploaded with `--image-column-mode` set to `block`, use `--image-caption-column` option. To also keep the caption as a Notion DB column, use `--image-caption-column-keep` flag.
 
-### Icon
+### Icons
 
 The tool allows you to add an icon to each row with the `--icon-column` option. The behavior is the same as with `--image-column`; the only difference is that you can use URL, file name, or single emoji.
 
@@ -242,7 +260,7 @@ To also treat `--icon-column` as a regular column, use `--icon-column-keep` flag
 
 If you want to set the same icon for each row, use the `--default-icon` option. If both `--icon-column` and `--default-icon` are present, the default icon is used if the row doesn't have anything in the icon column.
 
-### Mandatory columns
+### Mandatory Columns
 
 If you want to ensure that specific columns always have value and are not allowed to be empty, then use the `--mandatory-column` option. The program execution will stop if validation fails.
 
