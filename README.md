@@ -274,8 +274,9 @@ csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```
+![example_03.gif](assets/example_03.gif)
 
 </p>
 </details>
