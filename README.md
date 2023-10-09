@@ -163,7 +163,15 @@ validation options:
 
 You must pass a single `*.csv` file for upload. The CSV file must contain at least 2 rows. The first row will be used as a header.
 
-Optionally you can provide a URL to an existing Notion database with the `--url` option; if not provided, the tool will create a new database named after the CSV file. The URL must link [to a database view](https://github.com/vzhd1701/csv2notion/raw/master/examples/db_link.png), not a page.
+Optionally you can provide a URL to an existing Notion database with the `--url` option; if not provided, the tool will create a new database named after the CSV file. The URL must link to a database view, not a page.
+
+<details><summary>Obtaining Database URL</summary>
+<p>
+
+
+</p>
+</details>
+
 
 The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option. For information on how to get it, see [this article](https://vzhd1701.notion.site/Find-Your-Notion-Token-5f57951434c1414d84ac72f88226eede).
 
