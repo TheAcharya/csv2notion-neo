@@ -5,8 +5,8 @@ labels: "bug"
 body:
 - type: input
   attributes:
-    label: csv2notion version
-    description: What version of csv2notion are you using? If unsure, run `csv2notion --version`
+    label: csv2notion-neo version
+    description: What version of csv2notion are you using? If unsure, run `csv2notion-neo --version`
   validations:
     required: true
 - type: dropdown
