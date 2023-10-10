@@ -32,7 +32,7 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 - [Installation](#installation)
   - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
   - [From Source](#from-source)
-- [Usage](#usage)
+- [Guide](#guide)
   - [Prerequisite](#prerequisite)
   - [Upload Speed](#upload-speed)
   - [Duplicate CSV Columns](#duplicate-csv-columns)
@@ -79,7 +79,7 @@ $ poetry install --no-dev
 $ poetry run csv2notion-neo
 ```
 
-## Usage
+## Guide
 
 ```plain
 $ csv2notion --help
