@@ -73,10 +73,10 @@ $ pip install --user csv2notion
 This project uses [poetry](https://python-poetry.org/) for dependency management and packaging. You will have to install it first. See [poetry official documentation](https://python-poetry.org/docs/) for instructions.
 
 ```shell
-$ git clone https://github.com/vzhd1701/csv2notion.git
-$ cd csv2notion/
+$ git clone https://github.com/TheAcharya/csv2notion-neo.git
+$ cd csv2notion-neo/
 $ poetry install --no-dev
-$ poetry run csv2notion
+$ poetry run csv2notion-neo
 ```
 
 ## Usage
