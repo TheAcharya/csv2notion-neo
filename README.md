@@ -54,12 +54,6 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 
 Download the latest release of the latest binary release [here](https://github.com/TheAcharya/csv2notion-neo/releases).
 
-### With [PIPX](https://github.com/pypa/pipx) (Recommended for Linux & Windows)
-
-```shell
-$ pipx install csv2notion
-```
-
 ### With PIP
 
 ```bash
