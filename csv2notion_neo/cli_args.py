@@ -17,7 +17,7 @@ HELP_ARGS_WIDTH = 50
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
-        description="Import/Merge CSV file into Notion database",
+        description="Upload & Merge CSV Data with Images to Notion Database",
         usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
         add_help=False,
         formatter_class=lambda prog: argparse.RawTextHelpFormatter(
