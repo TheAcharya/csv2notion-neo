@@ -6,9 +6,9 @@ from typing import Dict, Optional, Tuple
 import requests
 from notion.block import Block
 
-from csv2notion.utils_exceptions import NotionError
-from csv2notion.utils_file import get_file_sha256
-from csv2notion.utils_static import FileType
+from csv2notion_neo.utils_exceptions import NotionError
+from csv2notion_neo.utils_file import get_file_sha256
+from csv2notion_neo.utils_static import FileType
 from urllib.parse import urlparse
 
 Meta = Dict[str, str]

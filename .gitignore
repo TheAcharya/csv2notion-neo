@@ -152,3 +152,7 @@ Thumbs.db
 
 # Pycharm
 .idea/
+
+#local test
+marker_data_demo
+upload-markers.sh

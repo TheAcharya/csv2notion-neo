@@ -3,14 +3,14 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "csv2notion"
+name = "csv2notion_neo"
 version = "0.3.8"
 description = "Import/Merge CSV files into Notion database"
-authors = ["vzhd1701 <vzhd1701@gmail.com>"]
+authors = ["vzhd1701 <vzhd1701@gmail.com>","Arjun <arjunprakash027@gmail.com>"]
 readme = "README.md"
 include = ["CHANGELOG.md"]
 license = "MIT"
-repository = "https://github.com/vzhd1701/csv2notion"
+repository = "https://github.com/TheAcharya/csv2notion-neo"
 keywords = ["csv", "notion", "import", "merge"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -26,10 +26,10 @@ classifiers = [
 ]
 
 [tool.poetry.urls]
-"Changelog" = "https://github.com/vzhd1701/csv2notion/blob/master/CHANGELOG.md"
+"Changelog" = "https://github.com/TheAcharya/csv2notion-neo/blob/master/CHANGELOG.md"
 
 [tool.poetry.scripts]
-csv2notion = "csv2notion.cli:main"
+csv2notion_neo = "csv2notion_neo.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.7"

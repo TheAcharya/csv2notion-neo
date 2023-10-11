@@ -1,8 +1,8 @@
 import pytest
 from notion.utils import slugify
 
-from csv2notion.cli import cli
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.cli import cli
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()

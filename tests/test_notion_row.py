@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()
@@ -60,7 +60,7 @@ def test_notion_row_bad_upload(db_maker, tmp_path, mocker, smallest_gif):
 
     test_row = test_db.rows[0]
 
-    mocker.patch("csv2notion.notion_row_upload_file._upload_file", return_value="")
+    mocker.patch("csv2notion_neo.notion_row_upload_file._upload_file", return_value="")
     with pytest.raises(NotionError) as e:
         test_row.cover = test_image
 

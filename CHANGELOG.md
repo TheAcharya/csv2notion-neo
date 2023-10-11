@@ -1,3 +1,6 @@
+### [1.0.0](https://github.com/TheAcharya/csv2notion-neo/commit/64e28be4b92786b08d950979601b35ee66ce8a91) 
+- A new fork of the old csv2notion created 
+
 ### [0.3.8](https://github.com/vzhd1701/csv2notion/compare/v0.3.7...v0.3.8) (2023-05-07)
 
 ### Bug Fixes

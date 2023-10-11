@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from csv2notion.cli import cli
+from csv2notion_neo.cli import cli
 
 
 @pytest.mark.vcr()
@@ -72,7 +72,7 @@ def test_column_types_status_wrong_skip(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text(f"a,b\na1,Bad")
 
-    with caplog.at_level(logging.WARNING, logger="csv2notion"):
+    with caplog.at_level(logging.WARNING, logger="csv2notion_neo"):
         test_db = db_maker.from_cli(
             "--token",
             db_maker.token,
@@ -103,7 +103,7 @@ def test_column_types_status_wrong_fail(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text(f"a,b\na1,Bad")
 
-    with caplog.at_level(logging.WARNING, logger="csv2notion"):
+    with caplog.at_level(logging.WARNING, logger="csv2notion_neo"):
         e = db_maker.from_raising_cli(
             "--token",
             db_maker.token,

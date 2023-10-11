@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()

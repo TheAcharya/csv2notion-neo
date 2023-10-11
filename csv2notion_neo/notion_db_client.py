@@ -6,7 +6,7 @@ from notion.space import Space
 from notion.store import RecordStore
 from notion.user import User
 
-from csv2notion.notion_db_collection import CollectionExtended
+from csv2notion_neo.notion_db_collection import CollectionExtended
 
 
 class NotionClientExtended(NotionClient):

@@ -2,8 +2,8 @@ import logging
 
 import pytest
 
-from csv2notion.cli import cli
-from csv2notion.utils_exceptions import CriticalError
+from csv2notion_neo.cli import cli
+from csv2notion_neo.utils_exceptions import CriticalError
 
 
 def test_fail_on_duplicate_csv_columns(tmp_path):
@@ -53,7 +53,7 @@ def test_fail_on_duplicate_csv_columns_ignore(tmp_path, db_maker, caplog):
 
     test_db = db_maker.from_csv_head("a,b")
 
-    with caplog.at_level(logging.WARNING, logger="csv2notion"):
+    with caplog.at_level(logging.WARNING, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,

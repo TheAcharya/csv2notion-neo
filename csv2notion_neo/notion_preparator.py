@@ -1,10 +1,10 @@
 import logging
 from typing import Callable, Dict, Iterable, List, Set, Tuple
 
-from csv2notion.csv_data import CSVData
-from csv2notion.notion_db import NotionDB
-from csv2notion.utils_exceptions import NotionError
-from csv2notion.utils_static import UNSETTABLE_TYPES, ConversionRules
+from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.notion_db import NotionDB
+from csv2notion_neo.utils_exceptions import NotionError
+from csv2notion_neo.utils_static import UNSETTABLE_TYPES, ConversionRules
 
 logger = logging.getLogger(__name__)
 

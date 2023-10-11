@@ -2,9 +2,9 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable, Iterable, Iterator
 
-from csv2notion.notion_db import NotionDB
-from csv2notion.notion_db_client import NotionClientExtended
-from csv2notion.notion_uploader import NotionRowUploader
+from csv2notion_neo.notion_db import NotionDB
+from csv2notion_neo.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_uploader import NotionRowUploader
 
 
 class ThreadRowUploader(object):

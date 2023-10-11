@@ -5,11 +5,11 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from csv2notion.cli_args import parse_args
-from csv2notion.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
-from csv2notion.csv_data import CSVData
-from csv2notion.notion_db import get_collection_id, get_notion_client
-from csv2notion.utils_exceptions import CriticalError, NotionError
+from csv2notion_neo.cli_args import parse_args
+from csv2notion_neo.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
+from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.notion_db import get_collection_id, get_notion_client
+from csv2notion_neo.utils_exceptions import CriticalError, NotionError
 
 logger = logging.getLogger(__name__)
 

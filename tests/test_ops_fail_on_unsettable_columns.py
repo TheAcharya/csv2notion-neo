@@ -3,7 +3,7 @@ import logging
 import pytest
 from notion.user import User
 
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()
@@ -12,7 +12,7 @@ def test_fail_on_unsettable_columns(tmp_path, db_maker, caplog):
     test_file = tmp_path / "test.csv"
     test_file.write_text("a,b,c,d,e\na,b,c,d,e")
 
-    with caplog.at_level(logging.WARNING, logger="csv2notion"):
+    with caplog.at_level(logging.WARNING, logger="csv2notion_neo"):
         e = db_maker.from_raising_cli(
             "--token",
             db_maker.token,
@@ -36,7 +36,7 @@ def test_fail_on_unsettable_columns_ok(tmp_path, caplog, db_maker):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text("a,b,c,d,e\na,b,c,d,e")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         test_db = db_maker.from_cli(
             "--token",
             db_maker.token,

@@ -4,8 +4,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional
 
-from csv2notion.notion_type_guess import guess_type_by_values
-from csv2notion.utils_exceptions import CriticalError
+from csv2notion_neo.notion_type_guess import guess_type_by_values
+from csv2notion_neo.utils_exceptions import CriticalError
 
 CSVRowType = Dict[str, str]
 

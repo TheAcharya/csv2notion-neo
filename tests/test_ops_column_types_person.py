@@ -39,7 +39,7 @@ def test_column_types_person_missing(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text("a,b\na1,missing")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         test_db = db_maker.from_cli(
             "--token",
             db_maker.token,
@@ -65,7 +65,7 @@ def test_column_types_person_missing_fail(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text("a,b\na1,missing")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         e = db_maker.from_raising_cli(
             "--token",
             db_maker.token,
@@ -112,7 +112,7 @@ def test_column_types_person_email_external(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text(f"a,b\na1,{test_user.email}")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         test_db = db_maker.from_cli(
             "--token",
             db_maker.token,
@@ -136,7 +136,7 @@ def test_column_types_person_email_missing(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text("a,b\na1,missing@mail.com")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         test_db = db_maker.from_cli(
             "--token",
             db_maker.token,
@@ -162,7 +162,7 @@ def test_column_types_person_email_missing_fail(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text("a,b\na1,missing@mail.com")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         e = db_maker.from_raising_cli(
             "--token",
             db_maker.token,

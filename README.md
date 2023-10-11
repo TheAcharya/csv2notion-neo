@@ -70,14 +70,14 @@ This project uses [poetry](https://python-poetry.org/) for dependency management
 $ git clone https://github.com/TheAcharya/csv2notion-neo.git
 $ cd csv2notion-neo/
 $ poetry install --no-dev
-$ poetry run csv2notion-neo
+$ poetry run csv2notion_neo
 ```
 
 ## Guide
 
 ```plain
-$ csv2notion --help
-usage: csv2notion [-h] --token TOKEN [--url URL] [OPTION]... FILE
+$ csv2notion_neo --help
+usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
 
 Import/Merge CSV file into Notion database
 
@@ -296,7 +296,7 @@ If you want to ensure that specific columns always have value and are not allowe
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE test.csv
 ```
 ![example_01.png](assets/example_01.png)
 
@@ -307,7 +307,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
 ```
 ![example_02.png](assets/example_02.png)
 
@@ -318,7 +318,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```
 ![example_03.gif](assets/example_03.gif)
 
@@ -329,7 +329,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```
 ![example_04.gif](assets/example_04.gif)
 
@@ -340,7 +340,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
+csv2notion_neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
 ```
 ![example_05.gif](assets/example_05.gif)
 
@@ -351,7 +351,7 @@ csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-co
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 ```
 ![example_06.gif](assets/example_06.gif)
 
@@ -362,7 +362,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 ```
 ![example_07.gif](assets/example_07.gif)
 
@@ -373,7 +373,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
 ```
 ![example_08.gif](assets/example_08.gif)
 

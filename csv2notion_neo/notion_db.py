@@ -4,13 +4,13 @@ import requests
 from notion.user import User
 from notion.utils import InvalidNotionIdentifier
 
-from csv2notion.csv_data import CSVData
-from csv2notion.notion_db_client import NotionClientExtended
-from csv2notion.notion_db_collection import CollectionExtended
-from csv2notion.notion_row import CollectionRowBlockExtended
-from csv2notion.utils_db import make_status_column
-from csv2notion.utils_exceptions import NotionError
-from csv2notion.utils_rand_id import rand_id_list
+from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_db_collection import CollectionExtended
+from csv2notion_neo.notion_row import CollectionRowBlockExtended
+from csv2notion_neo.utils_db import make_status_column
+from csv2notion_neo.utils_exceptions import NotionError
+from csv2notion_neo.utils_rand_id import rand_id_list
 
 
 class NotionDB(object):  # noqa: WPS214

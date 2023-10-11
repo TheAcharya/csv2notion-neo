@@ -16,7 +16,7 @@ on:
 
 env:
   BUILD_POETRY_VERSION: 1.4
-  PACKAGE_NAME: csv2notion-neo
+  PACKAGE_NAME: csv2notion_neo
 
 jobs:
   test:

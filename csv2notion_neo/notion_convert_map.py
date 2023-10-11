@@ -7,10 +7,10 @@ from dateutil.parser import parse as date_parse
 from emoji import distinct_emoji_list, emoji_count, replace_emoji
 from notion.collection import NotionDate
 
-from csv2notion.notion_type_guess import is_url
-from csv2notion.utils_exceptions import TypeConversionError
-from csv2notion.utils_static import FileType
-from csv2notion.utils_str import split_str
+from csv2notion_neo.notion_type_guess import is_url
+from csv2notion_neo.utils_exceptions import TypeConversionError
+from csv2notion_neo.utils_static import FileType
+from csv2notion_neo.utils_str import split_str
 
 
 def map_checkbox(s: str) -> bool:
