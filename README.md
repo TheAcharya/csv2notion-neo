@@ -57,7 +57,7 @@ Download the latest release of the latest binary release [here](https://github.c
 ### With PIP
 
 ```bash
-$ pip install --user csv2notion
+$ pip install --user csv2notion_neo
 ```
 
 **Python 3.7 or later required.**
@@ -68,7 +68,7 @@ This project uses [poetry](https://python-poetry.org/) for dependency management
 
 ```shell
 $ git clone https://github.com/TheAcharya/csv2notion-neo.git
-$ cd csv2notion-neo/
+$ cd csv2notion_neo/
 $ poetry install --no-dev
 $ poetry run csv2notion_neo
 ```
@@ -79,7 +79,7 @@ $ poetry run csv2notion_neo
 $ csv2notion_neo --help
 usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
 
-Import/Merge CSV file into Notion database
+Upload & Merge CSV Data with Images to Notion Database
 
 positional arguments:
   FILE                               CSV file to upload
