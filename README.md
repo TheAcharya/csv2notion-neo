@@ -3,7 +3,6 @@
 [![PyPI version](https://img.shields.io/pypi/v/csv2notion?label=version)](https://pypi.python.org/pypi/csv2notion)
 [![Python Version](https://img.shields.io/pypi/pyversions/csv2notion.svg)](https://pypi.org/project/csv2notion/)
 [![tests](https://github.com/vzhd1701/csv2notion/actions/workflows/test.yml/badge.svg)](https://github.com/vzhd1701/csv2notion/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/vzhd1701/csv2notion/branch/master/graph/badge.svg)](https://codecov.io/gh/vzhd1701/csv2notion)
 
 An alternative way to import `*.csv` files to [Notion.so](https://notion.so).
 
