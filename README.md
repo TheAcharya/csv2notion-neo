@@ -49,7 +49,7 @@ Due to current limitations of the official Notion SDK this tool is using the uno
 
 ## Background
 
-Why was this project created? Ideally, this repository should not exist. Since the original repository is inactive, we have forked and spin-off the project as **CSV2Notion Neo** to maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix and update the tool in a timely manner.
+Why was this repository created? Ideally, this repository should not exist. Since the original repository is inactive, we have forked and spin-off the project as **CSV2Notion Neo** to maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix and update the tool in a timely manner.
 
 ## Installation
 
