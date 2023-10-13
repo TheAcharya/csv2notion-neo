@@ -3,23 +3,27 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "csv2notion_neo"
-version = "0.3.8"
+name = "CSV2Notion Neo"
+version = "1.0.0"
 description = "Upload & Merge CSV Data with Images to Notion Database"
-authors = ["vzhd1701 <vzhd1701@gmail.com>","Arjun <arjunprakash027@gmail.com>"]
+authors = ["vzhd1701 <vzhd1701@gmail.com>", "Arjun <arjunprakash027@gmail.com>"]
 readme = "README.md"
 include = ["CHANGELOG.md"]
 license = "MIT"
+homepage = "https://github.com/TheAcharya/csv2notion-neo"
 repository = "https://github.com/TheAcharya/csv2notion-neo"
+documentation = "https://github.com/TheAcharya/csv2notion-neo/blob/master/README.md"
 keywords = ["csv", "notion", "import", "merge"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Environment :: Console",
     "Operating System :: MacOS",
     "Operating System :: Microsoft",
     "Operating System :: Unix",
+    "Topic :: Database",
     "Topic :: Internet",
     "Topic :: Terminals",
     "Topic :: Utilities",
@@ -153,7 +157,7 @@ skip_gitignore = true
     ]
 
 [tool.mypy]
-files = "csv2notion"
+files = "csv2notion_neo"
 
 disallow_untyped_defs = true
 disallow_untyped_calls = true
