@@ -82,6 +82,8 @@ $ poetry run csv2notion_neo
 $ csv2notion_neo --help
 usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
 
+https://github.com/TheAcharya/csv2notion-neo
+
 Upload & Merge CSV Data with Images to Notion Database
 
 positional arguments:
