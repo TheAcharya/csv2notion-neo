@@ -3,7 +3,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "CSV2Notion Neo"
+name = "csv2notion_neo"
 version = "1.0.0"
 description = "Upload & Merge CSV Data with Images to Notion Database"
 authors = ["vzhd1701 <vzhd1701@gmail.com>", "Arjun <arjunprakash027@gmail.com>"]
