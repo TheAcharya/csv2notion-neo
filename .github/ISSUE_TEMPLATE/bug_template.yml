@@ -5,8 +5,8 @@ labels: "bug"
 body:
 - type: input
   attributes:
-    label: csv2notion-neo version
-    description: What version of csv2notion are you using? If unsure, run `csv2notion-neo --version`
+    label: CSV2Notion Neo Version?
+    description: Which version of CSV2Notion Neo are you using? If unsure, run `csv2notion_neo --version`
   validations:
     required: true
 - type: dropdown
@@ -20,14 +20,14 @@ body:
     required: true
 - type: input
   attributes:
-    label: OS Version / Linux distribution
-    description: What OS version or Linux distribution version are you using?
-    placeholder: "e.g. Windows 10, Ubuntu 20.04"
+    label: OS Version or Linux distribution
+    description: Which OS version or Linux distribution version are you using?
+    placeholder: "e.g. macOS Sonoma 14.0, Windows 10, Ubuntu 20.04"
   validations:
     required: true
 - type: textarea
   attributes:
-    label: Bug description
+    label: Bug Description
     description: A clear description of the bug and how to reproduce it.
   validations:
     required: true
