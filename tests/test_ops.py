@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from csv2notion.cli import cli, main
-from csv2notion.utils_exceptions import CriticalError, NotionError
+from csv2notion_neo.cli import cli, main
+from csv2notion_neo.utils_exceptions import CriticalError, NotionError
 
 
 def test_no_args():
@@ -224,7 +224,7 @@ def test_inconsistent_columns_csv(tmp_path, db_maker, caplog):
     test_file = tmp_path / f"{db_maker.page_name}.csv"
     test_file.write_text("a,b\na,b,c\n")
 
-    with caplog.at_level(logging.WARNING, logger="csv2notion"):
+    with caplog.at_level(logging.WARNING, logger="csv2notion_neo"):
         test_db = db_maker.from_cli("--token", db_maker.token, str(test_file))
 
     assert test_db.header == {"a", "b"}
@@ -258,7 +258,7 @@ def test_existing_page_column_mismatch(tmp_path, db_maker):
 def test_log_file(fs, mocker):
     mocker.patch(
         "sys.argv",
-        ["csv2notion", "--token", "fake", "--log", "test_log.txt", "fake_file.csv"],
+        ["csv2notion_neo", "--token", "fake", "--log", "test_log.txt", "fake_file.csv"],
     )
 
     with pytest.raises(SystemExit) as e:
@@ -271,7 +271,7 @@ def test_log_file(fs, mocker):
 
 
 def test_keyboard_interrupt(mocker):
-    mocker.patch("csv2notion.cli.cli", side_effect=KeyboardInterrupt)
+    mocker.patch("csv2notion_neo.cli.cli", side_effect=KeyboardInterrupt)
 
     with pytest.raises(SystemExit) as e:
         main()
@@ -280,4 +280,4 @@ def test_keyboard_interrupt(mocker):
 
 
 def test_main_import():
-    from csv2notion import __main__  # noqa: F401, WPS433
+    from csv2notion_neo import __main__  # noqa: F401, WPS433

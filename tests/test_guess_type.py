@@ -1,6 +1,6 @@
 import pytest
 
-from csv2notion.notion_type_guess import (
+from csv2notion_neo.notion_type_guess import (
     guess_type_by_values,
     is_checkbox,
     is_email,

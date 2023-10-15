@@ -6,9 +6,9 @@ from notion.user import User
 from pyfakefs.fake_filesystem_unittest import Patcher
 from testfixtures import LogCapture, ShouldRaise
 
-from csv2notion.cli import cli
-from csv2notion.csv_data import CSVData
-from csv2notion.notion_db import notion_db_from_csv
+from csv2notion_neo.cli import cli
+from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.notion_db import notion_db_from_csv
 from tests.fixtures.db_maker_notion_db import NotionDB
 
 
@@ -44,7 +44,7 @@ class NotionDBMaker(object):
         return new_db
 
     def from_cli(self, *args: str) -> NotionDB:
-        with LogCapture("csv2notion", level=logging.INFO) as log:
+        with LogCapture("csv2notion_neo", level=logging.INFO) as log:
             cli(*args)
 
         url = re.search("New database URL: (.*)$", str(log), re.M)[1]
@@ -53,7 +53,7 @@ class NotionDBMaker(object):
 
     def from_raising_cli(self, *args: str) -> ShouldRaise:
         with ShouldRaise() as e:
-            with LogCapture("csv2notion", level=logging.INFO) as log:
+            with LogCapture("csv2notion_neo", level=logging.INFO) as log:
                 cli(*args)
 
         url = re.search("New database URL: (.*)$", str(log), re.M)[1]

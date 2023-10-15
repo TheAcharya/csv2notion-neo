@@ -5,14 +5,14 @@ from typing import List
 
 from tqdm import tqdm
 
-from csv2notion.csv_data import CSVData
-from csv2notion.notion_convert import NotionRowConverter
-from csv2notion.notion_db import NotionDB, notion_db_from_csv
-from csv2notion.notion_db_client import NotionClientExtended
-from csv2notion.notion_preparator import NotionPreparator
-from csv2notion.notion_uploader import NotionUploadRow
-from csv2notion.utils_static import ConversionRules
-from csv2notion.utils_threading import ThreadRowUploader, process_iter
+from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.notion_convert import NotionRowConverter
+from csv2notion_neo.notion_db import NotionDB, notion_db_from_csv
+from csv2notion_neo.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_preparator import NotionPreparator
+from csv2notion_neo.notion_uploader import NotionUploadRow
+from csv2notion_neo.utils_static import ConversionRules
+from csv2notion_neo.utils_threading import ThreadRowUploader, process_iter
 
 logger = logging.getLogger(__name__)
 

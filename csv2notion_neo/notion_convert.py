@@ -6,8 +6,8 @@ from typing import Any, Callable, Dict, List, Optional
 from notion.user import User
 from notion.utils import InvalidNotionIdentifier, extract_id
 
-from csv2notion.csv_data import CSVData, CSVRowType
-from csv2notion.notion_convert_map import (
+from csv2notion_neo.csv_data import CSVData, CSVRowType
+from csv2notion_neo.notion_convert_map import (
     map_checkbox,
     map_date,
     map_icon,
@@ -15,13 +15,13 @@ from csv2notion.notion_convert_map import (
     map_number,
     map_url_or_file,
 )
-from csv2notion.notion_db import NotionDB
-from csv2notion.notion_row import CollectionRowBlockExtended
-from csv2notion.notion_type_guess import is_email
-from csv2notion.notion_uploader import NotionUploadRow
-from csv2notion.utils_exceptions import NotionError, TypeConversionError
-from csv2notion.utils_static import ConversionRules, FileType
-from csv2notion.utils_str import split_str
+from csv2notion_neo.notion_db import NotionDB
+from csv2notion_neo.notion_row import CollectionRowBlockExtended
+from csv2notion_neo.notion_type_guess import is_email
+from csv2notion_neo.notion_uploader import NotionUploadRow
+from csv2notion_neo.utils_exceptions import NotionError, TypeConversionError
+from csv2notion_neo.utils_static import ConversionRules, FileType
+from csv2notion_neo.utils_str import split_str
 
 logger = logging.getLogger(__name__)
 

@@ -2,8 +2,8 @@ import logging
 
 import pytest
 
-from csv2notion.cli import cli
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.cli import cli
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()
@@ -35,7 +35,7 @@ def test_missing_columns_action_ignore(tmp_path, db_maker, caplog):
 
     test_db = db_maker.from_csv_head("a,b")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,
@@ -59,7 +59,7 @@ def test_missing_columns_action_add(tmp_path, db_maker, caplog):
 
     test_db = db_maker.from_csv_head("a,b")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,

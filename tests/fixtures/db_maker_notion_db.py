@@ -1,5 +1,5 @@
-from csv2notion.notion_row import CollectionRowBlockExtended
-from csv2notion.utils_rand_id import rand_id
+from csv2notion_neo.notion_row import CollectionRowBlockExtended
+from csv2notion_neo.utils_rand_id import rand_id
 
 
 class NotionDB(object):  # noqa: WPS214

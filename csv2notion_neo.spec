@@ -5,11 +5,11 @@ block_cipher = None
 
 spec_root = os.path.abspath(SPECPATH)
 
-a = Analysis(['csv2notion/__main__.py'],
+a = Analysis(['csv2notion_neo/__main__.py'],
              pathex=[spec_root],
              binaries=[],
              datas=[],
-             hiddenimports=[],
+             hiddenimports=['emoji'],
              hookspath=[],
              runtime_hooks=[],
              excludes=["multiprocessing"],
@@ -25,7 +25,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='csv2notion',
+          name='csv2notion_neo',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from csv2notion.notion_db import NotionDB
-from csv2notion.notion_row import CollectionRowBlockExtended
+from csv2notion_neo.notion_db import NotionDB
+from csv2notion_neo.notion_row import CollectionRowBlockExtended
 
 
 @dataclass

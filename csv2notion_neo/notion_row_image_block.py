@@ -5,7 +5,7 @@ from notion.collection import CollectionRowBlock
 from notion.maps import field_map
 from notion.operations import build_operation
 
-from csv2notion.notion_row_upload_file import get_file_id
+from csv2notion_neo.notion_row_upload_file import get_file_id
 
 
 class CoverImageBlock(ImageBlock):

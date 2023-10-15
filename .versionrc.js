@@ -28,7 +28,7 @@ let packageFiles = [
 
 let bumpFiles = packageFiles.concat([
   {
-    filename: "csv2notion/version.py",
+    filename: "csv2notion_neo/version.py",
     updater: version_updater_python,
   }
 ])

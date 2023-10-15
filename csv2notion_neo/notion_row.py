@@ -9,9 +9,9 @@ from notion.maps import field_map
 from notion.operations import build_operation
 from notion.utils import remove_signed_prefix_as_needed
 
-from csv2notion.notion_row_image_block import RowCoverImageBlock
-from csv2notion.notion_row_upload_file import Meta, is_meta_different, upload_filetype
-from csv2notion.utils_static import FileType
+from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
+from csv2notion_neo.notion_row_upload_file import Meta, is_meta_different, upload_filetype
+from csv2notion_neo.utils_static import FileType
 
 NamedURLs = Dict[str, str]
 

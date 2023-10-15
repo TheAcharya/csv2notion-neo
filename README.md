@@ -1,9 +1,8 @@
 # CSV2Notion Neo
 
-[![PyPI version](https://img.shields.io/pypi/v/csv2notion?label=version)](https://pypi.python.org/pypi/csv2notion)
-[![Python Version](https://img.shields.io/pypi/pyversions/csv2notion.svg)](https://pypi.org/project/csv2notion/)
-[![tests](https://github.com/vzhd1701/csv2notion/actions/workflows/test.yml/badge.svg)](https://github.com/vzhd1701/csv2notion/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/vzhd1701/csv2notion/branch/master/graph/badge.svg)](https://codecov.io/gh/vzhd1701/csv2notion)
+[![PyPI version](https://img.shields.io/pypi/v/csv2notion-neo?label=version)](https://pypi.python.org/pypi/csv2notion-neo)
+[![Python Version](https://img.shields.io/pypi/pyversions/csv2notion-neo.svg)](https://pypi.org/project/csv2notion-neo/)
+[![release_pypi](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml)
 
 An alternative way to import `*.csv` files to [Notion.so](https://notion.so).
 
@@ -62,7 +61,7 @@ Download the latest release of the latest binary release [here](https://github.c
 ### With PIP
 
 ```bash
-$ pip install --user csv2notion
+$ pip install --user csv2notion_neo
 ```
 
 **Python 3.7 or later required.**
@@ -73,18 +72,20 @@ This project uses [poetry](https://python-poetry.org/) for dependency management
 
 ```shell
 $ git clone https://github.com/TheAcharya/csv2notion-neo.git
-$ cd csv2notion-neo/
+$ cd csv2notion_neo/
 $ poetry install --no-dev
-$ poetry run csv2notion-neo
+$ poetry run csv2notion_neo
 ```
 
 ## Guide
 
 ```plain
-$ csv2notion --help
-usage: csv2notion [-h] --token TOKEN [--url URL] [OPTION]... FILE
+$ csv2notion_neo --help
+usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
 
-Import/Merge CSV file into Notion database
+https://github.com/TheAcharya/csv2notion-neo
+
+Upload & Merge CSV Data with Images to Notion Database
 
 positional arguments:
   FILE                               CSV file to upload
@@ -301,7 +302,7 @@ If you want to ensure that specific columns always have value and are not allowe
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE test.csv
 ```
 ![example_01.png](assets/example_01.png)
 
@@ -312,7 +313,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
 ```
 ![example_02.png](assets/example_02.png)
 
@@ -323,7 +324,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```
 ![example_03.gif](assets/example_03.gif)
 
@@ -334,7 +335,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```
 ![example_04.gif](assets/example_04.gif)
 
@@ -345,7 +346,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
+csv2notion_neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
 ```
 ![example_05.gif](assets/example_05.gif)
 
@@ -356,7 +357,7 @@ csv2notion-neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-co
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 ```
 ![example_06.gif](assets/example_06.gif)
 
@@ -367,7 +368,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 ```
 ![example_07.gif](assets/example_07.gif)
 
@@ -378,7 +379,7 @@ csv2notion-neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 <p>
 
 ```shell
-csv2notion-neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
 ```
 ![example_08.gif](assets/example_08.gif)
 

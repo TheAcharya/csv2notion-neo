@@ -2,8 +2,8 @@ import logging
 
 import pytest
 
-from csv2notion.cli import cli
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.cli import cli
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()
@@ -34,7 +34,7 @@ def test_icon_column_file_not_found(tmp_path, db_maker, caplog):
     test_file = tmp_path / "test.csv"
     test_file.write_text("a,b,icon file\na,b,test_image.jpg\n")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         test_db = db_maker.from_cli(
             "--token",
             db_maker.token,
@@ -59,7 +59,7 @@ def test_icon_column_file_not_found_fail(tmp_path, db_maker, caplog):
     test_file = tmp_path / "test.csv"
     test_file.write_text("a,b,icon file\na,b,test_image.jpg\n")
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         e = db_maker.from_raising_cli(
             "--token",
             db_maker.token,

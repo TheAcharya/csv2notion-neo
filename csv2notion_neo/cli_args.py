@@ -2,11 +2,11 @@ import argparse
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
-from csv2notion.notion_convert_map import map_icon
-from csv2notion.utils_exceptions import CriticalError
-from csv2notion.utils_static import ALLOWED_TYPES, FileType
-from csv2notion.utils_str import split_str
-from csv2notion.version import __version__
+from csv2notion_neo.notion_convert_map import map_icon
+from csv2notion_neo.utils_exceptions import CriticalError
+from csv2notion_neo.utils_static import ALLOWED_TYPES, FileType
+from csv2notion_neo.utils_str import split_str
+from csv2notion_neo.version import __version__
 
 ArgToken = Union[str, Tuple[str, str]]
 ArgOption = Dict[str, Any]
@@ -16,8 +16,8 @@ HELP_ARGS_WIDTH = 50
 
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="csv2notion",
-        description="Import/Merge CSV file into Notion database",
+        prog="csv2notion_neo",
+        description="Upload & Merge CSV Data with Images to Notion Database",
         usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
         add_help=False,
         formatter_class=lambda prog: argparse.RawTextHelpFormatter(

@@ -3,8 +3,8 @@ import logging
 import pytest
 from notion.utils import slugify
 
-from csv2notion.cli import cli
-from csv2notion.utils_exceptions import NotionError
+from csv2notion_neo.cli import cli
+from csv2notion_neo.utils_exceptions import NotionError
 
 
 @pytest.mark.vcr()
@@ -18,7 +18,7 @@ def test_relations_missing(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,
@@ -58,7 +58,7 @@ def test_relations_missing_fail(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         with pytest.raises(NotionError) as e:
             cli(
                 "--token",
@@ -91,7 +91,7 @@ def test_relations_url_404(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,
@@ -133,7 +133,7 @@ def test_relations_url_404_fail(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         with pytest.raises(NotionError) as e:
             cli(
                 "--token",
@@ -166,7 +166,7 @@ def test_relations_url_bad(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,
@@ -204,7 +204,7 @@ def test_relations_url_bad_fail(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         with pytest.raises(NotionError) as e:
             cli(
                 "--token",
@@ -271,7 +271,7 @@ def test_relations_add_missing_relations_url_404(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,
@@ -314,7 +314,7 @@ def test_relations_add_missing_relations_url_404_fail(tmp_path, db_maker, caplog
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         with pytest.raises(NotionError) as e:
             cli(
                 "--token",
@@ -348,7 +348,7 @@ def test_relations_add_missing_relations_url_bad(tmp_path, db_maker, caplog):
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         cli(
             "--token",
             db_maker.token,
@@ -387,7 +387,7 @@ def test_relations_add_missing_relations_url_bad_fail(tmp_path, db_maker, caplog
 
     test_db.set_relation("b", test_db_relation)
 
-    with caplog.at_level(logging.INFO, logger="csv2notion"):
+    with caplog.at_level(logging.INFO, logger="csv2notion_neo"):
         with pytest.raises(NotionError) as e:
             cli(
                 "--token",

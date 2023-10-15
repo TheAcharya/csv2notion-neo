@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from notion.client import NotionClient
 
-from csv2notion.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_db_client import NotionClientExtended
 from tests.fixtures.db_maker_class import NotionDBMaker
 
 

@@ -3,7 +3,7 @@ import hashlib
 import pytest
 from notion.block import ImageBlock, TextBlock
 
-from csv2notion.cli import cli
+from csv2notion_neo.cli import cli
 
 
 @pytest.mark.vcr()
