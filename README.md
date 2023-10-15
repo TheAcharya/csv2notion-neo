@@ -4,9 +4,7 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/csv2notion-neo.svg)](https://pypi.org/project/csv2notion-neo/)
 [![release_pypi](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml)
 
-An alternative way to import `*.csv` files to [Notion.so](https://notion.so).
-
-Due to current limitations of the official Notion SDK this tool is using the unofficial SDK by **Jamie Alexandre** [notion-py](https://github.com/jamalex/notion-py).
+An advance method to upload & merge `*.csv` files to [Notion.so](https://notion.so). CSV2Notion Neo uses [notion-py](https://github.com/jamalex/notion-py) API Library.
 
 ## Core Features
 
