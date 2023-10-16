@@ -1,6 +1,5 @@
 # CSV2Notion Neo
 
-[![License: MIT](http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/TheAcharya/MarkersExtractor/blob/main/LICENSE)
 [![PyPI version](https://img.shields.io/pypi/v/csv2notion-neo?label=version)](https://pypi.python.org/pypi/csv2notion-neo)
 [![Python Version](https://img.shields.io/pypi/pyversions/csv2notion-neo.svg)](https://pypi.org/project/csv2notion-neo/)
 [![release_pypi](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml)
