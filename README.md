@@ -159,8 +159,8 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 
 <details><summary>Obtaining Database URL</summary>
 <p>
-  
-![database_url.png](assets/database_url.png)
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/database_url.png?raw=true"> </p>
 
 </p>
 </details>
@@ -178,8 +178,8 @@ Enable Web Inspector
 
 - If you don’t see the Develop menu in the menu bar, choose Safari, Settings, click Advanced, then select “Show features for web developers”.
 - Press `⌥ + ⌘ + i` to show Web Inspector
-  
-![notion_token_safari.gif](assets/notion_token_safari.gif)
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_safari.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -188,8 +188,8 @@ Enable Web Inspector
 <p>
 
 Go to Setting, Privacy and security
-  
-![notion_token_brave.gif](assets/notion_token_brave.gif)
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_brave.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -302,7 +302,7 @@ If you want to ensure that specific columns always have value and are not allowe
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE test.csv
 ```
-![example_01.png](assets/example_01.png)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_01.png?raw=true"> </p>
 
 </p>
 </details>
@@ -313,7 +313,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE test.csv
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
 ```
-![example_02.png](assets/example_02.png)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_02.png?raw=true"> </p>
 
 </p>
 </details>
@@ -324,7 +324,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```
-![example_03.gif](assets/example_03.gif)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_03.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -335,7 +335,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```
-![example_04.gif](assets/example_04.gif)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_04.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -346,7 +346,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```shell
 csv2notion_neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
 ```
-![example_05.gif](assets/example_05.gif)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_05.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -357,7 +357,7 @@ csv2notion_neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-co
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 ```
-![example_06.gif](assets/example_06.gif)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_06.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -368,7 +368,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 ```
-![example_07.gif](assets/example_07.gif)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_07.gif?raw=true"> </p>
 
 </p>
 </details>
@@ -379,7 +379,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 ```shell
 csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
 ```
-![example_08.gif](assets/example_08.gif)
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_08.gif?raw=true"> </p>
 
 </p>
 </details>
