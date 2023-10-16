@@ -130,13 +130,6 @@ jobs:
     needs: [build_binaries]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Extract release changelog
-        run: |
-          sed "0,/### \[/d;/### \[/Q" CHANGELOG.md > release_changelog
-          echo -n "**Full Changelog**: " >> release_changelog
-          sed -n 's/### \[.*\](\(.*\)) (.*/\1/p' CHANGELOG.md | head -1 >> release_changelog
-
       - name: Get tag version
         run: |
           APP_VERSION=$(sed -n 's/^__version__ = "\([^"]\+\)"$/\1/p' ${{ env.PACKAGE_NAME }}/version.py)
@@ -169,7 +162,6 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          bodyFile: release_changelog
           artifacts: "dist/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.TAG_VERSION }}
