@@ -4,7 +4,7 @@
 [![Python Version](https://img.shields.io/pypi/pyversions/csv2notion-neo.svg)](https://pypi.org/project/csv2notion-neo/)
 [![release_pypi](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml)
 
-An advance method to upload & merge `*.csv` files to [Notion.so](https://notion.so). CSV2Notion Neo uses [notion-py](https://github.com/jamalex/notion-py) API Library.
+An advance method to upload & merge `*.csv` files to [Notion](https://notion.so). CSV2Notion Neo uses [notion-py](https://github.com/jamalex/notion-py) API Library.
 
 ## Core Features
 
@@ -48,7 +48,9 @@ An advance method to upload & merge `*.csv` files to [Notion.so](https://notion.
 
 ## Background
 
-Why was this project created? Ideally, this repository should not exist. Since the original repository is inactive, we have forked and spin-off the project as **CSV2Notion Neo** to maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix and update the tool in a timely manner.
+Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to address the lack of advanced importing support for `*.csv` files in [Notion](https://notion.so). We took inspiration from [Airtable](https://www.airtable.com)’s [CSV import extension](https://support.airtable.com/docs/csv-import-extension).
+
+Why was this separate project created? Ideally, this repository should not exist. Since the original repository is inactive, we have forked and spin-off the project as **CSV2Notion Neo** to maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix and update the tool in a timely manner.
 
 ## Installation
 
