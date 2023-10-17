@@ -2,10 +2,6 @@
 
 <div>
 <h1>CSV2Notion Neo</h1>
-<!-- license -->
-<a href="https://github.com/TheAcharya/csv2notion-neo/blob/master/LICENSE">
-<img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/>
-</a>
 <!-- PyPI -->
 <a href="https://pypi.python.org/pypi/csv2notion-neo">
 <img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
@@ -17,6 +13,10 @@
 <!-- tests -->
 <a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml">
 <img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml/badge.svg" alt="tests"/>
+</a>
+<!-- release_github -->
+<a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml">
+<img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
 </a>
 <p>
 <p>An advance method to upload & merge *.csv files to <a href="https://notion.so/" target="_blank">Notion</a>. CSV2Notion Neo uses <a href="https://github.com/jamalex/notion-py" target="_blank">notion-py</a> API Library.</p>
