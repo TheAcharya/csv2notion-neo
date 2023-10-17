@@ -1,4 +1,4 @@
-<img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/CSV2Notion Neo_Icon.png?raw=true" width="200" alt="App icon" align="left"/>
+<a href="https://github.com/TheAcharya/csv2notion-neo"><img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/CSV2Notion Neo_Icon.png?raw=true" width="200" alt="App icon" align="left"/>
 
 <div>
 <h1>CSV2Notion Neo</h1>
