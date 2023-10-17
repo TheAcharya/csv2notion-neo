@@ -1,13 +1,28 @@
-# CSV2Notion Neo
+<img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/CSV2Notion Neo_Icon.png?raw=true" width="200" alt="App icon" align="left"/>
 
-[![PyPI version](https://img.shields.io/pypi/v/csv2notion-neo?label=version)](https://pypi.python.org/pypi/csv2notion-neo)
-[![Python Version](https://img.shields.io/pypi/pyversions/csv2notion-neo.svg)](https://pypi.org/project/csv2notion-neo/)
-[![release_pypi](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_pypi.yml)
-[![release_github](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml)
-[![tests](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml/badge.svg)](https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml)
+<div>
+<h1>CSV2Notion Neo</h1>
+<!-- license -->
+<a href="https://github.com/TheAcharya/csv2notion-neo/blob/master/LICENSE">
+<img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/>
+</a>
+<!-- PyPI -->
+<a href="https://pypi.python.org/pypi/csv2notion-neo">
+<img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
+</a>
+<!-- Python -->
+<a href="https://pypi.org/project/csv2notion-neo/">
+<img src="https://img.shields.io/pypi/pyversions/csv2notion-neo.svg" alt="Python"/>
+</a>
+<!-- tests -->
+<a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml">
+<img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml/badge.svg" alt="tests"/>
+</a>
+<p>
+<p>An advance method to upload & merge *.csv files to <a href="https://notion.so/" target="_blank">Notion</a>. CSV2Notion Neo uses <a href="https://github.com/jamalex/notion-py" target="_blank">notion-py</a> API Library.</p>
 
-
-An advance method to upload & merge `*.csv` files to [Notion](https://notion.so). CSV2Notion Neo uses [notion-py](https://github.com/jamalex/notion-py) API Library.
+<br>
+</div>
 
 ## Core Features
 
@@ -396,6 +411,8 @@ Original Idea and Workflow by [Vigneswaran Rajkumar](https://twitter.com/IAmVign
 Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
 
 Original Work by [Vladilen Zhdanov](https://github.com/vzhd1701) ([0.1.0 ... 0.3.8](https://github.com/vzhd1701/csv2notion))
+
+Icon Design by [Bor Jen Goh](https://www.artstation.com/borjengoh)
 
 ## License
 
