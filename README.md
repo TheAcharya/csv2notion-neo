@@ -68,7 +68,7 @@
 
 Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to address the lack of advanced importing support for `*.csv` files in [Notion](https://notion.so). We took inspiration from [Airtable](https://www.airtable.com)’s [CSV import extension](https://support.airtable.com/docs/csv-import-extension).
 
-Why was this separate project created? Ideally, this repository should not exist. Since the original repository is inactive, we have forked and spin-off the project as **CSV2Notion Neo** to maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix and update the tool in a timely manner.
+**CSV2Notion Neo** was created as a spin-off project to address occasional inactivity in the original repository and maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix and update the tool in a timely manner. Any dependent tools or project that relied on [csv2notion](https://github.com/vzhd1701/csv2notion), can use our **CSV2Notion Neo** tool interchangeably.
 
 ## Installation
 
@@ -410,7 +410,7 @@ Original Idea and Workflow by [Vigneswaran Rajkumar](https://twitter.com/IAmVign
 
 Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
 
-Original Work by [Vladilen Zhdanov](https://github.com/vzhd1701) ([0.1.0 ... 0.3.8](https://github.com/vzhd1701/csv2notion))
+Original Work by [Vladilen Zhdanov](https://github.com/vzhd1701)
 
 Icon Design by [Bor Jen Goh](https://www.artstation.com/borjengoh)
 
