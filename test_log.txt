@@ -1,0 +1,2 @@
+2023-10-18 19:34:08,180 [INFO    ] Validating CSV & Notion DB schema
+2023-10-18 19:34:08,180 [CRITICAL] File fake_file.csv not found

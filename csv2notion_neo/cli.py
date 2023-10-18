@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def cli(*argv: str) -> None:
     args = parse_args(argv)
-
+    #print("entering into the code")
     setup_logging(is_verbose=args.verbose, log_file=args.log)
 
     logger.info("Validating CSV & Notion DB schema")
@@ -56,7 +56,7 @@ def cli(*argv: str) -> None:
 def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> None:
     logging.basicConfig(format="%(levelname)s: %(message)s")
 
-    logging.getLogger("csv2notion").setLevel(
+    logging.getLogger("csv2notion_neo").setLevel(
         logging.DEBUG if is_verbose else logging.INFO
     )
 
@@ -65,7 +65,7 @@ def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> 
         file_handler.setFormatter(
             logging.Formatter("%(asctime)s [%(levelname)-8.8s] %(message)s")
         )
-        logging.getLogger("csv2notion").addHandler(file_handler)
+        logging.getLogger("csv2notion_neo").addHandler(file_handler)
 
     logging.getLogger("notion").setLevel(logging.WARNING)
 
