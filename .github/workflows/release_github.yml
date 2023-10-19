@@ -106,9 +106,9 @@ jobs:
         run: mkdir dist_bin
 
       - name: Copy LICENSE file
-      run: |
-        cp ./LICENSE ./dist_bin/LICENSE
-      if: success()
+        run: |
+          cp ./LICENSE ./dist_bin/LICENSE
+        if: success()
 
       - name: Pack up binary for macos
         if: matrix.os == 'macos-latest'
