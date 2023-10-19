@@ -105,6 +105,11 @@ jobs:
       - name: Make directory for bins
         run: mkdir dist_bin
 
+      - name: Copy LICENSE file
+      run: |
+        cp ./LICENSE ./dist_bin/LICENSE
+      if: success()
+
       - name: Pack up binary for macos
         if: matrix.os == 'macos-latest'
         run: zip -q -j dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip ./dist/${{ env.PACKAGE_NAME }}
