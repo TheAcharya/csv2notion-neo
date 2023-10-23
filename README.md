@@ -61,6 +61,7 @@
   - [Icons](#icons)
   - [Mandatory Columns](#mandatory-columns)
 - [Examples](#examples)
+- [Known Issues](#known-issues)
 - [Credits](#credits)
 - [License](#license)
 - [Reporting Bugs](#reporting-bugs)
@@ -414,6 +415,11 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --me
 
 </p>
 </details>
+
+## Known Issues
+
+- Users would not be able to duplicate entries/records there where uploaded using **CSV2Notion Neo** in Notion.
+  - **Workaround:** Simply [duplicate](https://www.notion.so/help/duplicate-delete-and-restore-content) the database directly in Notion. You would be able to duplicate your entries/records in the duplicated database.
 
 ## Credits
 
