@@ -135,6 +135,7 @@ jobs:
     needs: [build_binaries]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Get tag version
         run: |
           APP_VERSION=$(sed -n 's/^__version__ = "\([^"]\+\)"$/\1/p' ${{ env.PACKAGE_NAME }}/version.py)
