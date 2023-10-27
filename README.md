@@ -424,7 +424,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --me
 
 ## Credits
 
-Original Idea and Workflow by [Vigneswaran Rajkumar](https://twitter.com/IAmVigneswaran)
+Original Idea and Workflow Architecture by [Vigneswaran Rajkumar](https://twitter.com/IAmVigneswaran)
 
 Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
 
