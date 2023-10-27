@@ -22,6 +22,7 @@
 <p>An advance method to upload & merge *.csv files to <a href="https://notion.so/" target="_blank">Notion</a>. CSV2Notion Neo uses <a href="https://github.com/jamalex/notion-py" target="_blank">notion-py</a> API Library.</p>
 
 <br>
+<br>
 </div>
 
 ## Core Features
