@@ -34,7 +34,7 @@ class CollectionExtended(Collection):
     ) -> CollectionRowBlockExtended:
         row_class = row_class or CollectionRowBlockExtended
 
-        new_row = super().add_row_block(
+        new_row = self._add_row_block(
             update_views=update_views,
             row_class=row_class,
             properties=properties,
@@ -42,6 +42,56 @@ class CollectionExtended(Collection):
         )
 
         return cast(CollectionRowBlockExtended, new_row)
+
+    def _add_row_block(
+        self,
+        update_views: bool = True,
+        row_class: Optional[type] = None,
+        properties: Optional[Dict[str, Any]] = None,
+        columns: Optional[Dict[str, Any]] = None,
+    ) -> CollectionRowBlock:
+        """
+        Create a new empty CollectionRowBlock under this collection, and return the instance.
+        """
+
+        row_class = row_class or CollectionRowBlock
+
+        row_id = self._client.create_record("block", self, type="page")
+        row = row_class(self._client, row_id)
+
+        columns = {} if columns is None else columns
+        properties = {} if properties is None else properties
+
+        with self._client.as_atomic_transaction():
+            for key, val in properties.items():
+                setattr(row, key, val)
+
+            for key, val in columns.items():
+                setattr(row.columns, key, val)
+
+            if update_views:
+                # make sure the new record is inserted at the end of each view
+                for view in self.parent.views:
+                    if view is None or isinstance(view, CalendarView):
+                        continue
+
+                    page_sort = view.get("page_sort", [])
+
+                    if not page_sort:
+                        view.set("page_sort", [row_id])
+                    else:
+                        last_element = page_sort[-1]
+                        self._client.submit_transaction(
+                            build_operation(
+                                id=view.id,
+                                path=["page_sort"],
+                                args={"id": row_id, "after": last_element},
+                                command="listAfter",
+                                table=view._table,
+                            )
+                        )
+
+        return row
 
     def add_column(self, column_name: str, column_type: str) -> None:
         schema_raw = self.get("schema")
