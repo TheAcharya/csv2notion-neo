@@ -1,7 +1,8 @@
 import random
 from typing import Any, Dict, List, Optional, Tuple, cast
 
-from notion.collection import Collection, NotionSelect
+from notion.collection import Collection, NotionSelect, CollectionRowBlock, CalendarView
+from notion.operations import build_operation
 
 from csv2notion_neo.notion_row import CollectionRowBlockExtended
 from csv2notion_neo.utils_db import make_status_column
