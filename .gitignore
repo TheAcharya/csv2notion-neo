@@ -123,3 +123,8 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+#testing
+marker_data_demo/
+small-data.sh
+upload-markers.sh

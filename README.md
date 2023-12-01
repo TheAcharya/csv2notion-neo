@@ -22,6 +22,7 @@
 <p>An advance method to upload & merge *.csv files to <a href="https://notion.so/" target="_blank">Notion</a>. CSV2Notion Neo uses <a href="https://github.com/jamalex/notion-py" target="_blank">notion-py</a> API Library.</p>
 
 <br>
+<br>
 </div>
 
 ## Core Features
@@ -423,7 +424,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --me
 
 ## Credits
 
-Original Idea and Workflow by [Vigneswaran Rajkumar](https://twitter.com/IAmVigneswaran)
+Original Idea and Workflow Architecture by [Vigneswaran Rajkumar](https://twitter.com/IAmVigneswaran)
 
 Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
 

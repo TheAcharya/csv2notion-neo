@@ -1,5 +1,16 @@
 # Changelog
 
+### 1.0.2
+
+**🎉 Released:**
+- 30th November 2023
+
+**🐞 Bug Fix:**
+- Add missing imports
+- Fixed avoid sending big payload on views update (#8)
+
+---
+
 ### 1.0.1
 
 **🎉 Released:**

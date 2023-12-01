@@ -190,6 +190,13 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "metavar": "COLUMN",
                 "default": [],
             },
+            "--key-column": {
+                "help": (
+                    "JSON object that is the key in notion db."
+                    " if json file is used, this cannot be empty!"
+                ),
+                "metavar": "key column"
+            },
             "--fail-on-relation-duplicates": {
                 "action": "store_true",
                 "help": (
@@ -267,7 +274,7 @@ def _parse_schema(  # noqa: WPS210
     for group_name, group_args in schema.items():
         if group_name == "POSITIONAL":
             group = parser
-        else:
+        else: 
             group = parser.add_argument_group(group_name)
 
         for arg, arg_params in group_args.items():

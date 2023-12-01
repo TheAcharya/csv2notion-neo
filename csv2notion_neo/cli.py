@@ -16,13 +16,19 @@ logger = logging.getLogger(__name__)
 
 def cli(*argv: str) -> None:
     args = parse_args(argv)
-    #print("entering into the code")
+
     setup_logging(is_verbose=args.verbose, log_file=args.log)
 
+    path = Path(args.csv_file).suffix
+
+    if "json" in path:
+        if not args.key_column:
+            raise CriticalError("Json file found, please enter the key column!")
+        
     logger.info("Validating CSV & Notion DB schema")
 
     csv_data = CSVData(
-        args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns
+        args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.key_column,
     )
 
     if not csv_data:

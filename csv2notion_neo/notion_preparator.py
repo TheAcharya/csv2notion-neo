@@ -16,7 +16,7 @@ class NotionPreparator(object):  # noqa: WPS214
         self.db = db
         self.csv = csv
         self.rules = conversion_rules
-
+        
     def prepare(self) -> None:
         steps: List[Callable[[], None]] = [
             self._validate_image_column,
