@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
+from csv2notion_neo.version import __version__
 from csv2notion_neo.cli_args import parse_args
 from csv2notion_neo.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
 from csv2notion_neo.csv_data import CSVData
@@ -18,6 +19,7 @@ def cli(*argv: str) -> None:
     args = parse_args(argv)
 
     setup_logging(is_verbose=args.verbose, log_file=args.log)
+    logger.info(f"csv2notion-neo version {__version__}")
 
     path = Path(args.csv_file).suffix
 
