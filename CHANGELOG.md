@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.1.0
+
+**🎉 Released:**
+- Next Release
+
+**🔨 Improvements:**
+- Added CSV2Notion Neo version number in Log File (#11)
+
+---
+
 ### 1.0.2
 
 **🎉 Released:**
