@@ -19,7 +19,7 @@ def cli(*argv: str) -> None:
     args = parse_args(argv)
 
     setup_logging(is_verbose=args.verbose, log_file=args.log)
-    logger.info(f"csv2notion-neo version {__version__}")
+    logger.info(f"CSV2Notion Neo version {__version__}")
 
     path = Path(args.csv_file).suffix
 
