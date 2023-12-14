@@ -103,7 +103,6 @@ class NotionPreparator(object):  # noqa: WPS214
             if self.rules.rename_notion_key_column[0] in missing_columns:
                 missing_columns.remove(self.rules.rename_notion_key_column[0])
         if missing_columns:
-            warn_text = f"CSV columns missing from Notion DB: {missing_columns}"
 
             if self.rules.add_missing_columns:
                 logger.info(f"Adding missing columns to the DB: {missing_columns}")
@@ -111,7 +110,8 @@ class NotionPreparator(object):  # noqa: WPS214
             elif self.rules.fail_on_missing_columns:
                 raise NotionError(warn_text)
             else:
-                logger.warning(warn_text)
+                for column in missing_columns:
+                    logger.warning(f"Column {column} would be skipped!")
                 self.csv.drop_columns(*missing_columns)
 
     def _handle_unsupported_columns(self) -> None:
