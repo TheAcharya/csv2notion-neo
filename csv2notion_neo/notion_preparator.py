@@ -81,7 +81,10 @@ class NotionPreparator(object):  # noqa: WPS214
 
     def _handle_merge(self) -> None:
         if self.rules.merge:
-            self._validate_key_column(self.csv.key_column)
+            if self.rules.rename_notion_key_column:
+                self._validate_key_column(self.rules.rename_notion_key_column[1])
+            else:
+                self._validate_key_column(self.csv.key_column)
 
             if self.rules.merge_only_column:
                 self._vlaidate_merge_only_columns()
@@ -95,6 +98,10 @@ class NotionPreparator(object):  # noqa: WPS214
 
     def _handle_missing_columns(self) -> None:
         missing_columns = self._get_missing_columns()
+
+        if self.rules.rename_notion_key_column:
+            if self.rules.rename_notion_key_column[0] in missing_columns:
+                missing_columns.remove(self.rules.rename_notion_key_column[0])
         if missing_columns:
             warn_text = f"CSV columns missing from Notion DB: {missing_columns}"
 
@@ -173,6 +180,7 @@ class NotionPreparator(object):  # noqa: WPS214
             raise NotionError("Duplicate values found in DB key column.")
 
     def _validate_key_column(self, key_column: str) -> None:
+        
         if key_column not in self.db.columns:
             raise NotionError(f"Key column '{key_column}' does not exist in Notion DB.")
         if self.db.columns[key_column]["type"] != "title":

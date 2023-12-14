@@ -22,6 +22,7 @@ from csv2notion_neo.notion_uploader import NotionUploadRow
 from csv2notion_neo.utils_exceptions import NotionError, TypeConversionError
 from csv2notion_neo.utils_static import ConversionRules, FileType
 from csv2notion_neo.utils_str import split_str
+from icecream import ic
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
     def __init__(self, db: NotionDB, conversion_rules: ConversionRules):
         self.db = db
         self.rules = conversion_rules
-
         self._current_row = 0
 
     def convert_to_notion_rows(self, csv_data: CSVData) -> List[NotionUploadRow]:
@@ -40,12 +40,21 @@ class NotionRowConverter(object):  # noqa:  WPS214
         self._current_row = 2
 
         for row in csv_data:
+            
+            ic(row)
+            if self.rules.rename_notion_key_column:
+                new_id = self.rules.rename_notion_key_column[1]
+                old_id = self.rules.rename_notion_key_column[0]
+                row[new_id] = row[old_id]
+                del row[old_id]
+
             try:
                 notion_rows.append(self._convert_row(row))
             except NotionError as e:
                 raise NotionError(f"CSV [{self._current_row}]: {e}")
             self._current_row += 1
 
+        #ic(notion_rows)
         return notion_rows
 
     def _error(self, error: str) -> None:

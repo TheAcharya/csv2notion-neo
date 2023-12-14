@@ -86,6 +86,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     " add them to Notion DB"
                 ),
             },
+            "--rename-notion-key-column":{
+                "nargs":2,
+                "help":"rename the key column in the file to a different key column in Airtable",
+                "metavar":"column",
+            },
             "--randomize-select-colors": {
                 "action": "store_true",
                 "help": (
@@ -190,7 +195,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "metavar": "COLUMN",
                 "default": [],
             },
-            "--key-column": {
+            "--payload-key-column": {
                 "help": (
                     "JSON object that is the key in notion db."
                     " if json file is used, this cannot be empty!"
