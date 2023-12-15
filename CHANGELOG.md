@@ -6,7 +6,11 @@
 - Next Release
 
 **🔨 Improvements:**
+- Added basic support of file format `.json` (#9)
+- Added `--payload-key-column` : define key column in JSON payload (#12)
 - Added CSV2Notion Neo version number in Log File (#11)
+- Added `--rename-notion-key-column` : rename the key column in the file to a different key column in Notion (#12)
+- Improved legibility warning log
 
 ---
 
