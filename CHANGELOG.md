@@ -10,7 +10,7 @@
 - Added `--payload-key-column` : define key column in JSON payload (#12)
 - Added CSV2Notion Neo version number in log file (#11)
 - Added `--rename-notion-key-column` : rename the key column in the file to a different key column in Notion (#12)
-- Improved legibility warning log
+- Improved legibility of warning log
 
 ---
 
