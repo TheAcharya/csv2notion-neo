@@ -13,14 +13,17 @@ ArgOption = Dict[str, Any]
 ArgSchema = Dict[str, Dict[ArgToken, ArgOption]]
 HELP_ARGS_WIDTH = 50
 
-
+class CustomHelpFormatter(argparse.RawTextHelpFormatter):
+    def _format_args(self, action, default_metavar):
+        return ""
+    
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
         description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV Data with Images to Notion Database",
         usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
         add_help=False,
-        formatter_class=lambda prog: argparse.RawTextHelpFormatter(
+        formatter_class=lambda prog: CustomHelpFormatter(
             prog, max_help_position=HELP_ARGS_WIDTH
         ),
     )
