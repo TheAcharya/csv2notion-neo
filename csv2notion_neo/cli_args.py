@@ -13,14 +13,17 @@ ArgOption = Dict[str, Any]
 ArgSchema = Dict[str, Dict[ArgToken, ArgOption]]
 HELP_ARGS_WIDTH = 50
 
-
+class CustomHelpFormatter(argparse.RawTextHelpFormatter):
+    def _format_args(self, action, default_metavar):
+        return ""
+    
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
         description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV Data with Images to Notion Database",
         usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
         add_help=False,
-        formatter_class=lambda prog: argparse.RawTextHelpFormatter(
+        formatter_class=lambda prog: CustomHelpFormatter(
             prog, max_help_position=HELP_ARGS_WIDTH
         ),
     )
@@ -85,6 +88,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "if columns are present in CSV but not in Notion DB,"
                     " add them to Notion DB"
                 ),
+            },
+            "--rename-notion-key-column":{
+                "nargs":2,
+                "help":"rename the key column in the file to a different key column in Airtable",
+                "metavar":"column",
             },
             "--randomize-select-colors": {
                 "action": "store_true",
@@ -190,6 +198,13 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "metavar": "COLUMN",
                 "default": [],
             },
+            "--payload-key-column": {
+                "help": (
+                    "JSON object that is the key in notion db."
+                    " if json file is used, this cannot be empty!"
+                ),
+                "metavar": "key column"
+            },
             "--fail-on-relation-duplicates": {
                 "action": "store_true",
                 "help": (
@@ -267,7 +282,7 @@ def _parse_schema(  # noqa: WPS210
     for group_name, group_args in schema.items():
         if group_name == "POSITIONAL":
             group = parser
-        else:
+        else: 
             group = parser.add_argument_group(group_name)
 
         for arg, arg_params in group_args.items():

@@ -1,4 +1,5 @@
 import csv
+import json
 import logging
 from collections import Counter
 from pathlib import Path
@@ -13,11 +14,23 @@ logger = logging.getLogger(__name__)
 
 
 def csv_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowType]:
-    try:
-        with open(file_path, "r", encoding="utf-8-sig") as csv_file:
-            return _csv_read_rows(csv_file, fail_on_duplicate_columns)
-    except FileNotFoundError as e:
-        raise CriticalError(f"File {file_path} not found") from e
+    suffix = Path(file_path).suffix
+
+    if "csv" in suffix:
+        try:
+            with open(file_path, "r", encoding="utf-8-sig") as csv_file:
+                return _csv_read_rows(csv_file, fail_on_duplicate_columns)
+        except FileNotFoundError as e:
+            raise CriticalError(f"File {file_path} not found") from e
+    elif "json" in suffix:
+        try:
+            with open(file_path, "r", encoding="utf-8-sig") as csv_file:
+                return _json_read_rows(csv_file, fail_on_duplicate_columns)
+        except FileNotFoundError as e:
+            raise CriticalError(f"File {file_path} not found") from e
+
+    else:
+        raise CriticalError(f"{suffix} file extension not supported!")
 
 
 def _csv_read_rows(
@@ -29,6 +42,7 @@ def _csv_read_rows(
         raise CriticalError("CSV file has no columns.")
 
     duplicate_columns = _list_duplicates(list(reader.fieldnames))
+
     if duplicate_columns:
         message = f"Duplicate columns found in CSV: {duplicate_columns}."
 
@@ -48,6 +62,24 @@ def _csv_read_rows(
 
     return rows
 
+def _json_read_rows(
+    json_file: Iterable[str], fail_on_duplicate_columns: bool
+) -> List[CSVRowType]:
+    reader = json.load(json_file)
+
+    if not reader:
+        raise CriticalError("JSON file has no data")
+
+    rows = list(reader)
+
+    if rows and None in rows[0]:
+        logger.warning(
+            "Inconsistent number of columns detected."
+            " Excess columns will be truncated."
+        )
+        rows = [_drop_dict_columns(row, [None]) for row in rows]
+
+    return rows
 
 def _list_duplicates(lst: List[str]) -> List[str]:
     return [lst_item for lst_item, count in Counter(lst).items() if count > 1]
@@ -65,10 +97,12 @@ class CSVData(Iterable[CSVRowType]):  # noqa:  WPS214
         csv_file: Path,
         column_types: Optional[List[str]] = None,
         fail_on_duplicate_columns: bool = False,
+        key_col_json: str = None
     ) -> None:
         self.csv_file = csv_file
         self.rows = csv_read(self.csv_file, fail_on_duplicate_columns)
         self.types = self._column_types(column_types)
+        self.key_col = key_col_json
 
     def __len__(self) -> int:
         return len(self.rows)
@@ -78,6 +112,9 @@ class CSVData(Iterable[CSVRowType]):  # noqa:  WPS214
 
     @property
     def key_column(self) -> str:
+        if self.key_col:
+            return self.key_col
+        
         return self.columns[0]
 
     @property

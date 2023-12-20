@@ -61,6 +61,8 @@ class ConversionRules(object):
     fail_on_unsettable_columns: bool
     fail_on_wrong_status_values: bool
 
+    rename_notion_key_column: List[str]
+
     @property
     def files_search_path(self) -> Path:
         return self.csv_file.parent

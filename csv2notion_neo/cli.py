@@ -4,7 +4,9 @@ import signal
 import sys
 from pathlib import Path
 from typing import Any, Optional
+from icecream import ic
 
+from csv2notion_neo.version import __version__
 from csv2notion_neo.cli_args import parse_args
 from csv2notion_neo.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
 from csv2notion_neo.csv_data import CSVData
@@ -15,18 +17,28 @@ logger = logging.getLogger(__name__)
 
 
 def cli(*argv: str) -> None:
+    ic.disable()
     args = parse_args(argv)
-    #print("entering into the code")
-    setup_logging(is_verbose=args.verbose, log_file=args.log)
 
-    logger.info("Validating CSV & Notion DB schema")
+    setup_logging(is_verbose=args.verbose, log_file=args.log)
+    logger.info(f"CSV2Notion Neo version {__version__}")
+
+    path = Path(args.csv_file).suffix
+
+    if "json" in path:
+        if not args.payload_key_column:
+            raise CriticalError("Json file found, please enter the key column!")
+        
+    logger.info(f"Validating {path[1::]} & Notion DB schema")
 
     csv_data = CSVData(
-        args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns
+        args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
     )
 
+    ic(csv_data)
+
     if not csv_data:
-        raise CriticalError("CSV file is empty")
+        raise CriticalError(f"{path} file is empty")
 
     client = get_notion_client(
         args.token,
@@ -39,6 +51,8 @@ def cli(*argv: str) -> None:
         collection_id = new_database(args, client, csv_data)
 
     notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
+
+    #ic(notion_rows)
 
     logger.info("Uploading {0}...".format(args.csv_file.name))
 

@@ -2,6 +2,7 @@ import logging
 from argparse import Namespace
 from functools import partial
 from typing import List
+from icecream import ic
 
 from tqdm import tqdm
 
@@ -50,6 +51,7 @@ def convert_csv_to_notion_rows(
     conversion_rules = ConversionRules.from_args(args)
 
     NotionPreparator(notion_db, csv_data, conversion_rules).prepare()
+
 
     converter = NotionRowConverter(notion_db, conversion_rules)
     return converter.convert_to_notion_rows(csv_data)

@@ -1,10 +1,16 @@
 import math
 import re
 from typing import List
-
+from icecream import ic
 
 def guess_type_by_values(values_str: List[str]) -> str:
-    unique_values = set(filter(None, values_str))
+
+    if type(values_str[0]) == list:
+        unique_values = set()
+        for value in values_str:
+            unique_values.update(value)
+    else:   
+        unique_values = set(filter(None, values_str))
 
     match_map = {
         "text": is_empty,
@@ -19,7 +25,6 @@ def guess_type_by_values(values_str: List[str]) -> str:
         for value_type, match_func in match_map.items()
         if all(map(match_func, unique_values))
     )
-
     return next(matches, "text")
 
 
