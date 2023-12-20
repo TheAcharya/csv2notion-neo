@@ -40,8 +40,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         self._current_row = 2
 
         for row in csv_data:
-            
-            ic(row)
+     
             if self.rules.rename_notion_key_column:
                 new_id = self.rules.rename_notion_key_column[1]
                 old_id = self.rules.rename_notion_key_column[0]

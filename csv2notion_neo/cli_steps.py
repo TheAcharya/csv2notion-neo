@@ -49,7 +49,6 @@ def convert_csv_to_notion_rows(
     notion_db = NotionDB(client, collection_id)
 
     conversion_rules = ConversionRules.from_args(args)
-    ic(conversion_rules)
 
     NotionPreparator(notion_db, csv_data, conversion_rules).prepare()
 
