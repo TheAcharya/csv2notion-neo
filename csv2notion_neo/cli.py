@@ -29,7 +29,7 @@ def cli(*argv: str) -> None:
         if not args.payload_key_column:
             raise CriticalError("Json file found, please enter the key column!")
         
-    logger.info("Validating CSV & Notion DB schema")
+    logger.info(f"Validating {path[1::]} & Notion DB schema")
 
     csv_data = CSVData(
         args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
@@ -38,7 +38,7 @@ def cli(*argv: str) -> None:
     ic(csv_data)
 
     if not csv_data:
-        raise CriticalError("CSV file is empty")
+        raise CriticalError(f"{path} file is empty")
 
     client = get_notion_client(
         args.token,
