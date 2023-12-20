@@ -6,7 +6,7 @@ from icecream import ic
 
 from tqdm import tqdm
 
-from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_convert import NotionRowConverter
 from csv2notion_neo.notion_db import NotionDB, notion_db_from_csv
 from csv2notion_neo.notion_db_client import NotionClientExtended
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def new_database(
-    args: Namespace, client: NotionClientExtended, csv_data: CSVData
+    args: Namespace, client: NotionClientExtended, csv_data: LocalData
 ) -> str:
     skip_columns = []
     if args.image_column and not args.image_column_keep:
@@ -44,7 +44,7 @@ def new_database(
 
 
 def convert_csv_to_notion_rows(
-    csv_data: CSVData, client: NotionClientExtended, collection_id: str, args: Namespace
+    csv_data: LocalData, client: NotionClientExtended, collection_id: str, args: Namespace
 ) -> List[NotionUploadRow]:
     notion_db = NotionDB(client, collection_id)
 

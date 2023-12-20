@@ -7,7 +7,7 @@ from pyfakefs.fake_filesystem_unittest import Patcher
 from testfixtures import LogCapture, ShouldRaise
 
 from csv2notion_neo.cli import cli
-from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import notion_db_from_csv
 from tests.fixtures.db_maker_notion_db import NotionDB
 
@@ -26,7 +26,7 @@ class NotionDBMaker(object):
 
         with Patcher() as patcher:
             patcher.fs.create_file("test.csv", contents=csv_content)
-            csv_data = CSVData(Path("test.csv"))
+            csv_data = LocalData(Path("test.csv"))
 
         url, collection_id = notion_db_from_csv(
             self.client, page_name=self.page_name, csv_data=csv_data

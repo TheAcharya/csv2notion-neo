@@ -4,7 +4,7 @@ import requests
 from notion.user import User
 from notion.utils import InvalidNotionIdentifier
 
-from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db_client import NotionClientExtended
 from csv2notion_neo.notion_db_collection import CollectionExtended
 from csv2notion_neo.notion_row import CollectionRowBlockExtended
@@ -134,7 +134,7 @@ def get_collection_id(client: NotionClientExtended, notion_url: str) -> str:
 def notion_db_from_csv(
     client: NotionClientExtended,
     page_name: str,
-    csv_data: CSVData,
+    csv_data: LocalData,
     skip_columns: Optional[List[str]] = None,
 ) -> Tuple[str, str]:
     schema = _schema_from_csv(csv_data, skip_columns)
@@ -176,7 +176,7 @@ def notion_db_from_csv(
 
 
 def _schema_from_csv(
-    csv_data: CSVData, skip_columns: Optional[List[str]] = None
+    csv_data: LocalData, skip_columns: Optional[List[str]] = None
 ) -> Dict[str, Dict[str, str]]:
     if skip_columns:
         columns = [c for c in csv_data.columns if c not in skip_columns]

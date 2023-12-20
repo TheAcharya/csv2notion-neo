@@ -91,7 +91,7 @@ def _drop_dict_columns(
     return {k: v for k, v in src_dict.items() if k not in columns_to_drop}
 
 
-class CSVData(Iterable[CSVRowType]):  # noqa:  WPS214
+class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
     def __init__(
         self,
         csv_file: Path,

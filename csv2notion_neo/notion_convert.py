@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Optional
 from notion.user import User
 from notion.utils import InvalidNotionIdentifier, extract_id
 
-from csv2notion_neo.csv_data import CSVData, CSVRowType
+from csv2notion_neo.local_data import LocalData, CSVRowType
 from csv2notion_neo.notion_convert_map import (
     map_checkbox,
     map_date,
@@ -33,7 +33,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         self.rules = conversion_rules
         self._current_row = 0
 
-    def convert_to_notion_rows(self, csv_data: CSVData) -> List[NotionUploadRow]:
+    def convert_to_notion_rows(self, csv_data: LocalData) -> List[NotionUploadRow]:
         notion_rows = []
 
         # starting with 2nd row, because first is header

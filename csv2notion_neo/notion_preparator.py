@@ -1,7 +1,7 @@
 import logging
 from typing import Callable, Dict, Iterable, List, Set, Tuple
 
-from csv2notion_neo.csv_data import CSVData
+from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_static import UNSETTABLE_TYPES, ConversionRules
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class NotionPreparator(object):  # noqa: WPS214
     def __init__(
-        self, db: NotionDB, csv: CSVData, conversion_rules: ConversionRules
+        self, db: NotionDB, csv: LocalData, conversion_rules: ConversionRules
     ) -> None:
         self.db = db
         self.csv = csv
