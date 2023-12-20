@@ -20,7 +20,7 @@ class CustomHelpFormatter(argparse.RawTextHelpFormatter):
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
-        description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV Data with Images to Notion Database",
+        description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV or JSON Data with Images to Notion Database",
         usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
         add_help=False,
         formatter_class=lambda prog: CustomHelpFormatter(
@@ -32,7 +32,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "POSITIONAL": {
             "csv_file": {
                 "type": Path,
-                "help": "CSV file to upload",
+                "help": "CSV or JSON file to upload",
                 "metavar": "FILE",
             }
         },
