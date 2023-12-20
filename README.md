@@ -106,7 +106,7 @@ usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
 
 https://github.com/TheAcharya/csv2notion-neo
 
-Upload & Merge CSV Data with Images to Notion Database
+Upload & Merge CSV or JSON Data with Images to Notion Database
 
 positional arguments:
   FILE                               CSV or JSON file to upload
