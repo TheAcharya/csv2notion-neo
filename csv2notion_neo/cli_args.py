@@ -200,8 +200,8 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--payload-key-column": {
                 "help": (
-                    "JSON object that is the key in notion db."
-                    " if json file is used, this cannot be empty!"
+                    "JSON object that is the key in Notion DB;"
+                    "\nif JSON file is used, this cannot be empty"
                 ),
                 "metavar": "key column"
             },
