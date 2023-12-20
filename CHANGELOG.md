@@ -1,5 +1,19 @@
 # Changelog
 
+### 1.1.0
+
+**🎉 Released:**
+- Next Release
+
+**🔨 Improvements:**
+- Added `.json` support for [MarkersExtractor](https://github.com/TheAcharya/MarkersExtractor) (#9)
+- Added `--payload-key-column` : define key column in JSON payload (#12)
+- Added CSV2Notion Neo version number in log file (#11)
+- Added `--rename-notion-key-column` : rename the key column in the file to a different key column in Notion (#12)
+- Improved legibility of warning log
+
+---
+
 ### 1.0.2
 
 **🎉 Released:**
