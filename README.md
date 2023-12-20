@@ -19,7 +19,7 @@
 <img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
 </a>
 <p>
-<p>An advance method to upload & merge *.csv files to <a href="https://notion.so/" target="_blank">Notion</a>. CSV2Notion Neo uses <a href="https://github.com/jamalex/notion-py" target="_blank">notion-py</a> API Library.</p>
+<p>An advance method to upload & merge *.csv or *.json files to <a href="https://notion.so/" target="_blank">Notion</a>. CSV2Notion Neo uses <a href="https://github.com/jamalex/notion-py" target="_blank">notion-py</a> API Library.</p>
 
 <br>
 <br>
@@ -29,7 +29,7 @@
 
 ### Advantages over native import
 
-- Actually merge CSV with existing database rows (not just add new ones), first column will be used as a key
+- Actually merge CSV or JSON with existing database rows (not just add new ones), first column will be used as a key
 - Manually set column types instead of relying on autodetection
 - Automatically link or create new entries in relation columns based on their value
 - Upload files into "Files & media" column
@@ -109,27 +109,28 @@ https://github.com/TheAcharya/csv2notion-neo
 Upload & Merge CSV Data with Images to Notion Database
 
 positional arguments:
-  FILE                               CSV file to upload
+  FILE                               CSV or JSON file to upload
 
 general options:
-  --token TOKEN                      Notion token, stored in token_v2 cookie for notion.so
+  --token                            Notion token, stored in token_v2 cookie for notion.so
   --url URL                          Notion database URL; if none is provided, will create a new database
-  --max-threads NUMBER               upload threads (default: 5)
+  --max-threads                      upload threads (default: 5)
   --log FILE                         file to store program log
   --verbose                          output debug information
   --version                          show program's version number and exit
   -h, --help                         show this help message and exit
 
 column options:
-  --column-types TYPES               comma-separated list of column types to use for non-key columns;
+  --column-types                     comma-separated list of column types to use for non-key columns;
                                      if none is provided, types will be guessed from CSV values
                                      (can also be used with --add-missing-columns flag)
   --add-missing-columns              if columns are present in CSV but not in Notion DB, add them to Notion DB
+  --rename-notion-key-column         rename the key column in the file to a different key column in Airtable
   --randomize-select-colors          randomize colors for added options in select and multi select columns
 
 merge options:
   --merge                            merge CSV with existing Notion DB rows, first column will be used as a key
-  --merge-only-column COLUMN         CSV column that should be updated on merge;
+  --merge-only-column                CSV column that should be updated on merge;
                                      when provided, other columns will be ignored
                                      (use multiple times for multiple columns)
   --merge-skip-new                   skip new rows in CSV that are not already in Notion DB during merge
@@ -141,18 +142,20 @@ page cover options:
   --image-column COLUMN              CSV column that points to URL or image file that will be embedded for that row
   --image-column-keep                keep image CSV column as a Notion DB column
   --image-column-mode {cover,block}  upload image as [cover] or insert it as [block] (default: block)
-  --image-caption-column COLUMN      CSV column that points to text caption that will be added to the image block
+  --image-caption-column             CSV column that points to text caption that will be added to the image block
                                      if --image-column-mode is set to 'block'
   --image-caption-column-keep        keep image caption CSV column as a Notion DB column
 
 page icon options:
-  --icon-column COLUMN               CSV column that points to emoji, URL or image file
+  --icon-column                      CSV column that points to emoji, URL or image file
                                      that will be used as page icon for that row
   --icon-column-keep                 keep icon CSV column as a Notion DB column
   --default-icon ICON                Emoji, URL or image file that will be used as page icon for every row by default
 
 validation options:
-  --mandatory-column COLUMN          CSV column that cannot be empty (use multiple times for multiple columns)
+  --mandatory-column                 CSV column that cannot be empty (use multiple times for multiple columns)
+  --payload-key-column               JSON object that is the key in Notion DB;
+                                     if JSON file is used, this cannot be empty
   --fail-on-relation-duplicates      fail if any linked DBs in relation columns have duplicate entries;
                                      otherwise, first entry in alphabetical order
                                      will be treated as unique when looking up relations
