@@ -52,7 +52,7 @@ def cli(*argv: str) -> None:
 
     notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
 
-    #ic(notion_rows)
+    ic(notion_rows)
 
     logger.info("Uploading {0}...".format(args.csv_file.name))
 

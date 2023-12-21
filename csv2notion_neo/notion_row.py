@@ -190,7 +190,6 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         if result_value is not None:
             return ["properties", prop["id"]], result_value
 
-        
         return super()._convert_python_to_notion(raw_value, prop, identifier)
 
     def _upload_column_files(self, column_id: str, files: List[FileType]) -> NamedURLs:

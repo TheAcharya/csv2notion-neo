@@ -7,13 +7,14 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional
 
 from csv2notion_neo.notion_type_guess import guess_type_by_values
 from csv2notion_neo.utils_exceptions import CriticalError
+from icecream import ic
 
 CSVRowType = Dict[str, str]
 
 logger = logging.getLogger(__name__)
 
 
-def csv_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowType]:
+def data_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowType]:
     suffix = Path(file_path).suffix
 
     if "csv" in suffix:
@@ -24,8 +25,8 @@ def csv_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowTyp
             raise CriticalError(f"File {file_path} not found") from e
     elif "json" in suffix:
         try:
-            with open(file_path, "r", encoding="utf-8-sig") as csv_file:
-                return _json_read_rows(csv_file, fail_on_duplicate_columns)
+            with open(file_path, "r", encoding="utf-8-sig") as json_file:
+                return _json_read_rows(json_file, fail_on_duplicate_columns)
         except FileNotFoundError as e:
             raise CriticalError(f"File {file_path} not found") from e
 
@@ -71,6 +72,7 @@ def _json_read_rows(
         raise CriticalError("JSON file has no data")
 
     rows = list(reader)
+    rows = [_convert_int_to_string(row) for row in rows]
 
     if rows and None in rows[0]:
         logger.warning(
@@ -90,6 +92,13 @@ def _drop_dict_columns(
 ) -> Dict[Any, Any]:
     return {k: v for k, v in src_dict.items() if k not in columns_to_drop}
 
+def _convert_int_to_string(src_dict:Dict[Any,Any]):
+    for key,val in src_dict.items():
+        if type(val) == int:
+            src_dict[key] = str(val)
+    
+    return src_dict
+
 
 class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
     def __init__(
@@ -100,7 +109,7 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         key_col_json: str = None
     ) -> None:
         self.csv_file = csv_file
-        self.rows = csv_read(self.csv_file, fail_on_duplicate_columns)
+        self.rows = data_read(self.csv_file, fail_on_duplicate_columns)
         self.types = self._column_types(column_types)
         self.key_col = key_col_json
 
