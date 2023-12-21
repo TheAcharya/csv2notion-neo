@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.1.1
+
+**🎉 Released:**
+- 21st December 2023
+
+**🐞 Bug Fix:**
+- Fixed conversion of integers into strings
+
+---
+
 ### 1.1.0
 
 **🎉 Released:**
