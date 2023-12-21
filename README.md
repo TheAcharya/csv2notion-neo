@@ -420,6 +420,30 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --me
 </p>
 </details>
 
+<details><summary>Importing JSON into Existing Database</summary>
+<p>
+
+```shell
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --merge JSON-Demo.json
+```
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_09.gif?raw=true"> </p>
+
+</p>
+</details>
+
+<details><summary>Importing JSON into Existing Database with a Different Key Column</summary>
+<p>
+
+```shell
+csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --rename-notion-key-column "Cat ID" "Anything ID" --merge JSON-Demo.json
+```
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_10.gif?raw=true"> </p>
+
+</p>
+</details>
+
 ## Known Issues
 
 - Users would not be able to duplicate entries/records there where uploaded using **CSV2Notion Neo** in Notion.
