@@ -4,10 +4,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from cached_property import cached_property
-from notion.collection import CollectionRowBlock
-from notion.maps import field_map
-from notion.operations import build_operation
-from notion.utils import remove_signed_prefix_as_needed
+from csv2notion_neo.notion.collection import CollectionRowBlock
+from csv2notion_neo.notion.maps import field_map
+from csv2notion_neo.notion.operations import build_operation
+from csv2notion_neo.notion.utils import remove_signed_prefix_as_needed
 
 from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
 from csv2notion_neo.notion_row_upload_file import Meta, is_meta_different, upload_filetype

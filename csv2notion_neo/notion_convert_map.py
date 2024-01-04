@@ -5,7 +5,7 @@ from typing import Optional, Union
 from dateutil.parser import ParserError
 from dateutil.parser import parse as date_parse
 from emoji import distinct_emoji_list, emoji_count, replace_emoji
-from notion.collection import NotionDate
+from csv2notion_neo.notion.collection import NotionDate
 
 from csv2notion_neo.notion_type_guess import is_url
 from csv2notion_neo.utils_exceptions import TypeConversionError

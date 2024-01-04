@@ -29,19 +29,18 @@ def cli(*argv: str) -> None:
         if not args.payload_key_column:
             raise CriticalError("Json file found, please enter the key column!")
         
-    logger.info(f"Validating {path[1::]} & Notion DB schema")
+    logger.info(f"Validating {path[1::]} & csv2notion_neo.notion DB schema")
 
     csv_data = LocalData(
         args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
     )
-
-    ic(csv_data)
 
     if not csv_data:
         raise CriticalError(f"{path} file is empty")
 
     client = get_notion_client(
         args.token,
+        workspace=args.workspace,
         is_randomize_select_colors=args.randomize_select_colors,
     )
 
@@ -81,7 +80,7 @@ def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> 
         )
         logging.getLogger("csv2notion_neo").addHandler(file_handler)
 
-    logging.getLogger("notion").setLevel(logging.WARNING)
+    logging.getLogger("csv2notion_neo.notion").setLevel(logging.WARNING)
 
 
 def abort(*_: Any) -> None:  # pragma: no cover

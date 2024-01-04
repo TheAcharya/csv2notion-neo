@@ -127,6 +127,12 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     " during merge"
                 ),
             },
+            "--workspace":{
+                "help": (
+                    "Mention your workspce"
+                ),
+                "metavar": "workspace"
+            },
         },
         "relations options": {
             "--add-missing-relations": {

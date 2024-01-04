@@ -3,8 +3,8 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-from notion.user import User
-from notion.utils import InvalidNotionIdentifier, extract_id
+from csv2notion_neo.notion.user import User
+from csv2notion_neo.notion.utils import InvalidNotionIdentifier, extract_id
 
 from csv2notion_neo.local_data import LocalData, CSVRowType
 from csv2notion_neo.notion_convert_map import (
@@ -223,7 +223,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         if _is_banned_extension(ensured_path):
             self._error(
                 f"File extension '*{ensured_path.suffix}' is not allowed"
-                f" to upload on Notion."
+                f" to upload on csv2notion_neo.notion."
             )
             return None
 
@@ -248,7 +248,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
         resolved_relations = []
         for v in col_values:
-            if v.startswith("https://www.notion.so/"):
+            if v.startswith("https://www.csv2notion_neo.notion.so/"):
                 resolved_relation = self._resolve_relation_by_url(relation_column, v)
             else:
                 resolved_relation = self._resolve_relation_by_key(relation_column, v)
@@ -301,7 +301,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         try:
             return str(extract_id(url))
         except InvalidNotionIdentifier:
-            self._error(f"'{url}' is not a valid Notion URL.")
+            self._error(f"'{url}' is not a valid csv2notion_neo.notion URL.")
 
             return None
 
