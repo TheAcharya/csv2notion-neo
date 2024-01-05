@@ -299,6 +299,7 @@ def _parse_default_icon(default_icon: str) -> FileType:
 
 
 def _parse_column_types(column_types: str) -> List[str]:
+
     column_types_list = split_str(column_types)
     unknown_types = set(column_types_list) - set(ALLOWED_TYPES)
     if unknown_types:

@@ -35,7 +35,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def convert_to_notion_rows(self, csv_data: LocalData) -> List[NotionUploadRow]:
         notion_rows = []
-
         # starting with 2nd row, because first is header
         self._current_row = 2
 
@@ -66,6 +65,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         properties = self._map_properties(row)
         columns = self._map_columns(row)
 
+
         return NotionUploadRow(columns=columns, properties=properties)
 
     def _map_properties(self, row: CSVRowType) -> Dict[str, Any]:
@@ -90,6 +90,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         for col_key, col_value in row.items():
             col_type = self.db.columns[col_key]["type"]
 
+            
             notion_row[col_key] = self._map_column(col_key, col_value, col_type)
 
             self._raise_if_mandatory_empty(col_key, notion_row[col_key])
@@ -196,6 +197,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return image_caption
 
     def _map_file(self, s: str) -> List[FileType]:
+    
         col_value = split_str(s)
 
         resolved_uris = []

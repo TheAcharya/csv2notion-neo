@@ -9,6 +9,7 @@ from notion.maps import field_map
 from notion.operations import build_operation
 from notion.utils import remove_signed_prefix_as_needed
 
+from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
 from csv2notion_neo.notion_row_upload_file import Meta, is_meta_different, upload_filetype
 from csv2notion_neo.utils_static import FileType
@@ -190,7 +191,12 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         if result_value is not None:
             return ["properties", prop["id"]], result_value
 
-        return super()._convert_python_to_notion(raw_value, prop, identifier)
+        
+        try:
+            return super()._convert_python_to_notion(raw_value, prop, identifier)
+        except:
+            raise NotionError(f"Column {prop['name']} seems to have an property mismatch, please check and change the property to appropriate value in notion database!")
+        
 
     def _upload_column_files(self, column_id: str, files: List[FileType]) -> NamedURLs:
         column_files_meta, column_files_urls = self._process_column_files(files)
