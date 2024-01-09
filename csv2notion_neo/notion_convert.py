@@ -186,6 +186,10 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return image
     
     def _mention_cover_image(self,image_column:List) -> List:
+
+        if len(image_column) == 1:
+            return image_column
+        
         img_col_copy = image_column.copy()
         cover_image = img_col_copy.pop(0)
         img_col_copy.append(cover_image)
