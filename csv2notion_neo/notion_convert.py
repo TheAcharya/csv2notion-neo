@@ -51,8 +51,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
             except NotionError as e:
                 raise NotionError(f"CSV [{self._current_row}]: {e}")
             self._current_row += 1
-
-        #ic(notion_rows)
+    
         return notion_rows
 
     def _error(self, error: str) -> None:
@@ -88,8 +87,8 @@ class NotionRowConverter(object):  # noqa:  WPS214
         notion_row = {}
 
         for col_key, col_value in row.items():
-            col_type = self.db.columns[col_key]["type"]
 
+            col_type = self.db.columns[col_key]["type"]
             
             notion_row[col_key] = self._map_column(col_key, col_value, col_type)
 
@@ -168,18 +167,31 @@ class NotionRowConverter(object):  # noqa:  WPS214
         image: Optional[FileType] = None
 
         if self.rules.image_column:
-            image = row.get(self.rules.image_column, "").strip()
-            if image:
-                image = map_url_or_file(image)
-                if isinstance(image, Path):
-                    image = self._relative_path(image)
+            
+            image_columns = self._mention_cover_image(self.rules.image_column)
+            
+            for image_column in image_columns:
+                image = row.get(image_column, "").strip()
+                if image:
+                    image = map_url_or_file(image)
+                    if isinstance(image, Path):
+                        image = self._relative_path(image)
 
-            self._raise_if_mandatory_empty(self.rules.image_column, image)
+                self._raise_if_mandatory_empty(image_column, image)
 
-            if not self.rules.image_column_keep:
-                row.pop(self.rules.image_column, None)
+                if not self.rules.image_column_keep:
+                    row.pop(image_column, None)
 
+        
         return image
+    
+    def _mention_cover_image(self,image_column:List) -> List:
+        img_col_copy = image_column.copy()
+        cover_image = img_col_copy.pop(0)
+        img_col_copy.append(cover_image)
+
+        return img_col_copy
+
 
     def _map_image_caption(self, row: CSVRowType) -> Optional[str]:
         image_caption = None
@@ -197,6 +209,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return image_caption
 
     def _map_file(self, s: str) -> List[FileType]:
+
     
         col_value = split_str(s)
 

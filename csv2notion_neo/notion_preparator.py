@@ -5,6 +5,7 @@ from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_static import UNSETTABLE_TYPES, ConversionRules
+from icecream import ic
 
 logger = logging.getLogger(__name__)
 
@@ -42,13 +43,15 @@ class NotionPreparator(object):  # noqa: WPS214
             step()
 
     def _validate_image_column(self) -> None:
-        if self.rules.image_column is None:
-            return
+        
+        for image_column in self.rules.image_column:
+            if image_column is None:
+                return
 
-        if self.rules.image_column not in self.csv.columns:
-            raise NotionError(
-                f"Image column '{self.rules.image_column}' not found in csv file."
-            )
+            if image_column not in self.csv.columns:
+                raise NotionError(
+                    f"Image column '{image_column}' not found in csv file."
+                )
 
     def _validate_image_caption_column(self) -> None:
         if self.rules.image_caption_column is None:

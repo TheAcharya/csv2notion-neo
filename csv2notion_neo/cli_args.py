@@ -140,6 +140,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "CSV column that points to URL or image file"
                     " that will be embedded for that row"
                 ),
+                "nargs":"*",
                 "metavar": "COLUMN",
             },
             "--image-column-keep": {

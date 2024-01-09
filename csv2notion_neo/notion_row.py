@@ -76,7 +76,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             raise RuntimeError("Cannot set cover_block during atomic transaction")
 
         new_image: Optional[FileType] = image if image else None
-
+     
         if not self._is_meta_changed("cover_block_meta", new_image, self.cover_block):
             return
 
@@ -199,6 +199,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         
 
     def _upload_column_files(self, column_id: str, files: List[FileType]) -> NamedURLs:
+        
         column_files_meta, column_files_urls = self._process_column_files(files)
 
         self.set(f"properties.meta.file_columns.{column_id}", column_files_meta)

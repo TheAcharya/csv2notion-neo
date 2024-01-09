@@ -10,6 +10,7 @@ from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_file import get_file_sha256
 from csv2notion_neo.utils_static import FileType
 from urllib.parse import urlparse
+from icecream import ic
 
 Meta = Dict[str, str]
 
@@ -26,6 +27,8 @@ def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
 
 def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
     file_url = _upload_file(block, file_path)
+
+   
 
     file_id = get_file_id(file_url)
     if file_id is None:
@@ -51,6 +54,7 @@ def _upload_file(block: Block, file_path: Path) -> str:
             "spaceId": block.space_info["spaceId"],
         },
     }
+
 
     upload_data = block._client.post("getUploadFileUrl", post_data).json()
 
