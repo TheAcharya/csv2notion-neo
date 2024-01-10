@@ -20,7 +20,7 @@ class CustomHelpFormatter(argparse.RawTextHelpFormatter):
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
-        description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV Data with Images to Notion Database",
+        description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV or JSON Data with Images to Notion Database",
         usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
         add_help=False,
         formatter_class=lambda prog: CustomHelpFormatter(
@@ -32,7 +32,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "POSITIONAL": {
             "csv_file": {
                 "type": Path,
-                "help": "CSV file to upload",
+                "help": "CSV or JSON file to upload",
                 "metavar": "FILE",
             }
         },
@@ -85,7 +85,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--add-missing-columns": {
                 "action": "store_true",
                 "help": (
-                    "if columns are present in CSV but not in Notion DB,"
+                    "if columns are present in CSV or JSON but not in Notion DB,"
                     " add them to Notion DB"
                 ),
             },
@@ -106,14 +106,14 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--merge": {
                 "action": "store_true",
                 "help": (
-                    "merge CSV with existing Notion DB rows,"
+                    "merge CSV or JSON with existing Notion DB rows,"
                     " first column will be used as a key"
                 ),
             },
             "--merge-only-column": {
                 "action": "append",
                 "help": (
-                    "CSV column that should be updated on merge;"
+                    "CSV or JSON column that should be updated on merge;"
                     "\nwhen provided, other columns will be ignored"
                     "\n(use multiple times for multiple columns)"
                 ),
@@ -123,7 +123,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--merge-skip-new": {
                 "action": "store_true",
                 "help": (
-                    "skip new rows in CSV that are not already in Notion DB"
+                    "skip new rows in CSV or JSON that are not already in Notion DB"
                     " during merge"
                 ),
             },
@@ -137,7 +137,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "page cover options": {
             "--image-column": {
                 "help": (
-                    "CSV column that points to URL or image file"
+                    "CSV or JSON column that points to URL or image file"
                     " that will be embedded for that row"
                 ),
                 "nargs":"*",
@@ -145,7 +145,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--image-column-keep": {
                 "action": "store_true",
-                "help": "keep image CSV column as a Notion DB column",
+                "help": "keep image CSV or JSON column as a Notion DB column",
             },
             "--image-column-mode": {
                 "choices": ["cover", "block"],
@@ -157,7 +157,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--image-caption-column": {
                 "help": (
-                    "CSV column that points to text caption"
+                    "CSV or JSON column that points to text caption"
                     " that will be added to the image block"
                     "\nif --image-column-mode is set to 'block'"
                 ),
@@ -177,14 +177,14 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "page icon options": {
             "--icon-column": {
                 "help": (
-                    "CSV column that points to emoji, URL or image file"
+                    "CSV or JSON column that points to emoji, URL or image file"
                     "\nthat will be used as page icon for that row"
                 ),
                 "metavar": "COLUMN",
             },
             "--icon-column-keep": {
                 "action": "store_true",
-                "help": "keep icon CSV column as a Notion DB column",
+                "help": "keep icon CSV or JSON column as a Notion DB column",
             },
             "--default-icon": {
                 "help": (
@@ -199,7 +199,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--mandatory-column": {
                 "action": "append",
                 "help": (
-                    "CSV column that cannot be empty"
+                    "CSV or JSON column that cannot be empty"
                     " (use multiple times for multiple columns)"
                 ),
                 "metavar": "COLUMN",
@@ -230,7 +230,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--fail-on-duplicate-csv-columns": {
                 "action": "store_true",
                 "help": (
-                    "fail if CSV has duplicate columns;"
+                    "fail if CSV or JSON has duplicate columns;"
                     "\notherwise last column will be used"
                 ),
             },
@@ -252,7 +252,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--fail-on-missing-columns": {
                 "action": "store_true",
                 "help": (
-                    "fail if columns are present in CSV but not in Notion DB;"
+                    "fail if columns are present in CSV or JSON but not in Notion DB;"
                     "\notherwise those columns will be ignored"
                 ),
             },
