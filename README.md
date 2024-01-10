@@ -130,39 +130,39 @@ column options:
   --randomize-select-colors          randomize colors for added options in select and multi select columns
 
 merge options:
-  --merge                            merge CSV with existing Notion DB rows, first column will be used as a key
-  --merge-only-column                CSV column that should be updated on merge;
+  --merge                            merge CSV or JSON with existing Notion DB rows, first column will be used as a key
+  --merge-only-column                CSV or JSON column that should be updated on merge;
                                      when provided, other columns will be ignored
                                      (use multiple times for multiple columns)
-  --merge-skip-new                   skip new rows in CSV that are not already in Notion DB during merge
+  --merge-skip-new                   skip new rows in CSV or JSON that are not already in Notion DB during merge
 
 relations options:
   --add-missing-relations            add missing entries into linked Notion DB
 
 page cover options:
-  --image-column COLUMN              CSV column that points to URL or image file that will be embedded for that row
-  --image-column-keep                keep image CSV column as a Notion DB column
+  --image-column COLUMN              One or more CSV or JSON column that points to URL or image file that will be embedded for that row
+  --image-column-keep                keep image CSV or JSON column as a Notion DB column
   --image-column-mode {cover,block}  upload image as [cover] or insert it as [block] (default: block)
-  --image-caption-column             CSV column that points to text caption that will be added to the image block
+  --image-caption-column             CSV or JSON column that points to text caption that will be added to the image block
                                      if --image-column-mode is set to 'block'
-  --image-caption-column-keep        keep image caption CSV column as a Notion DB column
+  --image-caption-column-keep        keep image caption CSV or JSON column as a Notion DB column
 
 page icon options:
-  --icon-column                      CSV column that points to emoji, URL or image file
+  --icon-column                      CSV or JSON column that points to emoji, URL or image file
                                      that will be used as page icon for that row
-  --icon-column-keep                 keep icon CSV column as a Notion DB column
+  --icon-column-keep                 keep icon CSV or JSON column as a Notion DB column
   --default-icon ICON                Emoji, URL or image file that will be used as page icon for every row by default
 
 validation options:
-  --mandatory-column                 CSV column that cannot be empty (use multiple times for multiple columns)
+  --mandatory-column                 CSV or JSON column that cannot be empty (use multiple times for multiple columns)
   --payload-key-column               JSON object that is the key in Notion DB;
                                      if JSON file is used, this cannot be empty
   --fail-on-relation-duplicates      fail if any linked DBs in relation columns have duplicate entries;
                                      otherwise, first entry in alphabetical order
                                      will be treated as unique when looking up relations
-  --fail-on-duplicates               fail if Notion DB or CSV has duplicates in key column,
+  --fail-on-duplicates               fail if Notion DB or CSV or JSON has duplicates in key column,
                                      useful when sanitizing before merge to avoid ambiguous mapping
-  --fail-on-duplicate-csv-columns    fail if CSV has duplicate columns;
+  --fail-on-duplicate-csv-columns    fail if CSV or JSON has duplicate columns;
                                      otherwise last column will be used
   --fail-on-conversion-error         fail if any column type conversion error occurs;
                                      otherwise errors will be replaced with empty strings
