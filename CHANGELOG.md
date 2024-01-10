@@ -6,6 +6,7 @@
 - Next Release
 
 **🔨 Improvements:**
+- Added direct integration of notion-py package for increased flexibility for futures enhancements
 - Added ability to add multiple image attachment columns  (#14)
 - Added `--workspace` : Active workspace name
   
