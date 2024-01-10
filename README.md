@@ -23,7 +23,6 @@
 
 <br>
 <br>
-<br>
 </div>
 
 ## Core Features
