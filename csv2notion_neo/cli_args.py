@@ -169,7 +169,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--workspace":{
                 "help": (
-                    "Active workspace name"
+                    "Active Notion workspace name"
                 ),
                 "metavar": "workspace"
             },
