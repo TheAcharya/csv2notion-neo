@@ -91,7 +91,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--rename-notion-key-column":{
                 "nargs":2,
-                "help":"rename the key column in the file to a different key column in Airtable",
+                "help":"rename the key column in the file to a different key column in Notion DB",
                 "metavar":"column",
             },
             "--randomize-select-colors": {
@@ -169,7 +169,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--workspace":{
                 "help": (
-                    "Mention your workspce"
+                    "Active workspace name"
                 ),
                 "metavar": "workspace"
             },
