@@ -1,5 +1,25 @@
 # Changelog
 
+### 1.2.0
+
+**🎉 Released:**
+- Next Release
+
+**🔨 Improvements:**
+- Added ability to add multiple image attachment columns  (#14)
+  
+---
+
+### 1.1.2
+
+**🎉 Released:**
+- 5th January 2024
+
+**🐞 Bug Fix:**
+- Improved error handling of property mismatch (#16)
+
+---
+
 ### 1.1.1
 
 **🎉 Released:**

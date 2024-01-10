@@ -11,6 +11,7 @@ from csv2notion_neo.notion.maps import field_map
 from csv2notion_neo.notion.operations import build_operation
 from csv2notion_neo.notion.utils import remove_signed_prefix_as_needed
 
+from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
 from csv2notion_neo.notion_row_upload_file import Meta, is_meta_different, upload_filetype
 from csv2notion_neo.utils_static import FileType
@@ -77,7 +78,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             raise RuntimeError("Cannot set cover_block during atomic transaction")
 
         new_image: Optional[FileType] = image if image else None
-
+     
         if not self._is_meta_changed("cover_block_meta", new_image, self.cover_block):
             return
 
@@ -192,7 +193,6 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         if result_value is not None:
             return ["properties", prop["id"]], result_value
         
-        
         try:
             return super()._convert_python_to_notion(raw_value, prop, identifier)
         except:
@@ -200,6 +200,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         
 
     def _upload_column_files(self, column_id: str, files: List[FileType]) -> NamedURLs:
+        
         column_files_meta, column_files_urls = self._process_column_files(files)
 
         self.set(f"properties.meta.file_columns.{column_id}", column_files_meta)

@@ -35,7 +35,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def convert_to_notion_rows(self, csv_data: LocalData) -> List[NotionUploadRow]:
         notion_rows = []
-
         # starting with 2nd row, because first is header
         self._current_row = 2
 
@@ -52,8 +51,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
             except NotionError as e:
                 raise NotionError(f"CSV [{self._current_row}]: {e}")
             self._current_row += 1
-
-        #ic(notion_rows)
+    
         return notion_rows
 
     def _error(self, error: str) -> None:
@@ -65,6 +63,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
     def _convert_row(self, row: CSVRowType) -> NotionUploadRow:
         properties = self._map_properties(row)
         columns = self._map_columns(row)
+
 
         return NotionUploadRow(columns=columns, properties=properties)
 
@@ -88,8 +87,9 @@ class NotionRowConverter(object):  # noqa:  WPS214
         notion_row = {}
 
         for col_key, col_value in row.items():
-            col_type = self.db.columns[col_key]["type"]
 
+            col_type = self.db.columns[col_key]["type"]
+            
             notion_row[col_key] = self._map_column(col_key, col_value, col_type)
 
             self._raise_if_mandatory_empty(col_key, notion_row[col_key])
@@ -164,6 +164,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return icon
 
     def _map_image(self, row: CSVRowType) -> Optional[FileType]:
+
             image: Optional[FileType] = None
 
             if self.rules.image_column:
@@ -183,6 +184,29 @@ class NotionRowConverter(object):  # noqa:  WPS214
                         row.pop(image_column, None)
 
             return image
+    
+    def _mention_cover_image(self,image_column:List) -> List:
+	
+        image: Optional[FileType] = None
+
+        if self.rules.image_column:
+            
+            image_columns = self._mention_cover_image(self.rules.image_column)
+            
+            for image_column in image_columns:
+                image = row.get(image_column, "").strip()
+                if image:
+                    image = map_url_or_file(image)
+                    if isinstance(image, Path):
+                        image = self._relative_path(image)
+
+                self._raise_if_mandatory_empty(image_column, image)
+
+                if not self.rules.image_column_keep:
+                    row.pop(image_column, None)
+
+        
+        return image
     
     def _mention_cover_image(self,image_column:List) -> List:
 	
@@ -211,6 +235,8 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return image_caption
 
     def _map_file(self, s: str) -> List[FileType]:
+
+    
         col_value = split_str(s)
 
         resolved_uris = []
