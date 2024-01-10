@@ -3,6 +3,8 @@ from itertools import starmap
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+
+from csv2notion_neo.utils_exceptions import NotionError
 from cached_property import cached_property
 from csv2notion_neo.notion.collection import CollectionRowBlock
 from csv2notion_neo.notion.maps import field_map
@@ -189,8 +191,13 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
         if result_value is not None:
             return ["properties", prop["id"]], result_value
-
-        return super()._convert_python_to_notion(raw_value, prop, identifier)
+        
+        
+        try:
+            return super()._convert_python_to_notion(raw_value, prop, identifier)
+        except:
+            raise NotionError(f"Column {prop['name']} seems to have an property mismatch, please check and change the property to appropriate value in notion database!")
+        
 
     def _upload_column_files(self, column_id: str, files: List[FileType]) -> NamedURLs:
         column_files_meta, column_files_urls = self._process_column_files(files)

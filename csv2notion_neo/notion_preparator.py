@@ -42,13 +42,15 @@ class NotionPreparator(object):  # noqa: WPS214
             step()
 
     def _validate_image_column(self) -> None:
-        if self.rules.image_column is None:
-            return
+    
+        for image_column in self.rules.image_column:
+            if image_column is None:
+                return
 
-        if self.rules.image_column not in self.csv.columns:
-            raise NotionError(
-                f"Image column '{self.rules.image_column}' not found in csv file."
-            )
+            if image_column not in self.csv.columns:
+                raise NotionError(
+                    f"Image column '{image_column}' not found in csv file."
+                )
 
     def _validate_image_caption_column(self) -> None:
         if self.rules.image_caption_column is None:

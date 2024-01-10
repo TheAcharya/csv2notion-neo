@@ -164,21 +164,36 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return icon
 
     def _map_image(self, row: CSVRowType) -> Optional[FileType]:
-        image: Optional[FileType] = None
+            image: Optional[FileType] = None
 
-        if self.rules.image_column:
-            image = row.get(self.rules.image_column, "").strip()
-            if image:
-                image = map_url_or_file(image)
-                if isinstance(image, Path):
-                    image = self._relative_path(image)
+            if self.rules.image_column:
+                
+                image_columns = self._mention_cover_image(self.rules.image_column)
+                
+                for image_column in image_columns:
+                    image = row.get(image_column, "").strip()
+                    if image:
+                        image = map_url_or_file(image)
+                        if isinstance(image, Path):
+                            image = self._relative_path(image)
 
-            self._raise_if_mandatory_empty(self.rules.image_column, image)
+                    self._raise_if_mandatory_empty(image_column, image)
 
-            if not self.rules.image_column_keep:
-                row.pop(self.rules.image_column, None)
+                    if not self.rules.image_column_keep:
+                        row.pop(image_column, None)
 
-        return image
+            return image
+    
+    def _mention_cover_image(self,image_column:List) -> List:
+	
+        if len(image_column) == 1:
+            return image_column
+        
+        img_col_copy = image_column.copy()
+        cover_image = img_col_copy.pop(0)
+        img_col_copy.append(cover_image)
+
+        return img_col_copy
 
     def _map_image_caption(self, row: CSVRowType) -> Optional[str]:
         image_caption = None

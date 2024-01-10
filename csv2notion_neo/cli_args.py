@@ -127,12 +127,6 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     " during merge"
                 ),
             },
-            "--workspace":{
-                "help": (
-                    "Mention your workspce"
-                ),
-                "metavar": "workspace"
-            },
         },
         "relations options": {
             "--add-missing-relations": {
@@ -146,6 +140,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "CSV column that points to URL or image file"
                     " that will be embedded for that row"
                 ),
+                "nargs":"*",
                 "metavar": "COLUMN",
             },
             "--image-column-keep": {
@@ -171,6 +166,12 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--image-caption-column-keep": {
                 "action": "store_true",
                 "help": "keep image caption CSV column as a Notion DB column",
+            },
+            "--workspace":{
+                "help": (
+                    "Mention your workspce"
+                ),
+                "metavar": "workspace"
             },
         },
         "page icon options": {
@@ -305,6 +306,7 @@ def _parse_default_icon(default_icon: str) -> FileType:
 
 
 def _parse_column_types(column_types: str) -> List[str]:
+
     column_types_list = split_str(column_types)
     unknown_types = set(column_types_list) - set(ALLOWED_TYPES)
     if unknown_types:
