@@ -37,6 +37,13 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             }
         },
         "general options": {
+            "--workspace":{
+                "help": (
+                    "Active Notion workspace name"
+                ),
+                "required":True,
+                "metavar": "workspace",
+            },
             "--token": {
                 "help": "Notion token, stored in token_v2 cookie for notion.so",
                 "required": True,
@@ -166,12 +173,6 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--image-caption-column-keep": {
                 "action": "store_true",
                 "help": "keep image caption CSV column as a Notion DB column",
-            },
-            "--workspace":{
-                "help": (
-                    "Active Notion workspace name"
-                ),
-                "metavar": "workspace"
             },
         },
         "page icon options": {
