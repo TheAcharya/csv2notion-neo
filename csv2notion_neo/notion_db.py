@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests
-from notion.user import User
-from notion.utils import InvalidNotionIdentifier
+from csv2notion_neo.notion.user import User
+from csv2notion_neo.notion.utils import InvalidNotionIdentifier
 
 from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db_client import NotionClientExtended
@@ -11,6 +11,7 @@ from csv2notion_neo.notion_row import CollectionRowBlockExtended
 from csv2notion_neo.utils_db import make_status_column
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_rand_id import rand_id_list
+from icecream import ic
 
 
 class NotionDB(object):  # noqa: WPS214
@@ -45,6 +46,7 @@ class NotionDB(object):  # noqa: WPS214
     def rows(self) -> Dict[str, CollectionRowBlockExtended]:
         if not self._cache_rows:
             self._cache_rows = self.collection.get_unique_rows()
+
 
         return self._cache_rows
 
@@ -199,9 +201,9 @@ def _schema_from_csv(
     return schema
 
 
-def get_notion_client(token: str, **options: Dict[str, Any]) -> NotionClientExtended:
+def get_notion_client(token: str,workspace: str, **options: Dict[str, Any]) -> NotionClientExtended:
     try:
-        client = NotionClientExtended(token_v2=token)
+        client = NotionClientExtended(token_v2=token,workspace=workspace)
     except requests.exceptions.HTTPError as e:
         raise NotionError("Invalid Notion token") from e
 

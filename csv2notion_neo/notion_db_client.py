@@ -1,13 +1,13 @@
 from copy import deepcopy
 from typing import Any, Dict, Optional
 
-from notion.client import NotionClient, create_session
-from notion.space import Space
-from notion.store import RecordStore
-from notion.user import User
+from csv2notion_neo.notion.client import NotionClient, create_session
+from csv2notion_neo.notion.space import Space
+from csv2notion_neo.notion.store import RecordStore
+from csv2notion_neo.notion.user import User
 
 from csv2notion_neo.notion_db_collection import CollectionExtended
-
+from icecream import ic
 
 class NotionClientExtended(NotionClient):
     def __init__(
@@ -15,15 +15,18 @@ class NotionClientExtended(NotionClient):
         *args: Any,
         old_client: Optional["NotionClientExtended"] = None,
         options: Optional[Dict[str, Any]] = None,
+        workspace = None,
         **kwargs: Any,
     ):
+        
         self.options = options or {}
 
         if old_client is None:
-            super().__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs,workspace=workspace)
             return
 
         self._monitor = None
+
 
         self.session = create_session()
         self.session.cookies = old_client.session.cookies.copy()

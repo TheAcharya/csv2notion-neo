@@ -43,7 +43,7 @@ class NotionPreparator(object):  # noqa: WPS214
             step()
 
     def _validate_image_column(self) -> None:
-        
+      
         for image_column in self.rules.image_column:
             if image_column is None:
                 return

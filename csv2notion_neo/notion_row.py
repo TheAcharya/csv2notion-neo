@@ -3,11 +3,13 @@ from itertools import starmap
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+
+from csv2notion_neo.utils_exceptions import NotionError
 from cached_property import cached_property
-from notion.collection import CollectionRowBlock
-from notion.maps import field_map
-from notion.operations import build_operation
-from notion.utils import remove_signed_prefix_as_needed
+from csv2notion_neo.notion.collection import CollectionRowBlock
+from csv2notion_neo.notion.maps import field_map
+from csv2notion_neo.notion.operations import build_operation
+from csv2notion_neo.notion.utils import remove_signed_prefix_as_needed
 
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
@@ -190,7 +192,6 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
         if result_value is not None:
             return ["properties", prop["id"]], result_value
-
         
         try:
             return super()._convert_python_to_notion(raw_value, prop, identifier)

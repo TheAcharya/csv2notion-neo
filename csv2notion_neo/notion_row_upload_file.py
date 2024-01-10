@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import requests
-from notion.block import Block
+from csv2notion_neo.notion.block import Block
 
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_file import get_file_sha256

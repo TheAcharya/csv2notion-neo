@@ -1,9 +1,9 @@
 from typing import Any, Optional, cast
 
-from notion.block import ImageBlock
-from notion.collection import CollectionRowBlock
-from notion.maps import field_map
-from notion.operations import build_operation
+from csv2notion_neo.notion.block import ImageBlock
+from csv2notion_neo.notion.collection import CollectionRowBlock
+from csv2notion_neo.notion.maps import field_map
+from csv2notion_neo.notion.operations import build_operation
 
 from csv2notion_neo.notion_row_upload_file import get_file_id
 

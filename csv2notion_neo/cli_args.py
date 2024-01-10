@@ -167,6 +167,12 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "action": "store_true",
                 "help": "keep image caption CSV column as a Notion DB column",
             },
+            "--workspace":{
+                "help": (
+                    "Mention your workspce"
+                ),
+                "metavar": "workspace"
+            },
         },
         "page icon options": {
             "--icon-column": {

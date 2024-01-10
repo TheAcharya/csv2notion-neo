@@ -3,8 +3,8 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-from notion.user import User
-from notion.utils import InvalidNotionIdentifier, extract_id
+from csv2notion_neo.notion.user import User
+from csv2notion_neo.notion.utils import InvalidNotionIdentifier, extract_id
 
 from csv2notion_neo.local_data import LocalData, CSVRowType
 from csv2notion_neo.notion_convert_map import (
@@ -164,6 +164,29 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return icon
 
     def _map_image(self, row: CSVRowType) -> Optional[FileType]:
+
+            image: Optional[FileType] = None
+
+            if self.rules.image_column:
+                
+                image_columns = self._mention_cover_image(self.rules.image_column)
+                
+                for image_column in image_columns:
+                    image = row.get(image_column, "").strip()
+                    if image:
+                        image = map_url_or_file(image)
+                        if isinstance(image, Path):
+                            image = self._relative_path(image)
+
+                    self._raise_if_mandatory_empty(image_column, image)
+
+                    if not self.rules.image_column_keep:
+                        row.pop(image_column, None)
+
+            return image
+    
+    def _mention_cover_image(self,image_column:List) -> List:
+	
         image: Optional[FileType] = None
 
         if self.rules.image_column:
@@ -187,7 +210,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
     
     def _mention_cover_image(self,image_column:List) -> List:
 	
-	
         if len(image_column) == 1:
             return image_column
         
@@ -196,7 +218,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
         img_col_copy.append(cover_image)
 
         return img_col_copy
-
 
     def _map_image_caption(self, row: CSVRowType) -> Optional[str]:
         image_caption = None
@@ -243,7 +264,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         if _is_banned_extension(ensured_path):
             self._error(
                 f"File extension '*{ensured_path.suffix}' is not allowed"
-                f" to upload on Notion."
+                f" to upload on csv2notion_neo.notion."
             )
             return None
 
@@ -268,7 +289,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
         resolved_relations = []
         for v in col_values:
-            if v.startswith("https://www.notion.so/"):
+            if v.startswith("https://www.csv2notion_neo.notion.so/"):
                 resolved_relation = self._resolve_relation_by_url(relation_column, v)
             else:
                 resolved_relation = self._resolve_relation_by_key(relation_column, v)
@@ -321,7 +342,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         try:
             return str(extract_id(url))
         except InvalidNotionIdentifier:
-            self._error(f"'{url}' is not a valid Notion URL.")
+            self._error(f"'{url}' is not a valid csv2notion_neo.notion URL.")
 
             return None
 
