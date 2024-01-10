@@ -112,6 +112,7 @@ positional arguments:
   FILE                               CSV or JSON file to upload
 
 general options:
+  --workspace                        Active Notion workspace name
   --token                            Notion token, stored in token_v2 cookie for notion.so
   --url URL                          Notion database URL; if none is provided, will create a new database
   --max-threads                      upload threads (default: 5)
