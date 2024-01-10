@@ -137,7 +137,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "page cover options": {
             "--image-column": {
                 "help": (
-                    "CSV or JSON column that points to URL or image file"
+                    "One or more CSV or JSON column that points to URL or image file"
                     " that will be embedded for that row"
                 ),
                 "nargs":"*",
