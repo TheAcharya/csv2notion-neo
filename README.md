@@ -19,7 +19,7 @@
 <img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
 </a>
 <p>
-<p>An advance method to upload & merge *.csv or *.json files to <a href="https://notion.so/" target="_blank">Notion</a>.
+<p>An advance method to upload & merge *.csv or *.json files with images to <a href="https://notion.so/" target="_blank">Notion</a> database.
 
 <br>
 <br>
