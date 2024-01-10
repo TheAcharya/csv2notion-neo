@@ -202,6 +202,17 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 </p>
 </details>
 
+<details><summary>Obtaining Workspace Name</summary>
+<p>
+
+<p align="center"> <img src="https://www.notion.so/cdn-cgi/image/format=auto,width=3840,quality=100/https://images.ctfassets.net/spoqsaf9291f/36DSq2EcSv3Q9uUUnRXdMo/9f8e7900ef53569a84c8625097bcc271/Workspace_settings_-_hero.png"> </p>
+
+1. To see your Workspace name go to `Settings & members` at the top of the left sidebar. In the window that pops up, click on the `Settings` tab.
+2. If your Workspace name is `Acme Inc.`, you are required to provide `--workspace "Acme Inc."` as such.
+
+</p>
+</details>
+
 
 The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option.
 
@@ -337,7 +348,7 @@ If you want to ensure that specific columns always have value and are not allowe
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_01.png?raw=true"> </p>
 
@@ -348,7 +359,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE test.csv
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_02.png?raw=true"> </p>
 
@@ -359,7 +370,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --column-types "number,multi_select" test
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_03.gif?raw=true"> </p>
 
@@ -370,7 +381,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_04.gif?raw=true"> </p>
 
@@ -381,7 +392,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_05.gif?raw=true"> </p>
 
@@ -392,7 +403,7 @@ csv2notion_neo --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-co
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_06.gif?raw=true"> </p>
 
@@ -403,7 +414,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_07.gif?raw=true"> </p>
 
@@ -414,7 +425,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_08.gif?raw=true"> </p>
 
@@ -425,7 +436,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --me
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --merge JSON-Demo.json
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --merge JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_09.gif?raw=true"> </p>
@@ -437,7 +448,7 @@ csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat 
 <p>
 
 ```shell
-csv2notion_neo --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --rename-notion-key-column "Cat ID" "Anything ID" --merge JSON-Demo.json
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --rename-notion-key-column "Cat ID" "Anything ID" --merge JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_10.gif?raw=true"> </p>
