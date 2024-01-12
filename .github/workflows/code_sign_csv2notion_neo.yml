@@ -1,0 +1,70 @@
+name: code_sign_csv2notion_neo
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release after build'
+        required: true
+        default: 'no'
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Create Distribution directory
+      run: mkdir -p dist/bin
+
+    - name: Copy Local Distribution 
+      run: |
+        mkdir -p dist/bin
+        cp -R ./Bin/. ./dist/bin
+
+    - name: Verify Copied Files
+      run: |
+        echo "Checking copied files..."
+        ls -l ./dist/bin
+
+    - name: Prepare Directories
+      run: |
+        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+        mkdir -p "$PARENT/dist/bin"
+
+    - name: Copy Local Resources
+      run: |
+        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+        cp -R ./Bin/csv2notion_neo "$PARENT/dist/bin"
+        
+    - name: Verify Uninstaller
+      run: |
+        echo "Checking copied files..."
+        ls -l ./dist/bin
+
+    - name: Codesign CSV2Notion Neo
+      env: 
+        APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+        APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+        APP="$PARENT/dist/bin/csv2notion_neo"
+    
+        echo $APPLE_CERT_DATA | base64 --decode > certificate.p12
+        security create-keychain -p $KEYCHAIN_PASSWORD build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
+        security import certificate.p12 -k build.keychain -P $APPLE_CERT_PASSWORD -T /usr/bin/codesign
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
+        /usr/bin/codesign --force -s $APPLE_TEAM_ID "$APP" -v
+        
+    - name: Verify Codesign CSV2Notion Neo
+      run: |
+        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+        APP="$PARENT/dist/bin/csv2notion_neo"
+
+        /usr/bin/codesign -dv --verbose=4 "$APP"
