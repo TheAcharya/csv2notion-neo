@@ -60,7 +60,7 @@ jobs:
         security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
         security import certificate.p12 -k build.keychain -P $APPLE_CERT_PASSWORD -T /usr/bin/codesign
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
-        /usr/bin/codesign --force -s $APPLE_TEAM_ID "$APP" -v
+        /usr/bin/codesign --force -s $APPLE_TEAM_ID --options runtime "$APP" -v
         
     - name: Verify Codesign CSV2Notion Neo
       run: |
