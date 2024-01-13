@@ -22,7 +22,7 @@ jobs:
     - name: Copy Local Distribution 
       run: |
         mkdir -p dist/bin
-        cp -R ./Bin/. ./dist/bin
+        cp -R ./bin/. ./dist/bin
 
     - name: Verify Copied Files
       run: |
@@ -37,9 +37,10 @@ jobs:
     - name: Copy Local Resources
       run: |
         PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-        cp -R ./Bin/csv2notion_neo "$PARENT/dist/bin"
+        cp -R ./bin/csv2notion_neo "$PARENT/dist/bin"
+        cp -R ./bin/entitlements.plist "$PARENT/dist/bin"
         
-    - name: Verify Uninstaller
+    - name: Verify Files
       run: |
         echo "Checking copied files..."
         ls -l ./dist/bin
@@ -53,18 +54,23 @@ jobs:
       run: |
         PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
         APP="$PARENT/dist/bin/csv2notion_neo"
-    
+        ENTITLE="$PARENT/dist/bin/entitlements.plist"
+        ls -l "$PARENT/dist/bin"
+
         echo $APPLE_CERT_DATA | base64 --decode > certificate.p12
         security create-keychain -p $KEYCHAIN_PASSWORD build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
         security import certificate.p12 -k build.keychain -P $APPLE_CERT_PASSWORD -T /usr/bin/codesign
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
-        /usr/bin/codesign --force -s $APPLE_TEAM_ID --options runtime "$APP" -v
+        
+        chmod +x "$ENTITLE"
+        
+        /usr/bin/codesign --force -s $APPLE_TEAM_ID --identifier "co.theacharya.CSV2Notion-Neo" --options runtime --entitlements "$ENTITLE" "$APP" -v
         
     - name: Verify Codesign CSV2Notion Neo
       run: |
         PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
         APP="$PARENT/dist/bin/csv2notion_neo"
-
+    
         /usr/bin/codesign -dv --verbose=4 "$APP"
