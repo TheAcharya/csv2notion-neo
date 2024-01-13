@@ -112,7 +112,45 @@ jobs:
 
       - name: Pack up binary for macos
         if: matrix.os == 'macos-latest'
-        run: zip -q -j dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip ./dist/${{ env.PACKAGE_NAME }}
+        env: 
+          APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+          APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_DEV_ID: ${{ secrets.APPLE_DEV_ID }}
+          APPLE_DEV_ID_PASSWORD: ${{ secrets.APPLE_DEV_ID_PASSWORD }}
+        run: |
+          mkdir -p dist/bin
+          PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+          mkdir -p "$PARENT/dist/bin"
+          cp -R ./dist/${{ env.PACKAGE_NAME }} "$PARENT/dist/bin"
+          cp -R ./bin/entitlements.plist "$PARENT/dist/bin"
+
+          APP="$PARENT/dist/bin/${{ env.PACKAGE_NAME }}"
+          ENTITLE="$PARENT/dist/bin/entitlements.plist"
+          ls -l "$PARENT/dist/bin"
+  
+          echo $APPLE_CERT_DATA | base64 --decode > certificate.p12
+          security create-keychain -p $KEYCHAIN_PASSWORD build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
+          security import certificate.p12 -k build.keychain -P $APPLE_CERT_PASSWORD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
+          
+          chmod +x "$ENTITLE"
+          
+          /usr/bin/codesign --force -s $APPLE_TEAM_ID --identifier "co.theacharya.CSV2Notion-Neo" --options runtime --entitlements "$ENTITLE" "$APP" -v
+
+          echo "Create Keychain Profile"
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id $APPLE_DEV_ID --password $APPLE_DEV_ID_PASSWORD --team-id $APPLE_TEAM_ID
+            
+          echo "Creating Temp Notarization Archive"
+          ditto -c -k --keepParent "$APP" "csv2notion_neo.zip"
+            
+          echo "Notarize App"
+          xcrun notarytool submit "csv2notion_neo.zip" --keychain-profile "notarytool-profile" --progress --wait
+
+          zip -q -j dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "$APP"
 
       - name: Pack up binary for linux
         if: matrix.os == 'ubuntu-latest'
