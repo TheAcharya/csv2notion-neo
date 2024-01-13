@@ -150,7 +150,7 @@ jobs:
           echo "Notarize App"
           xcrun notarytool submit "csv2notion_neo.zip" --keychain-profile "notarytool-profile" --progress --wait
 
-          zip -q -j dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "$APP"
+          zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "$PARENT/dist/bin"
 
       - name: Pack up binary for linux
         if: matrix.os == 'ubuntu-latest'
