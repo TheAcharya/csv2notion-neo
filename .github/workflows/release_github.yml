@@ -151,7 +151,10 @@ jobs:
           xcrun notarytool submit "csv2notion_neo.zip" --keychain-profile "notarytool-profile" --progress --wait
 
 
-          cp -R "$PARENT/dist/bin" "dist/"
+          cp -R "$PARENT/dist/bin/${{ env.PACKAGE_NAME }}" dist/
+          cp -R  ./bin/entitlements.plist dist/
+          cp ./LICENSE dist/
+
 
           zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
 
