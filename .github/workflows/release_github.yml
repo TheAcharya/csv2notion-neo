@@ -120,7 +120,7 @@ jobs:
           APPLE_DEV_ID: ${{ secrets.APPLE_DEV_ID }}
           APPLE_DEV_ID_PASSWORD: ${{ secrets.APPLE_DEV_ID_PASSWORD }}
         run: |
-          mkdir -p dist/bin
+          mkdir -p dist
           PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
           mkdir -p "$PARENT/dist/bin"
           cp -R ./dist/${{ env.PACKAGE_NAME }} "$PARENT/dist/bin"
@@ -150,11 +150,10 @@ jobs:
           echo "Notarize App"
           xcrun notarytool submit "csv2notion_neo.zip" --keychain-profile "notarytool-profile" --progress --wait
 
-          mkdir -p "/binary"
 
-          cp -R "$PARENT/dist/bin" "/binary"
+          cp -R "$PARENT/dist/bin" "dist/"
 
-          zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "/binary"
+          zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
 
       - name: Pack up binary for linux
         if: matrix.os == 'ubuntu-latest'
