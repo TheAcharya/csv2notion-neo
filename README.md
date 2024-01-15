@@ -140,7 +140,7 @@ relations options:
   --add-missing-relations            add missing entries into linked Notion DB
 
 page cover options:
-  --image-column COLUMN              One or more CSV or JSON column that points to URL or image file that will be embedded for that row
+  --image-column COLUMN              one or more CSV or JSON column that points to URL or image file that will be embedded for that row
   --image-column-keep                keep image CSV or JSON column as a Notion DB column
   --image-column-mode {cover,block}  upload image as [cover] or insert it as [block] (default: block)
   --image-caption-column             CSV or JSON column that points to text caption that will be added to the image block
