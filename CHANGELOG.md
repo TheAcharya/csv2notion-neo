@@ -9,6 +9,7 @@
 - Added direct integration of notion-py package for increased flexibility for futures enhancements (#18)
 - Added ability to add multiple image attachment columns  (#14)
 - Added `--workspace` : Active workspace name
+- Added codesign and notarization to macOS binary
   
 ---
 
