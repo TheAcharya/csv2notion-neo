@@ -3,7 +3,7 @@
 ### 1.2.0
 
 **🎉 Released:**
-- Next Release
+- 15th January 2024
 
 **🔨 Improvements:**
 - Added direct integration of notion-py package for increased flexibility for futures enhancements (#18)
