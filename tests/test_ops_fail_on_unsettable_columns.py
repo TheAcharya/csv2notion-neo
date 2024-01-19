@@ -1,7 +1,7 @@
 import logging
 
 import pytest
-from notion.user import User
+from csv2notion_neo.notion.user import User
 
 from csv2notion_neo.utils_exceptions import NotionError
 

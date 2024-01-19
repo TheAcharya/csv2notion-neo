@@ -1,5 +1,5 @@
 import pytest
-from notion.utils import slugify
+from csv2notion_neo.notion.utils import slugify
 
 from csv2notion_neo.cli import cli
 from csv2notion_neo.utils_exceptions import NotionError

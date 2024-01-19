@@ -2,7 +2,7 @@ import logging
 import re
 from pathlib import Path
 
-from notion.user import User
+from csv2notion_neo.notion.user import User
 from pyfakefs.fake_filesystem_unittest import Patcher
 from testfixtures import LogCapture, ShouldRaise
 

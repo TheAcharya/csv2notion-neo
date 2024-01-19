@@ -1,7 +1,7 @@
 import hashlib
 
 import pytest
-from notion.block import ImageBlock, TextBlock
+from csv2notion_neo.notion.block import ImageBlock, TextBlock
 
 from csv2notion_neo.cli import cli
 

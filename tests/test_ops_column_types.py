@@ -9,6 +9,8 @@ from csv2notion_neo.utils_exceptions import CriticalError
 def test_column_types_bad():
     with pytest.raises(CriticalError) as e:
         cli(
+            "--workspace",
+            "arun",
             "--token",
             "fake",
             "--column-types",
@@ -27,6 +29,8 @@ def test_column_types_bad_count(tmp_path):
 
     with pytest.raises(CriticalError) as e:
         cli(
+            "--workspace",
+            "arun",
             "--token",
             "fake",
             "--column-types",
@@ -48,6 +52,8 @@ def test_column_types_checkbox(tmp_path, db_maker):
     test_file.write_text("a,b\na,true\nb,false\nc,test")
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -76,6 +82,8 @@ def test_column_types_date(tmp_path, db_maker):
     test_file.write_text("a,b\na,2001-12-01\nb,bad\nc")
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -108,6 +116,8 @@ def test_column_types_date_split(tmp_path, db_maker):
     )
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -138,6 +148,8 @@ def test_column_types_textlike(tmp_path, db_maker):
     test_file.write_text("a,b,c,d,e\na1,b1,c1,d1,e1")
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -168,6 +180,8 @@ def test_column_types_multi_select(tmp_path, db_maker):
     test_file.write_text('a,b\na,"b1, b2, b3"')
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -197,6 +211,8 @@ def test_column_types_select(tmp_path, db_maker):
     test_file.write_text("a,b\na1,b1\na2,b2")
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -235,6 +251,8 @@ def test_column_types_multi_select_colored(tmp_path, db_maker, mocker):
     )
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
@@ -265,6 +283,8 @@ def test_column_types_number(tmp_path, db_maker):
     test_file.write_text("a,b\na1,100\na2,1.25\na3,bad")
 
     test_db = db_maker.from_cli(
+        "--workspace",
+        "arun",
         "--token",
         db_maker.token,
         "--column-types",
