@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.2.1
+
+**🎉 Released:**
+- 19th January 2024
+
+**🐞 Bug Fix:**
+- Fixed multiple image upload (#21)
+
+---
+
 ### 1.2.0
 
 **🎉 Released:**
