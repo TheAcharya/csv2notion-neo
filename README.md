@@ -10,10 +10,6 @@
 <a href="https://pypi.org/project/csv2notion-neo/">
 <img src="https://img.shields.io/pypi/pyversions/csv2notion-neo.svg" alt="Python"/>
 </a>
-<!-- tests -->
-<a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml">
-<img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/test.yml/badge.svg" alt="tests"/>
-</a>
 <!-- release_github -->
 <a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml">
 <img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
