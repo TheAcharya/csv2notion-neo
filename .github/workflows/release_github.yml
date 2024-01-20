@@ -157,6 +157,68 @@ jobs:
 
 
           zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
+      
+      - name: Create pkg and productsign it
+        if: matrix.os == 'macos-latest'
+        env:
+          APPLE_INTSALL_CERT_DATA: ${{ secrets.APPLE_INSTALL_CERT_DATA }}
+          APPLE_INSTALL_CERT_PASSWORD: ${{ secrets.APPLE_INSTALL_CERT_PASSWORD }}
+          KEYCHAIN_PASSWORD_IN: ${{ secrets.KEYCHAIN_PASSWORD_IN }}
+          APPLE_TEAM_ID_INSTALL: ${{ secrets.APPLE_TEAM_ID_INSTALL }}
+          APPLE_DEV_ID: ${{ secrets.APPLE_DEV_ID }}
+          APPLE_DEV_ID_PASSWORD: ${{ secrets.APPLE_DEV_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+          BINARY_PATH="$PARENT/dist/bin/${{ env.PACKAGE_NAME }}"
+          PKG_IDENTIFIER="co.theacharya.Csv2notion_neo"
+          INSTALL_LOCATION="/Applications/Csv2notion_neo"
+          PACKAGE_NAME="Csv2notion_neo-unsigned"
+          OUTPUT_DIR="$PARENT/dist/pkg-build"
+          VERSION=${{ env.APP_VERSION }}
+          
+          echo "Creating Temp Dir"
+          TMP_DIR="$OUTPUT_DIR/tmp_pkgbuild"
+          mkdir -p "$TMP_DIR"
+
+          cp "$BINARY_PATH" "$TMP_DIR/$(basename "$BINARY_PATH")"
+
+          echo "Running Creating PKG"
+          pkgbuild --root "$TMP_DIR" --identifier "$PKG_IDENTIFIER" --version "$VERSION" --install-location "$INSTALL_LOCATION" "$OUTPUT_DIR/$PACKAGE_NAME.pkg"
+
+          echo "Checking pkg files..."
+          ls -l "$PARENT/dist/pkg-build"
+
+          PKG="$PARENT/dist/pkg-build/Csv2notion_neo-unsigned.pkg"
+          SPKG="$PARENT/dist/pkg-build/Csv2notion_neo_${{env.APP_VERSION}}.pkg"
+          SIGNING_IDENTITY="$APPLE_TEAM_ID_INSTALL"
+          
+          echo "sign pkg"
+          echo $APPLE_INTSALL_CERT_DATA | base64 --decode > certificate.p12
+          security create-keychain -p $KEYCHAIN_PASSWORD_IN build-i.keychain
+          security default-keychain -s build-i.keychain
+          security unlock-keychain -p $KEYCHAIN_PASSWORD_IN build-i.keychain
+          security import certificate.p12 -k build-i.keychain -P $APPLE_INSTALL_CERT_PASSWORD -T /usr/bin/productsign
+          security set-key-partition-list -S apple-tool:,apple:,productsign: -s -k $KEYCHAIN_PASSWORD_IN build-i.keychain
+        
+          /usr/bin/productsign --sign "$SIGNING_IDENTITY" "$PKG" "$SPKG"
+
+          SPKG="$PARENT/dist/pkg-build/Csv2notion_neo_${{env.APP_VERSION}}.pkg"
+        
+          echo "SPKG=$SPKG" >> $GITHUB_ENV
+          echo "Create Keychain Profile"
+          xcrun notarytool store-credentials "notarytool-profile" --apple-id $APPLE_DEV_ID --password $APPLE_DEV_ID_PASSWORD --team-id $APPLE_TEAM_ID
+          
+          echo "Notarize csv2notion_neo PKG"
+          xcrun notarytool submit "$SPKG" --keychain-profile "notarytool-profile" --progress --wait
+          
+          echo "Attach staple"
+          xcrun stapler staple "$SPKG"
+
+          cp "$SPKG" "dist/"
+          
+          ls "dist"
+          rm -rf "$TMP_DIR"
 
       - name: Pack up binary for linux
         if: matrix.os == 'ubuntu-latest'
@@ -169,13 +231,20 @@ jobs:
         run: |
           choco install zip
           copy ./LICENSE dist/
-          zip -q -j dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip ./dist/${{ env.PACKAGE_NAME }}.exe
+          zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
 
       - name: Save release binaries for ${{ matrix.OS_CODE }}
         uses: actions/upload-artifact@v3
         with:
           name: release_dist_bin_${{ matrix.OS_CODE }}
           path: dist_bin
+
+      - name: Save release binaries for macos
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v3
+        with:
+          name: release_csv2notion_neo_pkg
+          path: ${{ env.SPKG }}
 
   release:
     if: github.event_name == 'push' || github.event.inputs.release == 'yes'
@@ -210,6 +279,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: release_dist_bin_macos
+          path: dist
+      
+      - name: Load release pkg
+        uses: actions/download-artifact@v3
+        with:
+          name: release_csv2notion_neo_pkg
           path: dist
 
       - name: Create Release
