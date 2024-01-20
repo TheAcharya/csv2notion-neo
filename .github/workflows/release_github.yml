@@ -171,9 +171,9 @@ jobs:
         run: |
           PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
           BINARY_PATH="$PARENT/dist/bin/${{ env.PACKAGE_NAME }}"
-          PKG_IDENTIFIER="co.theacharya.Csv2notion_neo"
-          INSTALL_LOCATION="/Applications/Csv2notion_neo"
-          PACKAGE_NAME="Csv2notion_neo-unsigned"
+          PKG_IDENTIFIER="co.theacharya.CSV2Notion-Neo"
+          INSTALL_LOCATION="/Applications/CSV2Notion Neo"
+          PACKAGE_NAME="CSV2Notion-Neo-unsigned"
           OUTPUT_DIR="$PARENT/dist/pkg-build"
           VERSION=${{ env.APP_VERSION }}
           
@@ -189,8 +189,8 @@ jobs:
           echo "Checking pkg files..."
           ls -l "$PARENT/dist/pkg-build"
 
-          PKG="$PARENT/dist/pkg-build/Csv2notion_neo-unsigned.pkg"
-          SPKG="$PARENT/dist/pkg-build/Csv2notion_neo_${{env.APP_VERSION}}.pkg"
+          PKG="$PARENT/dist/pkg-build/CSV2Notion-Neo-unsigned.pkg"
+          SPKG="$PARENT/dist/pkg-build/CSV2Notion-Neo_${{env.APP_VERSION}}.pkg"
           SIGNING_IDENTITY="$APPLE_TEAM_ID_INSTALL"
           
           echo "sign pkg"
@@ -203,7 +203,7 @@ jobs:
         
           /usr/bin/productsign --sign "$SIGNING_IDENTITY" "$PKG" "$SPKG"
 
-          SPKG="$PARENT/dist/pkg-build/Csv2notion_neo_${{env.APP_VERSION}}.pkg"
+          SPKG="$PARENT/dist/pkg-build/CSV2Notion-Neo_${{env.APP_VERSION}}.pkg"
         
           echo "SPKG=$SPKG" >> $GITHUB_ENV
           echo "Create Keychain Profile"
