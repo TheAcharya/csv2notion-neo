@@ -46,7 +46,7 @@
   - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
   - [From Source](#from-source)
 - [Guide](#guide)
-  - [macOS Gatekeeper & Notarization](#macos-gatekeeper--notarization)
+  - [macOS Release](#macos-release)
   - [Prerequisite](#prerequisite)
   - [Upload Speed](#upload-speed)
   - [Duplicate CSV Columns](#duplicate-csv-columns)
@@ -174,15 +174,21 @@ validation options:
                                      otherwise those values will be replaced with default status
 ```
 
-### macOS Gatekeeper & Notarization
+### macOS Release
 
-After trying to run `csv2notion_neo` for the first time, the process will be blocked by macOS's Gatekeeper, and a system dialog will appear which includes
+<details><summary>Privacy & Security</summary>
+<p>
 
-> "csv2notion_neo" can't be opened because the developer cannot be verified...
+For macOS, you have the option of two distinct releases: one packaged within a `.zip` archive and the other in a `.pkg` format. Navigate to the `Privacy & Security` settings and set your preference to `App Store and identified developers`.
 
-- To approve the process and allow `csv2notion_neo` to run, go to System Preferences, Security & Privacy, General, and look in the bottom right corner for a button to click.
-- After approving `csv2notion_neo`, it should run successfully. 
-- For more information, visit https://support.apple.com/en-us/HT202491.
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/main/assets/macOS-privacy.png?raw=true"> </p>
+
+</p>
+</details>
+
+Utilise the `CSV2Notion-Neo.pkg` installer to install the command-line binary into your system. Upon completion, find the installed binary located within `/Applications/Airlift/airlift`. To uninstall, you can simply delete the folder containing the binary.
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/main/assets/macOS-installer.png?raw=true"> </p>
 
 ### Prerequisite
 
@@ -456,6 +462,18 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 
 - Users would not be able to duplicate entries/records there where uploaded using **CSV2Notion Neo** in Notion.
   - **Workaround:** Simply [duplicate](https://www.notion.so/help/duplicate-delete-and-restore-content) the database directly in Notion. You would be able to duplicate your entries/records in the duplicated database.
+  
+## Utilised By
+
+### [CommandPost](https://commandpost.io)
+
+<details><summary>CommandPost's Notion Toolbox</summary>
+<p>
+
+<p align="center"> <img src="https://github.com/CommandPost/CommandPost-Website/blob/main/docs/static/toolbox-notion.png?raw=true"> </p>
+
+</p>
+</details>
 
 ## Credits
 
