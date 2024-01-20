@@ -1,5 +1,13 @@
 # Changelog
 
+### 1.2.2
+
+**🎉 Released:**
+- Next Release
+
+**🔨 Improvements:**
+- Added new macOS pkg release with notarization ticket stapled
+
 ### 1.2.1
 
 **🎉 Released:**
