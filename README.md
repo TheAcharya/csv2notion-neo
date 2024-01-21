@@ -186,7 +186,7 @@ For macOS, you have the option of two distinct releases: one packaged within a `
 </p>
 </details>
 
-Utilise the `CSV2Notion Neo.pkg` installer to install the command-line binary into your system. Upon completion, find the installed binary located within `/Applications/Airlift/airlift`. To uninstall, you can simply delete the folder containing the binary.
+Utilise the `CSV2Notion Neo.pkg` installer to install the command-line binary into your system. Upon completion, find the installed binary located within `/Applications/CSV2Notion Neo/csv2notion_neo`. To uninstall, you can simply delete the folder containing the binary.
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/macOS-installer.png?raw=true"> </p>
 
