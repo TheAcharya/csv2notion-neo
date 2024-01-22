@@ -172,7 +172,7 @@ jobs:
           PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
           BINARY_PATH="$PARENT/dist/bin/${{ env.PACKAGE_NAME }}"
           PKG_IDENTIFIER="co.theacharya.CSV2Notion-Neo"
-          INSTALL_LOCATION="/Applications/CSV2Notion Neo"
+          INSTALL_LOCATION="/usr/local/bin"
           PACKAGE_NAME="CSV2Notion-Neo-unsigned"
           OUTPUT_DIR="$PARENT/dist/pkg-build"
           VERSION=${{ env.APP_VERSION }}
