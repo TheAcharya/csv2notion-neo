@@ -187,29 +187,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
     
     def _mention_cover_image(self,image_column:List) -> List:
 	
-        image: Optional[FileType] = None
-
-        if self.rules.image_column:
-            
-            image_columns = self._mention_cover_image(self.rules.image_column)
-            
-            for image_column in image_columns:
-                image = row.get(image_column, "").strip()
-                if image:
-                    image = map_url_or_file(image)
-                    if isinstance(image, Path):
-                        image = self._relative_path(image)
-
-                self._raise_if_mandatory_empty(image_column, image)
-
-                if not self.rules.image_column_keep:
-                    row.pop(image_column, None)
-
-        
-        return image
-    
-    def _mention_cover_image(self,image_column:List) -> List:
-	
         if len(image_column) == 1:
             return image_column
         

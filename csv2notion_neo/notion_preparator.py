@@ -231,7 +231,8 @@ class NotionPreparator(object):  # noqa: WPS214
         db_columns = set(self.db.columns)
 
         if self.rules.image_column and not self.rules.image_column_keep:
-            csv_columns -= {self.rules.image_column}
+            for image_column in self.rules.image_column:
+                csv_columns -= {image_column}
 
         if self.rules.image_caption_column:
             if not self.rules.image_caption_column_keep:
