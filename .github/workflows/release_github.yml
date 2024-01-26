@@ -42,13 +42,13 @@ jobs:
         run: poetry build
 
       - name: Save release python requirements
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release_dist_reqs
           path: requirements.txt
 
       - name: Save release python packages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release_dist_python
           path: dist
@@ -234,14 +234,14 @@ jobs:
           zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
 
       - name: Save release binaries for ${{ matrix.OS_CODE }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release_dist_bin_${{ matrix.OS_CODE }}
           path: dist_bin
 
       - name: Save release binaries for macos
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release_csv2notion_neo_pkg
           path: ${{ env.SPKG }}
