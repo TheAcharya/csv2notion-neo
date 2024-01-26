@@ -8,6 +8,9 @@
 **🔨 Improvements:**
 - Added new macOS pkg release with notarization ticket stapled
 
+**🐞 Bug Fix:**
+- Fixed multiple image upload (#23)
+
 ### 1.2.1
 
 **🎉 Released:**
