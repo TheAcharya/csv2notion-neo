@@ -11,6 +11,8 @@
 **🐞 Bug Fix:**
 - Fixed multiple image upload (#23)
 
+---
+
 ### 1.2.1
 
 **🎉 Released:**
