@@ -75,6 +75,15 @@ Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to
 
 Download the latest release of the latest binary release [here](https://github.com/TheAcharya/csv2notion-neo/releases).
 
+### With [Homebrew](https://brew.sh/) (Recommended for macOS)
+
+```bash
+$ brew install TheAcharya/homebrew-tap/csv2notion-neo
+```
+```bash
+$ brew uninstall --cask csv2notion-neo
+```
+
 ### With PIP
 
 ```bash
