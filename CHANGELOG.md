@@ -3,7 +3,7 @@
 ### 1.2.2
 
 **🎉 Released:**
-- Next Release
+- 27th January 2024
 
 **🔨 Improvements:**
 - Added new macOS pkg release with notarization ticket stapled
