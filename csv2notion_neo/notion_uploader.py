@@ -35,7 +35,7 @@ class NotionRowUploader(object):
 
         existing_row = self.db.rows.get(row.key()) if is_merge else None
 
-        #ic(existing_row)
+
         if is_merge and existing_row:
             cur_row = existing_row
             cur_row.update(properties=row.properties, columns=row.columns)

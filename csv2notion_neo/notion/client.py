@@ -3,6 +3,7 @@ import json
 import re
 import uuid
 import time
+from icecream import ic
 
 from requests import Session, HTTPError
 from requests.cookies import cookiejar_from_dict
@@ -322,7 +323,6 @@ class NotionClient(object):
 
         response.raise_for_status()
 
-        #ic("insider-response",response.json())
         return response
 
     def submit_transaction(self, operations, update_last_edited=True):
