@@ -1,5 +1,18 @@
 # Changelog
 
+### 1.2.3
+
+**🎉 Released:**
+- Next Release
+
+**🔨 Improvements:**
+- Added support for attaching multiple Notion blocks (#14)
+
+**🐞 Bug Fix:**
+- Improved logic and funcations for multiple image attachment columns (#14)
+
+---
+
 ### 1.2.2
 
 **🎉 Released:**
@@ -30,7 +43,7 @@
 
 **🔨 Improvements:**
 - Added direct integration of notion-py package for increased flexibility for futures enhancements (#18)
-- Added ability to add multiple image attachment columns  (#14)
+- Added ability to add multiple image attachment columns (#14)
 - Added `--workspace` : active Notion workspace name
 - Added codesign and notarization to macOS binary
   
