@@ -10,7 +10,7 @@
 - Added support for having multiple image attachment with sub-folders (#14)
 
 **🐞 Bug Fix:**
-- Improved logic and funcations for multiple image attachment columns (#14)
+- Improved logic and functions for multiple image attachment columns (#14)
 
 ---
 
