@@ -431,9 +431,7 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --im
 ```shell
 csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --image-column "Colour Image" "Black & White Image" "Map" --image-column-keep --mandatory-column "Cat ID" test.csv
 ```
-<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_11A.gif?raw=true"> </p>
-
-<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_11B.png?raw=true"> </p>
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_11.gif?raw=true"> </p>
 
 </p>
 </details>
