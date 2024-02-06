@@ -431,6 +431,51 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --im
 ```shell
 csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --image-column "Colour Image" "Black & White Image" "Map" --image-column-keep --mandatory-column "Cat ID" test.csv
 ```
+
+Example CSV
+
+```text
+Cat ID,Animal Name,Location,Colour Image,Black & White Image,Map
+1,Lion,Namibia,Colour/lion.jpg,Black & White/lion.jpg,Map/Namibia.jpg
+2,Tiger,India,Colour/tiger.jpg,Black & White/tiger.jpg,Map/India.jpg
+3,Panther,India,Colour/panther.jpg,Black & White/panther.jpg,Map/India.jpg
+4,Snow Leopard,Nepal,Colour/snow_leopard.jpg,Black & White/snow_leopard.jpg,Map/Nepal.jpg
+5,Cheetah,South Africa,Colour/cheetah.jpg,Black & White/cheetah.jpg,Map/South Africa.jpg
+6,Puma,South America,Colour/puma.jpg,Black & White/puma.jpg,Map/South America.jpg
+7,Jaguar,Brazil,Colour/jaguar.jpg,Black & White/jaguar.jpg,Map/Brazil.jpg
+```
+
+Example Folder Structure
+
+```text
+├─ Data/
+│  ├─ test.csv
+│  ├─ Black & White/
+│  │  ├─ cheetah.jpg
+│  │  ├─ jaguar.jpg
+│  │  ├─ lion.jpg
+│  │  ├─ panther.jpg
+│  │  ├─ puma.jpg
+│  │  ├─ snow_leopard.jpg
+│  │  ├─ tiger.jpg
+│  ├─ Colour/
+│  │  ├─ cheetah.jpg
+│  │  ├─ jaguar.jpg
+│  │  ├─ lion.jpg
+│  │  ├─ panther.jpg
+│  │  ├─ puma.jpg
+│  │  ├─ snow_leopard.jpg
+│  │  ├─ tiger.jpg
+│  ├─ Map/
+│  │  ├─ Brazil.jpg
+│  │  ├─ India.jpg
+│  │  ├─ Namibia.jpg
+│  │  ├─ Nepal.jpg
+│  │  ├─ South Africa.jpg
+│  │  ├─ South America.jpg
+│  │  ├─ tiger.jpg
+```
+
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_11.gif?raw=true"> </p>
 
 </p>
