@@ -7,6 +7,7 @@
 
 **🔨 Improvements:**
 - Added support for attaching multiple Notion blocks (#14)
+- Added support for having multiple image attachment with sub-folders (#14)
 
 **🐞 Bug Fix:**
 - Improved logic and funcations for multiple image attachment columns (#14)
