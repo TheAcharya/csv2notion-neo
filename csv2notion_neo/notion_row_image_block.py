@@ -6,10 +6,12 @@ from csv2notion_neo.notion.maps import field_map
 from csv2notion_neo.notion.operations import build_operation
 
 from csv2notion_neo.notion_row_upload_file import get_file_id
+from icecream import ic
 
 
 class CoverImageBlock(ImageBlock):
     is_cover_block = field_map("properties.is_cover_block")
+
 
     def update(self, **attrs: Any) -> None:
         with self._client.as_atomic_transaction():
@@ -71,19 +73,23 @@ class RowCoverImageBlock(object):  # noqa: WPS214
 
     @url.setter
     def url(self, image_url: Optional[str]) -> None:
-        if image_url is None:
+
+        cover_img = image_url.pop(0)
+        if cover_img is None:
             if self.image_block is not None:
                 self.image_block.remove()
             return
 
         attrs = {
-            "display_source": image_url,
-            "source": image_url,
+            "display_source": cover_img,
+            "source": cover_img,
         }
 
-        file_id = get_file_id(image_url)
+
+        file_id = get_file_id(cover_img)
         if file_id:
             attrs["file_id"] = file_id
+
 
         if self.row.children:
             if self.image_block:
@@ -94,11 +100,31 @@ class RowCoverImageBlock(object):  # noqa: WPS214
         else:
             self.image_block = self._add_new_image_block(**attrs)
 
+
         self.image_block.is_cover_block = True
 
+        if image_url:
+            for img in image_url:
+                if img is None:
+                    if self.image_block is not None:
+                        self.image_block.remove()
+                    return
+                attrs = {
+                    "display_source": img,
+                    "source": img,
+                }
+
+
+                file_id = get_file_id(img)
+                if file_id:
+                    attrs["file_id"] = file_id
+
+                self.new_image_block = self._add_new_image_block(**attrs)
+
     def _add_new_image_block(self, **attrs: Any) -> CoverImageBlock:
+
         image_block = self.row.children.add_new(ImageBlock, **attrs)
-        image_block = CoverImageBlock(image_block._client, image_block._id)
+        # image_block = CoverImageBlock(image_block._client, image_block._id)
         return cast(CoverImageBlock, image_block)
 
     def _get_cover_image_block(self) -> Optional[CoverImageBlock]:

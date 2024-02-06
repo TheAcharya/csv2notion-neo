@@ -16,6 +16,7 @@ from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
 from csv2notion_neo.notion_row_upload_file import Meta, is_meta_different, upload_filetype
 from csv2notion_neo.utils_static import FileType
 from icecream import ic
+from csv2notion_neo.notion_row_upload_file import get_file_id
 
 
 NamedURLs = Dict[str, str]
@@ -63,6 +64,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         if new_image is None:
             cover_meta = None
         else:
+
             new_image, cover_meta = upload_filetype(self, new_image)
 
         self.cover_meta = cover_meta
@@ -74,10 +76,14 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
     @cover_block.setter
     def cover_block(self, image: FileType) -> None:
+        
+        new_images = []
+        cover_img = image.pop(0)
         if self._client.in_transaction():
             raise RuntimeError("Cannot set cover_block during atomic transaction")
 
-        new_image: Optional[FileType] = image if image else None
+        new_image: Optional[FileType] = cover_img if cover_img else None
+
      
         if not self._is_meta_changed("cover_block_meta", new_image, self.cover_block):
             return
@@ -87,8 +93,33 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         else:
             new_image, cover_block_meta = upload_filetype(self, new_image)
 
+
         self.cover_block_meta = cover_block_meta
-        self.image_block.url = new_image
+        new_images.append(new_image)
+        
+
+        if image:
+            for im in image:
+                new_img,meta = upload_filetype(self,im)
+                new_images.append(new_img)
+        
+        self.image_block.url = new_images
+
+    def upload_non_cover_images(self, image_url: Optional[str]) -> None:
+        if image_url is None:
+            if self.image_block is not None:
+                self.image_block.remove()
+            return
+
+        attrs = {
+            "display_source": image_url,
+            "source": image_url,
+        }
+        
+
+        file_id = get_file_id(image_url)
+        if file_id:
+            attrs["file_id"] = file_id
 
     @property
     def cover_block_caption(self) -> Optional[str]:
@@ -247,6 +278,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             return True
 
         current_value_meta = getattr(self, meta_parameter)
+
 
         return is_meta_different(new_val, current_val, current_value_meta)
 

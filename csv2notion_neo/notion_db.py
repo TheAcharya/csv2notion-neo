@@ -105,6 +105,7 @@ class NotionDB(object):  # noqa: WPS214
     ) -> CollectionRowBlockExtended:
         new_row = self.collection.add_row_block(properties=properties, columns=columns)
 
+
         key = columns.get(self.key_column) if columns else None
         if key:
             self.rows[key] = new_row

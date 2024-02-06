@@ -69,6 +69,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_properties(self, row: CSVRowType) -> Dict[str, Any]:
         properties = {}
+       
 
         if self.rules.image_column_mode == "block":
             properties["cover_block"] = self._map_image(row)
@@ -163,15 +164,14 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
         return icon
 
-    def _map_image(self, row: CSVRowType) -> Optional[FileType]:
+    def _map_image(self, row: CSVRowType) -> List:
 
             image: Optional[FileType] = None
+            images = []
 
             if self.rules.image_column:
-                
-                image_columns = self._mention_cover_image(self.rules.image_column)
-                
-                for image_column in image_columns:
+        
+                for image_column in self.rules.image_column:
                     image = row.get(image_column, "").strip()
                     if image:
                         image = map_url_or_file(image)
@@ -180,10 +180,34 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
                     self._raise_if_mandatory_empty(image_column, image)
 
+                    images.append(image)
                     if not self.rules.image_column_keep:
                         row.pop(image_column, None)
+            
+            return images
+    
+    def _map_non_cover_images(self,row:CSVRowType) ->  List:
 
-            return image
+        images = None
+
+        if self.rules.image_column:
+            image_columns = self._remove_cover_image(self.rules.image_caption_column)
+            
+
+        if self.rules.image_column:
+            pass
+
+
+
+    def _remove_cover_image(self,image_column:List) -> List:
+
+        if len(image_column) == 1:
+            return None
+        
+        img_col_copy = image_column.copy()
+        img_col_copy.pop(0)
+
+        return img_col_copy
     
     def _mention_cover_image(self,image_column:List) -> List:
 	

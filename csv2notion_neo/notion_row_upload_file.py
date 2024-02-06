@@ -16,6 +16,7 @@ Meta = Dict[str, str]
 
 
 def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
+
     if isinstance(filetype, Path):
         url, meta = upload_file(parent, filetype)
     else:
@@ -27,8 +28,6 @@ def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
 
 def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
     file_url = _upload_file(block, file_path)
-
-   
 
     file_id = get_file_id(file_url)
     if file_id is None:
@@ -44,6 +43,7 @@ def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
 def _upload_file(block: Block, file_path: Path) -> str:
     file_mime = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
 
+
     post_data = {
         "bucket": "secure",
         "name": file_path.name,
@@ -57,6 +57,7 @@ def _upload_file(block: Block, file_path: Path) -> str:
 
 
     upload_data = block._client.post("getUploadFileUrl", post_data).json()
+
 
     with open(file_path, "rb") as f:
         requests.put(
@@ -73,6 +74,7 @@ def get_file_id(image_url: str) -> Optional[str]:
     aws_re = r"^https://(.*?\.amazonaws\.com)/([a-f0-9\-]+)/([a-f0-9\-]+)/(.*?)$"
 
     aws_match = re.search(aws_re, image_url)
+
 
     if aws_match:
         return aws_match.group(3)
