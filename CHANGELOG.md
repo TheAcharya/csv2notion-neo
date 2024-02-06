@@ -3,7 +3,7 @@
 ### 1.2.3
 
 **🎉 Released:**
-- Next Release
+- 6th February 2024
 
 **🔨 Improvements:**
 - Added support for attaching multiple Notion blocks (#14)
