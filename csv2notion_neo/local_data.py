@@ -128,6 +128,8 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
 
     @property
     def content_columns(self) -> List[str]:
+        if self.key_col:
+            return [ele for ele in self.columns if ele != self.key_col]
         return self.columns[1:]
 
     @property
