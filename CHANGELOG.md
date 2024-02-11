@@ -1,5 +1,18 @@
 # Changelog
 
+### 1.2.4
+
+**🎉 Released:**
+- Next Release
+
+**🔨 Improvements:**
+- Added logic for `--merge-only-column` for `.json` data (#27)
+
+**🐞 Bug Fix:**
+- Fixed `key_column` error (#29)
+
+---
+
 ### 1.2.3
 
 **🎉 Released:**
