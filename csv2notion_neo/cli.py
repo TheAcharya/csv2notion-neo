@@ -17,8 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 def cli(*argv: str) -> None:
-    ic.enable()
+    ic.disable()
     args = parse_args(argv)
+    
 
     setup_logging(is_verbose=args.verbose, log_file=args.log)
     logger.info(f"CSV2Notion Neo version {__version__}")
@@ -34,7 +35,6 @@ def cli(*argv: str) -> None:
     csv_data = LocalData(
         args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
     )
-
 
     if not csv_data:
         raise CriticalError(f"{path} file is empty")
