@@ -10,6 +10,7 @@
 - Improved log output with `--verbose` augmentation
 
 **🐞 Bug Fix:**
+- Fixed image check before getting cover image (#28)
 - Fixed `key_column` error (#29)
 
 ---
