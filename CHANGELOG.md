@@ -7,6 +7,7 @@
 
 **🔨 Improvements:**
 - Added logic for `--merge-only-column` for `.json` data (#27)
+- Improved log output with `--verbose` augmentation
 
 **🐞 Bug Fix:**
 - Fixed `key_column` error (#29)
