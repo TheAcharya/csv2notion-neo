@@ -78,7 +78,10 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
     def cover_block(self, image: FileType) -> None:
         
         new_images = []
-        cover_img = image.pop(0)
+        if image:
+            cover_img = image.pop(0)
+        else:
+            cover_img = None
         if self._client.in_transaction():
             raise RuntimeError("Cannot set cover_block during atomic transaction")
 

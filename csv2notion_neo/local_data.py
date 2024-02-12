@@ -110,8 +110,9 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
     ) -> None:
         self.csv_file = csv_file
         self.rows = data_read(self.csv_file, fail_on_duplicate_columns)
-        self.types = self._column_types(column_types)
         self.key_col = key_col_json
+        self.types = self._column_types(column_types)
+        
 
     def __len__(self) -> int:
         return len(self.rows)
@@ -128,6 +129,8 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
 
     @property
     def content_columns(self) -> List[str]:
+        if self.key_column:
+            return [ele for ele in self.columns if ele != self.key_column]
         return self.columns[1:]
 
     @property
@@ -151,11 +154,18 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         self.rows = [row for row in self.rows if row[self.key_column] not in keys]
 
     def _column_types(self, column_types: Optional[List[str]] = None) -> Dict[str, str]:
+        
         if not column_types:
-            return {
+            if self.key_column:
+                return {
                 key: guess_type_by_values(self.col_values(key))
-                for key in self.columns[1:]
+                for key in self.content_columns
             }
+            else:
+                return {
+                    key: guess_type_by_values(self.col_values(key))
+                    for key in self.columns[1:]
+                }   
 
         if len(column_types) != len(self.columns) - 1:
             raise CriticalError(

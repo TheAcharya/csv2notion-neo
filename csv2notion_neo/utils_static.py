@@ -63,6 +63,8 @@ class ConversionRules(object):
 
     rename_notion_key_column: List[str]
 
+    payload_key_column: Optional[str]
+
     @property
     def files_search_path(self) -> Path:
         return self.csv_file.parent

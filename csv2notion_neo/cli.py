@@ -17,52 +17,59 @@ logger = logging.getLogger(__name__)
 
 
 def cli(*argv: str) -> None:
-    ic.disable()
-    args = parse_args(argv)
-
-    setup_logging(is_verbose=args.verbose, log_file=args.log)
-    logger.info(f"CSV2Notion Neo version {__version__}")
-
-    path = Path(args.csv_file).suffix
-
-    if "json" in path:
-        if not args.payload_key_column:
-            raise CriticalError("Json file found, please enter the key column!")
+    try:
+        ic.disable()
+        args = parse_args(argv)
         
-    logger.info(f"Validating {path[1::]} & csv2notion_neo.notion DB schema")
+        setup_logging(is_verbose=args.verbose, log_file=args.log)
+        logger.info(f"CSV2Notion Neo version {__version__}")
 
-    csv_data = LocalData(
-        args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
-    )
+        path = Path(args.csv_file).suffix
 
-    if not csv_data:
-        raise CriticalError(f"{path} file is empty")
+        if "json" in path:
+            if not args.payload_key_column:
+                raise CriticalError("Json file found, please enter the key column!")
+            
+        logger.info(f"Validating {path[1::]} & csv2notion_neo.notion DB schema")
 
-    client = get_notion_client(
-        args.token,
-        workspace=args.workspace,
-        is_randomize_select_colors=args.randomize_select_colors,
-    )
+        csv_data = LocalData(
+            args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
+        )
 
-    if args.url:
-        collection_id = get_collection_id(client, args.url)
-    else:
-        collection_id = new_database(args, client, csv_data)
+        if not csv_data:
+            raise CriticalError(f"{path} file is empty")
 
-    notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
+        client = get_notion_client(
+            args.token,
+            workspace=args.workspace,
+            is_randomize_select_colors=args.randomize_select_colors,
+        )
+
+        if args.url:
+            collection_id = get_collection_id(client, args.url)
+        else:
+            collection_id = new_database(args, client, csv_data)
+
+        notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
 
 
-    logger.info("Uploading {0}...".format(args.csv_file.name))
+        logger.info("Uploading {0}...".format(args.csv_file.name))
 
-    upload_rows(
-        notion_rows,
-        client=client,
-        collection_id=collection_id,
-        is_merge=args.merge,
-        max_threads=args.max_threads,
-    )
+        upload_rows(
+            notion_rows,
+            client=client,
+            collection_id=collection_id,
+            is_merge=args.merge,
+            max_threads=args.max_threads,
+        )
 
-    logger.info("Done!")
+        logger.info("Done!")
+
+    except Exception as e:
+        if args.verbose:
+            logger.error('Error at %s', 'division', exc_info=e)
+        else:
+            logger.error("An error has occured! use --verbose switch to know more")
 
 
 def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> None:

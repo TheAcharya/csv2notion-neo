@@ -63,13 +63,15 @@ class NotionRowConverter(object):  # noqa:  WPS214
     def _convert_row(self, row: CSVRowType) -> NotionUploadRow:
         properties = self._map_properties(row)
         columns = self._map_columns(row)
-
+        
 
         return NotionUploadRow(columns=columns, properties=properties)
 
     def _map_properties(self, row: CSVRowType) -> Dict[str, Any]:
         properties = {}
-       
+
+        if self.rules.payload_key_column:
+            properties["payload_key_column"] = self.rules.payload_key_column
 
         if self.rules.image_column_mode == "block":
             properties["cover_block"] = self._map_image(row)
