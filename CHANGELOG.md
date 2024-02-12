@@ -3,7 +3,7 @@
 ### 1.2.4
 
 **🎉 Released:**
-- Next Release
+- 12th February 2024
 
 **🔨 Improvements:**
 - Added logic for `--merge-only-column` for `.json` data (#27)
