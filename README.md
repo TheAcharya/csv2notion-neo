@@ -1,25 +1,22 @@
-<a href="https://github.com/TheAcharya/csv2notion-neo"><img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/CSV2Notion Neo_Icon.png?raw=true" width="200" alt="App icon" align="left"/>
+<p align="center">
+  <a href="https://github.com/TheAcharya/csv2notion-neo"><img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/CSV2Notion Neo_Icon.png?raw=true" height="200">
+  <h1 align="center">CSV2Notion Neo</h1>
+</p>
 
-<div>
-<h1>CSV2Notion Neo</h1>
-<!-- PyPI -->
-<a href="https://pypi.python.org/pypi/csv2notion-neo">
-<img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
-</a>
-<!-- Python -->
-<a href="https://pypi.org/project/csv2notion-neo/">
-<img src="https://img.shields.io/pypi/pyversions/csv2notion-neo.svg" alt="Python"/>
-</a>
-<!-- release_github -->
-<a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml">
-<img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
-</a>
-<p>
-<p>An advance method to upload & merge *.csv or *.json files with images to <a href="https://notion.so/" target="_blank">Notion</a> database.
 
-<br>
-<br>
-</div>
+<p align="center">
+  <a href="https://pypi.python.org/pypi/csv2notion-neo">
+    <img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
+  </a>
+  <a href="https://pypi.org/project/csv2notion-neo/">
+    <img src="https://img.shields.io/pypi/pyversions/csv2notion-neo.svg" alt="Python"/>
+  </a>
+  <a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml">
+    <img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
+  </a>
+</p>
+
+An advance method to upload & merge *.csv or *.json files with images to <a href="https://notion.so/" target="_blank">Notion</a> database.
 
 ## Core Features
 
