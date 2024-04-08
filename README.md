@@ -4,7 +4,7 @@
 </p>
 
 
-<p align="center">
+<p align="left">
   <a href="https://pypi.python.org/pypi/csv2notion-neo">
     <img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
   </a>
