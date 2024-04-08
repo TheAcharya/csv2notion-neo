@@ -5,6 +5,9 @@
 
 
 <p align="center">
+  <a href="https://github.com/TheAcharya/csv2notion-neo/blob/main/LICENSE">
+    <img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/>
+  </a>
   <a href="https://pypi.python.org/pypi/csv2notion-neo">
     <img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
   </a>
