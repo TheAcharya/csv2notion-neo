@@ -2,15 +2,13 @@ import hashlib
 import json
 import re
 import uuid
-import time
-from icecream import ic
 
 from requests import Session, HTTPError
 from requests.cookies import cookiejar_from_dict
 from urllib.parse import urljoin
+from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from getpass import getpass
-from ratelimit import limits, sleep_and_retry
 
 from .block import Block, BLOCK_TYPES
 from .collection import (
@@ -28,23 +26,14 @@ from .space import Space
 from .store import RecordStore
 from .user import User
 from .utils import extract_id, now
-from .utils_ssl import HTTPAdapterTLS
 
 from icecream import ic
-
-CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.7113.93 Safari/537.36"
-
-
-class HTTPRateLimitException(Exception):
-    pass
-
 
 def create_session(client_specified_retry=None):
     """
     retry on 502
     """
     session = Session()
-
     if client_specified_retry:
         retry = client_specified_retry
     else:
@@ -63,10 +52,8 @@ def create_session(client_specified_retry=None):
                 "DELETE",
             ),
         )
-    adapter = HTTPAdapterTLS(max_retries=retry)
+    adapter = HTTPAdapter(max_retries=retry)
     session.mount("https://", adapter)
-    session.headers.update({"User-Agent": CHROME})
-    session.headers.update({"Content-Type": "application/json"})
     return session
 
 
@@ -84,31 +71,21 @@ class NotionClient(object):
         start_monitoring=False,
         enable_caching=False,
         cache_key=None,
-        cache_path=None,
         email=None,
         password=None,
         client_specified_retry=None,
-        workspace=None,
+        workspace=None
     ):
-        
         self.workspace = workspace
-
         self.session = create_session(client_specified_retry)
         if token_v2:
-            self.session.cookies.set(
-                "token_v2",
-                token_v2,
-                domain=".www.notion.so",
-                discard=False,
-                expires=int(time.time()) + 3600 * 24 * 365,
-                secure=True,
-            )
+            self.session.cookies = cookiejar_from_dict({"token_v2": token_v2})
         else:
             self._set_token(email=email, password=password)
 
         if enable_caching:
             cache_key = cache_key or hashlib.sha256(token_v2.encode()).hexdigest()
-            self._store = RecordStore(self, cache_key=cache_key, cache_path=cache_path)
+            self._store = RecordStore(self, cache_key=cache_key)
         else:
             self._store = RecordStore(self)
         if monitor:
@@ -122,7 +99,7 @@ class NotionClient(object):
 
     def start_monitoring(self):
         self._monitor.poll_async()
-
+    
     def _fetch_guest_space_data(self, records):
         """
         guest users have an empty `space` dict, so get the space_id from the `space_view` dict instead,
@@ -130,7 +107,6 @@ class NotionClient(object):
 
         Note: This mutates the records dict
         """
-
         space_id = list(records["space_view"].values())[0]["value"]["space_id"]
 
         space_data = self.post(
@@ -187,6 +163,7 @@ class NotionClient(object):
         }
 
     def set_user_by_uid(self, user_id):
+        self.session.headers.update({"x-notion-active-user-header": user_id})
         self._update_user_info()
 
     def set_user_by_email(self, email):
@@ -255,7 +232,7 @@ class NotionClient(object):
         """
         # if it's a URL for a database page, try extracting the collection and view IDs
         if url_or_id.startswith("http"):
-            match = re.search(r"([a-f0-9]{32})\?v=([a-f0-9]{32})", url_or_id)
+            match = re.search("([a-f0-9]{32})\?v=([a-f0-9]{32})", url_or_id)
             if not match:
                 raise Exception("Invalid collection view URL")
             block_id, view_id = match.groups()
@@ -291,38 +268,25 @@ class NotionClient(object):
         row_ids = [row.id for row in self.get_collection(collection_id).get_rows()]
         self._store.set_collection_rows(collection_id, row_ids)
 
-    @sleep_and_retry
-    @limits(calls=3000, period=60)
     def post(self, endpoint, data):
-        while True:
-            try:
-                return self._post(endpoint, data)
-            except HTTPRateLimitException:
-                time.sleep(1)
-    def _post(self, endpoint, data):
         """
         All API requests on Notion.so are done as POSTs (except the websocket communications).
         """
         url = urljoin(API_BASE_URL, endpoint)
-        
         response = self.session.post(url, json=data)
-
         if response.status_code == 400:
-            logger.error(
-                "Got 400 error attempting to POST to {}, with data: {}".format(
-                    endpoint, json.dumps(data, indent=2)
+            if endpoint != 'getRecordValues':
+                logger.error(
+                    "Got 400 error attempting to POST to {}, with data: {}".format(
+                        endpoint, json.dumps(data, indent=2)
+                    )
                 )
-            )
-            raise HTTPError(
-                response.json().get(
-                    "message", "There was an error (400) submitting the request."
+                raise HTTPError(
+                    response.json().get(
+                        "message", "There was an error (400) submitting the request."
+                    )
                 )
-            )
-        if response.status_code == 429:
-            raise HTTPRateLimitException
-
         response.raise_for_status()
-
         return response
 
     def submit_transaction(self, operations, update_last_edited=True):
@@ -347,11 +311,11 @@ class NotionClient(object):
             self._transaction_operations += operations
         else:
             data = {"operations": operations}
+            
             self.post("submitTransaction", data)
             self._store.run_local_operations(operations)
 
     def query_collection(self, *args, **kwargs):
-    
         return self._store.call_query_collection(*args, **kwargs)
 
     def as_atomic_transaction(self):
@@ -437,13 +401,12 @@ class NotionClient(object):
             "created_time": now(),
             "parent_id": parent.id,
             "parent_table": parent._table,
-            "space_id": self.current_space.id,
         }
 
         args.update(kwargs)
 
         with self.as_atomic_transaction():
-
+            
             # create the new record
             self.submit_transaction(
                 build_operation(

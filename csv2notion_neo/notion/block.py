@@ -4,6 +4,7 @@ import random
 import requests
 import time
 import uuid
+from icecream import ic
 
 from cached_property import cached_property
 from copy import deepcopy
@@ -405,7 +406,7 @@ class Block(Record):
             else:
                 self._alias_parent = new_parent_id
 
-            # Add the moving block's ID to the "content" list of the new parent
+            # Add the moving block's ID to the "content" list of the new paren
             self._client.submit_transaction(
                 build_operation(
                     id=new_parent_id,
@@ -415,12 +416,15 @@ class Block(Record):
                 )
             )
 
-        # Parent block can be a collection, which will cause API error on refresh
-        refresh_blocks = [self, self.parent, target_block, target_block.parent]
-        refresh_blocks_ids = [b.id for b in refresh_blocks if isinstance(b, Block)]
-
         # update the local block cache to reflect the updates
-        self._client.refresh_records(block=refresh_blocks_ids)
+        self._client.refresh_records(
+            block=[
+                self.id,
+                self.get("parent_id"),
+                target_block.id,
+                target_block.get("parent_id"),
+            ]
+        )
 
 
 class DividerBlock(Block):
@@ -634,10 +638,19 @@ class EmbedOrUploadBlock(EmbedBlock):
 
         mimetype = mimetypes.guess_type(path)[0] or "text/plain"
         filename = os.path.split(path)[-1]
-
+        
         data = self._client.post(
             "getUploadFileUrl",
-            {"bucket": "secure", "name": filename, "contentType": mimetype},
+            {
+                "bucket": "secure",
+                "name": filename,
+                "contentType": mimetype,
+                "record": {
+                    "id": self.id,
+                    "spaceId": self.space_info["spaceId"],
+                    "table": "block"
+                },
+            },
         ).json()
 
         with open(path, "rb") as f:
@@ -711,7 +724,7 @@ class CollectionViewBlock(MediaBlock):
 
     @property
     def collection(self):
-        collection_id = self.get("format.collection_pointer.id")
+        collection_id = self.get("collection_id")
         if not collection_id:
             return None
         if not hasattr(self, "_collection"):
@@ -722,7 +735,7 @@ class CollectionViewBlock(MediaBlock):
     def collection(self, val):
         if hasattr(self, "_collection"):
             del self._collection
-        self.set("format.collection_pointer.id", val.id)
+        self.set("collection_id", val.id)
 
     @property
     def views(self):

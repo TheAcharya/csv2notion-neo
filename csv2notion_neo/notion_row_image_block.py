@@ -12,7 +12,7 @@ from icecream import ic
 class CoverImageBlock(ImageBlock):
     is_cover_block = field_map("properties.is_cover_block")
 
-
+    
     def update(self, **attrs: Any) -> None:
         with self._client.as_atomic_transaction():
             file_id = attrs.pop("file_id", None)
