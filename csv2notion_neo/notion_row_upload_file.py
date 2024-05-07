@@ -34,12 +34,18 @@ def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
     if file_id is None:
         raise NotionError(f"Could not upload file {file_path}")
     
-    # return file_url, [[file_url]]
     return file_url, {
-        "type": "file",
-        "file_id": file_id,
-        "sha256": get_file_sha256(file_path),
+        "source": [
+            [
+                file_url
+            ]
+        ]
     }
+    # return file_url, {
+    #     "type": "file",
+    #     "file_id": file_id,
+    #     "sha256": get_file_sha256(file_path),
+    # }
 
 
 def _upload_file(block: Block, file_path: Path) -> str:

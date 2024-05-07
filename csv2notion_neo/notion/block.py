@@ -387,7 +387,7 @@ class Block(Record):
         with self._client.as_atomic_transaction():
 
             # First, remove the node, before we re-insert and re-activate it at the target location
-            self.remove()
+            #self.remove()
 
             if not self.is_alias:
                 # Set the parent_id of the moving block to the new parent, and mark it as active again

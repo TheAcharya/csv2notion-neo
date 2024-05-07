@@ -112,14 +112,21 @@ class Record(object):
         """
         Set a specific `value` (under the specific `path`) on the record's data structure on the server.
         """
+        
+        command = 'set'
         if 'cover_block' in path:
-            path = ['format']
+            path = ['properties']
+            command = 'update'
         elif 'icon' in path:
             path = ['format','page_icon']
+        elif 'display_source' in path:
+            path = ['format']
+            value = {"display_source":value}
+            command = 'update'
 
         if value:
             self._client.submit_transaction(
-                build_operation(id=self.id, path=path, args=value, table=self._table)
+                build_operation(id=self.id, path=path, args=value, table=self._table,command=command)
             )
 
     def __eq__(self, other):
