@@ -90,6 +90,8 @@ jobs:
 
       - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
         uses: actions/setup-python@v5
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: 1
         with:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
 
