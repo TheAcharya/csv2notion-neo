@@ -3,7 +3,7 @@ from copy import deepcopy
 from .logger import logger
 from .operations import build_operation
 from .utils import extract_id, get_by_path
-
+from icecream import ic
 
 class Record(object):
 
@@ -112,9 +112,22 @@ class Record(object):
         """
         Set a specific `value` (under the specific `path`) on the record's data structure on the server.
         """
-        self._client.submit_transaction(
-            build_operation(id=self.id, path=path, args=value, table=self._table)
-        )
+        
+        command = 'set'
+        if 'cover_block' in path:
+            path = ['properties']
+            command = 'update'
+        elif 'icon' in path:
+            path = ['format','page_icon']
+        elif 'display_source' in path:
+            path = ['format']
+            value = {"display_source":value}
+            command = 'update'
+
+        if value:
+            self._client.submit_transaction(
+                build_operation(id=self.id, path=path, args=value, table=self._table,command=command)
+            )
 
     def __eq__(self, other):
         return self.id == other.id

@@ -738,7 +738,7 @@ class CollectionRowBlock(PageBlock):
         # Mark the block as inactive
         self._client.submit_transaction(
             build_operation(
-                id=self.id, path=[], args={"alive": False}, command="update"
+                id=self.id, path=[], args={"alive": True}, command="update"
             )
         )
 

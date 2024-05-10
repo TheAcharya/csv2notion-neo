@@ -12,7 +12,6 @@ class NotionUploadRow(object):
     properties: Dict[str, Any]
 
     def key(self) -> str:
-        
         if "payload_key_column" in self.properties:
             if self.properties["payload_key_column"]:
                 return str(self.columns[self.properties["payload_key_column"]])
@@ -24,6 +23,7 @@ class NotionRowUploader(object):
         self.db = db
 
     def upload_row(self, row: NotionUploadRow, is_merge: bool) -> None:
+
         post_properties = _extract_post_properties(row.properties)
 
         db_row = self._get_db_row(row, is_merge)
@@ -38,6 +38,7 @@ class NotionRowUploader(object):
     ) -> CollectionRowBlockExtended:
       
         existing_row = self.db.rows.get(row.key()) if is_merge else None
+
         if is_merge and existing_row:       
             cur_row = existing_row
             cur_row.update(properties=row.properties, columns=row.columns)

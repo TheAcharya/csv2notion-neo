@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def data_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowType]:
+    print("file extbn",file_path)
     suffix = Path(file_path).suffix
 
     if "csv" in suffix:

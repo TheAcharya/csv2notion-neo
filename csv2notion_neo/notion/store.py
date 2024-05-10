@@ -12,8 +12,8 @@ from pathlib import Path
 from tzlocal import get_localzone
 
 from .logger import logger
+from .settings import CACHE_DIR
 from .utils import extract_id
-
 from icecream import ic
 
 class MissingClass(object):
@@ -74,24 +74,17 @@ class Callback(object):
 
 
 class RecordStore(object):
-    def __init__(self, client, cache_key=None, cache_path=None):
+    def __init__(self, client, cache_key=None):
         self._mutex = Lock()
         self._client = client
         self._cache_key = cache_key
-        self._cache_path = cache_path
         self._values = defaultdict(lambda: defaultdict(dict))
         self._role = defaultdict(lambda: defaultdict(str))
         self._collection_row_ids = {}
         self._callbacks = defaultdict(lambda: defaultdict(list))
         self._records_to_refresh = {}
         self._pages_to_refresh = []
-
         with self._mutex:
-            if self._cache_key:
-                if not self._cache_path or not isinstance(self._cache_path, Path):
-                    raise ValueError("You must provide directory for cache")
-                self._cache_path.mkdir(parents=True, exist_ok=True)
-
             self._load_cache()
 
     def _get(self, table, id):
@@ -120,7 +113,9 @@ class RecordStore(object):
             callbacks.remove(callback_or_callback_id_prefix)
 
     def _get_cache_path(self, attribute):
-        return self._cache_path / "{}{}.json".format(self._cache_key, attribute)
+        return str(
+            Path(CACHE_DIR).joinpath("{}{}.json".format(self._cache_key, attribute))
+        )
 
     def _load_cache(self, attributes=("_values", "_role", "_collection_row_ids")):
         if not self._cache_key:
@@ -251,21 +246,24 @@ class RecordStore(object):
             requestlist += [{"table": table, "id": extract_id(id)} for id in ids]
 
         if requestlist:
-            logger.debug(
-                "Calling 'getRecordValues' endpoint for requests: {}".format(
-                    requestlist
+            try:
+                logger.debug(
+                    "Calling 'getRecordValues' endpoint for requests: {}".format(
+                        requestlist
+                    )
                 )
-            )
-            results = self._client.post(
-                "getRecordValues", {"requests": requestlist}
-            ).json()["results"]
-            for request, result in zip(requestlist, results):
-                self._update_record(
-                    request["table"],
-                    request["id"],
-                    value=result.get("value"),
-                    role=result.get("role"),
-                )
+                results = self._client.post(
+                    "getRecordValues", {"requests": requestlist}
+                ).json()["results"]
+                for request, result in zip(requestlist, results):
+                    self._update_record(
+                        request["table"],
+                        request["id"],
+                        value=result.get("value"),
+                        role=result.get("role"),
+                    )
+            except Exception as e:
+                pass
 
     def get_current_version(self, table, id):
         values = self._get(table, id)
@@ -281,9 +279,7 @@ class RecordStore(object):
             return
 
         data = {
-            "page": {
-                "id": page_id,
-            },
+            "pageId": page_id,
             "limit": limit,
             "cursor": {"stack": []},
             "chunkNumber": 0,
@@ -313,6 +309,7 @@ class RecordStore(object):
         type="table",
         aggregate=[],
         aggregations=[],
+        filter={},
         sort=[],
         calendar_by="",
         group_by="",
@@ -355,8 +352,6 @@ class RecordStore(object):
         response = self._client.post("queryCollection", data).json()
 
         self.store_recordmap(response["recordMap"])
-
-        from icecream import ic
 
         return response["result"]
 
