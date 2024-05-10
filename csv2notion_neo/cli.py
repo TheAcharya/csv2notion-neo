@@ -26,7 +26,6 @@ def cli(*argv: str) -> None:
 
         path = Path(args.csv_file).suffix
 
-
         if "json" in path:
             if not args.payload_key_column:
                 raise CriticalError("Json file found, please enter the key column!")

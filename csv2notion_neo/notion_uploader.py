@@ -12,7 +12,6 @@ class NotionUploadRow(object):
     properties: Dict[str, Any]
 
     def key(self) -> str:
-        
         if "payload_key_column" in self.properties:
             if self.properties["payload_key_column"]:
                 return str(self.columns[self.properties["payload_key_column"]])
