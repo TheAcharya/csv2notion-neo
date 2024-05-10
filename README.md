@@ -58,7 +58,6 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
   - [Icons](#icons)
   - [Mandatory Columns](#mandatory-columns)
 - [Examples](#examples)
-- [Known Issues](#known-issues)
 - [Credits](#credits)
 - [License](#license)
 - [Reporting Bugs](#reporting-bugs)
@@ -527,11 +526,6 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 </p>
 </details>
 
-## Known Issues
-
-- Users would not be able to duplicate entries/records there where uploaded using **CSV2Notion Neo** in Notion.
-  - **Workaround:** Simply [duplicate](https://www.notion.so/help/duplicate-delete-and-restore-content) the database directly in Notion. You would be able to duplicate your entries/records in the duplicated database.
-  
 ## Utilised By
 
 ### [CommandPost](https://commandpost.io)
