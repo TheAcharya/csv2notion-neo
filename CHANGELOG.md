@@ -1,5 +1,21 @@
 # Changelog
 
+### 1.2.5
+
+**🎉 Released:**
+- 10th May 2024
+
+**🔨 Improvements:**
+- Improved image and icon upload logic (#32)
+- Improved `--payload-key-column` Logic (#33)
+- Updated dependencies packages
+
+**🐞 Bug Fix:**
+- Fixed can't able to upload images due to Notion API changes (#32)
+- Fixed can't duplicate item within Notion when using CSV2Notion Neo (#3)
+
+---
+
 ### 1.2.4
 
 **🎉 Released:**
