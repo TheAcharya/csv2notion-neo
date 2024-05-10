@@ -7,7 +7,7 @@
 
 **🔨 Improvements:**
 - Improved image and icon upload logic (#32)
-- Improved `--payload-key-column` Logic (#33)
+- Improved `--payload-key-column` logic (#33)
 - Updated dependencies packages
 
 **🐞 Bug Fix:**
