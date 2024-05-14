@@ -109,6 +109,21 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 ),
             },
         },
+        "ai options":{
+            "--hftoken":{
+                "help": (
+                    "Hugging Face token to use image captioning model online"
+                ),
+                "metavar": "AI",
+            },
+            "--caption-column":{
+                "help":(
+                    "Provide both image column and column where caption must be saved"
+                ),
+                "metavar":"AI",
+                "nargs":2,
+            }
+        },
         "merge options": {
             "--merge": {
                 "action": "store_true",

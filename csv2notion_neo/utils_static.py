@@ -65,6 +65,10 @@ class ConversionRules(object):
 
     payload_key_column: Optional[str]
 
+    hftoken: Optional[str]
+
+    caption_column: List[str]
+
     @property
     def files_search_path(self) -> Path:
         return self.csv_file.parent

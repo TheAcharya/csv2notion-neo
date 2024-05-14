@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 def cli(*argv: str) -> None:
     try:
-        ic.disable()
+        ic.enable()
         args = parse_args(argv)
-        
+            
         setup_logging(is_verbose=args.verbose, log_file=args.log)
         logger.info(f"CSV2Notion Neo version {__version__}")
 
@@ -33,7 +33,7 @@ def cli(*argv: str) -> None:
         logger.info(f"Validating {path[1::]} & csv2notion_neo.notion DB schema")
 
         csv_data = LocalData(
-            args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,
+            args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,args=args
         )
 
         if not csv_data:

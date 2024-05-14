@@ -4,7 +4,7 @@ from typing import Any, Dict
 from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.notion_row import CollectionRowBlockExtended
 from icecream import ic
-
+from csv2notion_neo.utils_ai import AI
 
 @dataclass
 class NotionUploadRow(object):
@@ -17,13 +17,17 @@ class NotionUploadRow(object):
                 return str(self.columns[self.properties["payload_key_column"]])
         return str(list(self.columns.values())[0])
 
-
 class NotionRowUploader(object):
     def __init__(self, db: NotionDB):
         self.db = db
 
     def upload_row(self, row: NotionUploadRow, is_merge: bool) -> None:
 
+        #CHECK
+        if 'AI' in row.properties:
+            ai_client = AI(row.properties['AI'])
+            row.columns = ai_client.out(row.columns)
+        #row.columns['ai caption'] = '2'
         post_properties = _extract_post_properties(row.properties)
 
         db_row = self._get_db_row(row, is_merge)

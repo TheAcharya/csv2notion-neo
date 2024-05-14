@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 def data_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowType]:
-    print("file extbn",file_path)
     suffix = Path(file_path).suffix
 
     if "csv" in suffix:
@@ -107,13 +106,23 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         csv_file: Path,
         column_types: Optional[List[str]] = None,
         fail_on_duplicate_columns: bool = False,
-        key_col_json: str = None
+        key_col_json: str = None,
+        args:dict = None
     ) -> None:
         self.csv_file = csv_file
         self.rows = data_read(self.csv_file, fail_on_duplicate_columns)
         self.key_col = key_col_json
         self.types = self._column_types(column_types)
-        
+
+        try:
+            if args.hftoken:
+                if args.caption_column:
+                    self._create_ai_columns(args.caption_column[1])
+                else:
+                    raise Exception("ai token provided, please provide column maps to fill the ai content")
+
+        except Exception as e:
+            logger.error(f"Problem in creating AI column {e}")
 
     def __len__(self) -> int:
         return len(self.rows)
@@ -154,6 +163,11 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
     def drop_rows(self, *keys: str) -> None:
         self.rows = [row for row in self.rows if row[self.key_column] not in keys]
 
+    def _create_ai_columns(self,column_name:str) -> None:
+        self.types[column_name] = 'text'
+        for x in self.rows:
+            x[column_name] = ''
+    
     def _column_types(self, column_types: Optional[List[str]] = None) -> Dict[str, str]:
         
         if not column_types:

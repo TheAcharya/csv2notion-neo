@@ -5,7 +5,7 @@ from typing import Any, Callable, Iterable, Iterator
 from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.notion_db_client import NotionClientExtended
 from csv2notion_neo.notion_uploader import NotionRowUploader
-
+from icecream import ic
 
 class ThreadRowUploader(object):
     def __init__(self, client: NotionClientExtended, collection_id: str) -> None:
@@ -20,6 +20,7 @@ class ThreadRowUploader(object):
         except AttributeError:
             client = NotionClientExtended(old_client=self.client)
             notion_db = NotionDB(client, self.collection_id)
+            
             notion_uploader = NotionRowUploader(notion_db)
             self.thread_data.uploader = notion_uploader
 

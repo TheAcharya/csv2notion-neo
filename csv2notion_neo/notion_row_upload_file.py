@@ -17,6 +17,7 @@ Meta = Dict[str, str]
 
 def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
 
+    #ic(filetype)
     if isinstance(filetype, Path):
         url, meta = upload_file(parent, filetype)
     else:
