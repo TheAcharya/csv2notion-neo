@@ -6,7 +6,7 @@
 - 19th May 2024
 
 **🔨 Improvements:**
-- Improved logging for `--rename-notion-key-column` (#35)
+- Improved log output for `--rename-notion-key-column` (#35)
 
 ---
 
