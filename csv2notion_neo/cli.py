@@ -69,7 +69,7 @@ def cli(*argv: str) -> None:
         if args.verbose:
             logger.error('Error at %s', 'division', exc_info=e)
         else:
-            logger.error("An error has occured! use --verbose switch to know more")
+            logger.error(e)
 
 
 def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> None:
