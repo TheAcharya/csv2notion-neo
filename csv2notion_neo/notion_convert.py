@@ -19,7 +19,7 @@ from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.notion_row import CollectionRowBlockExtended
 from csv2notion_neo.notion_type_guess import is_email
 from csv2notion_neo.notion_uploader import NotionUploadRow
-from csv2notion_neo.utils_exceptions import NotionError, TypeConversionError
+from csv2notion_neo.utils_exceptions import NotionError, TypeConversionError, CriticalError
 from csv2notion_neo.utils_static import ConversionRules, FileType
 from csv2notion_neo.utils_str import split_str
 from icecream import ic
@@ -39,7 +39,10 @@ class NotionRowConverter(object):  # noqa:  WPS214
         self._current_row = 2
 
         for row in csv_data:
+
             if self.rules.rename_notion_key_column:
+                if self.rules.rename_notion_key_column[1] == self.rules.rename_notion_key_column[0]:
+                    raise CriticalError(f"Please do not provide same column name in rename-payload-key-column")
                 new_id = self.rules.rename_notion_key_column[1]
                 old_id = self.rules.rename_notion_key_column[0]
                 row[new_id] = row[old_id]
