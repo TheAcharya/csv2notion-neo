@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.2.6
+
+**🎉 Released:**
+- 19th May 2024
+
+**🔨 Improvements:**
+- Improved logging for `--rename-notion-key-column` logic (#35)
+
+---
+
 ### 1.2.5
 
 **🎉 Released:**
