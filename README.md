@@ -528,7 +528,7 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 
 ## Utilised By
 
-### [Marker Data](https://markerdata.theacharya.co)
+### Marker Data
 
 <details><summary>Marker Data's Notion Panel</summary>
 <p>
