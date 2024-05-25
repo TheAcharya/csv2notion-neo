@@ -30,7 +30,7 @@ class AI:
             tqdm.write(f"AI generating caption for image {filename}")
 
             caption = sess.post(
-            'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large',
+            'https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning',
             json='None',
             data=file,
             headers={'authorization': f'Bearer {token}'},
