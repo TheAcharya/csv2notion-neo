@@ -79,6 +79,27 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "help": "show this help message and exit",
             },
         },
+        "machine learning options":{
+            "--hugging-face-token":{
+                "help": (
+                    "Hugging Face token to use image captioning model online"
+                ),
+                "metavar": "AI",
+            },
+            "--hf-model":{
+                "help": (
+                    "Provide the model used for generating caption, defaults to vit-gpt2"
+                ),
+                "metavar": "AI",
+            },
+            "--caption-column":{
+                "help":(
+                    "Provide both image column and column where caption must be saved"
+                ),
+                "metavar":"AI",
+                "nargs":2,
+            }
+        },
         "column options": {
             "--column-types": {
                 "help": (
@@ -108,21 +129,6 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     " in select and multi select columns"
                 ),
             },
-        },
-        "ai options":{
-            "--hftoken":{
-                "help": (
-                    "Hugging Face token to use image captioning model online"
-                ),
-                "metavar": "AI",
-            },
-            "--caption-column":{
-                "help":(
-                    "Provide both image column and column where caption must be saved"
-                ),
-                "metavar":"AI",
-                "nargs":2,
-            }
         },
         "merge options": {
             "--merge": {

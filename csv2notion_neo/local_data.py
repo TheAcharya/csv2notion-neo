@@ -115,7 +115,7 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         self.types = self._column_types(column_types)
 
         try:
-            if args.hftoken:
+            if args.hugging_face_token:
                 if args.caption_column:
                     self._create_ai_columns(args.caption_column[1])
                 else:

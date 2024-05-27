@@ -16,13 +16,13 @@ class AI:
         if 'caption' in self.ai_data:
             data = self.ai_data['caption']
             try:
-                row[data['caption_column']] = self._img2caption(data['hftoken'],str(data['image_path']))
+                row[data['caption_column']] = self._img2caption(data['hftoken'],str(data['image_path']),data['model_url'])
                 return row
             except Exception as e:
                 logger.error(f"Error during AI process : {e}")
 
 
-    def _img2caption(self,token,image_url:str) -> str:
+    def _img2caption(self,token:str,image_url:str,model_url:str) -> str:
         try:
             sess = requests.session()
             file = open(image_url,'rb')
@@ -30,7 +30,7 @@ class AI:
             tqdm.write(f"AI generating caption for image {filename}")
 
             caption = sess.post(
-            'https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning',
+            model_url,
             json='None',
             data=file,
             headers={'authorization': f'Bearer {token}'},
@@ -44,6 +44,7 @@ class AI:
         except Exception as e:
             tqdm.write(f"Error generating caption for {filename}")
             logger.error(e,exc_info=1)
+            logger.error(caption.json())
 
 
 
