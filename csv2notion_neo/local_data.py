@@ -114,10 +114,12 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         self.key_col = key_col_json
         self.types = self._column_types(column_types)
 
+        #ai features
         try:
             if args.hugging_face_token:
                 if args.caption_column:
                     self._create_ai_columns(args.caption_column[1])
+                    self.model_url = self._pick_model(args.hf_model)
                 else:
                     raise Exception("ai token provided, please provide column maps to fill the ai content")
 
@@ -167,6 +169,26 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         self.types[column_name] = 'text'
         for x in self.rows:
             x[column_name] = ''
+
+    def _pick_model(self,model_name:str) -> str:
+        model_map = {
+            "vit-gpt2":"https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning",
+            "blip-image":"https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base",
+            "git-large":"https://api-inference.huggingface.co/models/microsoft/git-large"
+        }
+
+        if model_name:
+            try:
+                model_url = model_map[model_name]
+                logger.info(f"Using model {model_name}")
+            except:
+                logger.error(f"{model_name} is not present! defaulting to vit-gpt2")
+                model_url = model_map["vit-gpt2"]
+        else:
+            logger.error(f"model not provided! defaulting to vit-gpt2")
+            model_url = model_map["vit-gpt2"]
+        
+        return model_url
     
     def _column_types(self, column_types: Optional[List[str]] = None) -> Dict[str, str]:
         

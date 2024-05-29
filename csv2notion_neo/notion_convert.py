@@ -37,6 +37,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         notion_rows = []
         # starting with 2nd row, because first is header
         self._current_row = 2
+        self.csv_data = csv_data
 
         for row in csv_data:
             if self.rules.rename_notion_key_column:
@@ -76,27 +77,13 @@ class NotionRowConverter(object):  # noqa:  WPS214
                 properties["payload_key_column"] = self.rules.payload_key_column
 
         #ai features
-        model_map = {
-            "vit-gpt2":"https://api-inference.huggingface.co/models/nlpconnect/vit-gpt2-image-captioning"
-        }
-
-        if self.rules.hf_model:
-            try:
-                model_url = model_map[self.rules.hf_model]
-            except:
-                logger.error(f"{self.rules.hf_model} is not present! defaulting to vit-gpt2")
-                model_url = model_map["vit-gpt2"]
-        else:
-            logger.error(f"model not provided! defaulting to vit-gpt2")
-            model_url = model_map["vit-gpt2"]
-
         if self.rules.hugging_face_token:
             if self.rules.caption_column:
                 properties['AI'] = {"caption":{
                     "hftoken":self.rules.hugging_face_token,
                     "image_path": self.rules.csv_file.parent / Path(row[self.rules.caption_column[0]]),
                     "caption_column":self.rules.caption_column[1],
-                    "model_url":model_url
+                    "model_url":self.csv_data.model_url
                 }}
 
         
