@@ -58,6 +58,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
   - [Cover Image & Embedded Image](#cover-image--embedded-image)
   - [Icons](#icons)
   - [Mandatory Columns](#mandatory-columns)
+  - [AI/ML Options (Hugging Face)](#aiml-options-hugging-face)
 - [Examples](#examples)
 - [Credits](#credits)
 - [License](#license)
@@ -404,7 +405,7 @@ Steps to Obtain a Hugging Face Token with Write Mode
 <details><summary>Avaliable Model Information</summary>
 <p>
 
-| Model      | Information                                                          | Accuracy |
+| Models      | Information                                                          | Accuracy |
 | ---------- | -------------------------------------------------------------------- | -------- |
 | vit-gpt2   | [Link](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)  | Low - Medium   |
 | blip-image | [Link](https://huggingface.co/Salesforce/blip-image-captioning-base) | Low - Medium   |
@@ -415,7 +416,8 @@ Steps to Obtain a Hugging Face Token with Write Mode
 </p>
 </details>
 
-
+> [!WARNING]  
+> Please be aware that this feature is currently in an experimental phase. We strongly advise against uploading sensitive images or those of a personal and private nature. Images will be uploaded to Hugging Face’s servers for analysis. We recommend using commercial images, such as movie stills or stock photos, for AI captioning.
 
 ## Examples
 
