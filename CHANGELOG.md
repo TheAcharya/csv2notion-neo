@@ -1,5 +1,18 @@
 # Changelog
 
+### 1.3.0
+
+**🎉 Released:**
+- 3rd June 2024
+
+**🔨 Improvements:**
+- Automatically analyse and generate captions for images using Hugging Face's open-source AI/ML models (#25)
+- Added `--hugging-face-token`: Hugging Face token to use image captioning model online
+- Added `--hf-model `: Provide the model used for generating caption <`vit-gpt2` | `blip-image` | `git-large`> (defaults: `vit-gpt2`)
+- Added `--caption-column`: Provide both image column and column where caption would be written
+
+---
+
 ### 1.2.6
 
 **🎉 Released:**
