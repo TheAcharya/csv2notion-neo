@@ -436,7 +436,8 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE test
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --column-types "number,multi_select" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --column-types "number,multi_select" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_02.png?raw=true"> </p>
 
@@ -447,7 +448,8 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --co
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --url NOTION_URL test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_03.gif?raw=true"> </p>
 
@@ -458,7 +460,9 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --merge test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --merge test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_04.gif?raw=true"> </p>
 
@@ -469,7 +473,11 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE --url NOTION URL --merge --merge-only-column "Column 2" --merge-onLy-column "Column 3" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE \
+  --url NOTION URL \
+  --merge \
+  --merge-only-column "Column 2" \
+  --merge-onLy-column "Column 3" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_05.gif?raw=true"> </p>
 
@@ -480,7 +488,8 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE --u
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --image-column "Image Column" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+--image-column "Image Column" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_06.gif?raw=true"> </p>
 
@@ -491,7 +500,9 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --im
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --image-column "Colour Image" "Black & White Image" "Map" --image-column-keep --mandatory-column "Cat ID" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --image-column "Colour Image" "Black & White Image" "Map" \
+  --image-column-keep --mandatory-column "Cat ID" test.csv
 ```
 
 Example CSV
@@ -547,7 +558,8 @@ Example Folder Structure
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --icon-column "Icon Column" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE  \
+  --icon-column "Icon Column" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_07.gif?raw=true"> </p>
 
@@ -558,7 +570,11 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ic
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --default-icon 👍 --merge --merge-only-column "Key" test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --default-icon 👍 \
+  --merge \
+  --merge-only-column "Key" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_08.gif?raw=true"> </p>
 
@@ -569,7 +585,11 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --merge JSON-Demo.json
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --mandatory-column "Cat ID" \
+  --payload-key-column "Cat ID" \
+  --merge JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_09.gif?raw=true"> </p>
@@ -581,7 +601,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --mandatory-column "Cat ID" --payload-key-column "Cat ID" --rename-notion-key-column "Cat ID" "Anything ID" --merge JSON-Demo.json
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --mandatory-column "Cat ID" \
+  --payload-key-column "Cat ID" \
+  --rename-notion-key-column "Cat ID" "Anything ID" \
+  --merge JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_10.gif?raw=true"> </p>
@@ -593,7 +618,13 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --hugging-face-token YOUR_HUGGING_FACE_HERE --hf-model blip-image --caption-column "Image Filename" "Frame Description" --image-column "Image Filename" --image-column-keep --mandatory-column "Cat ID" --merge big_cats.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --hugging-face-token YOUR_HUGGING_FACE_TOKEN_HERE \
+  --hf-model blip-image \
+  --caption-column "Image Filename" "Frame Description" \
+  --image-column "Image Filename" \
+  --image-column-keep \
+  --mandatory-column "Cat ID" \
+  --merge big_cats.csv
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_12.gif?raw=true"> </p>
