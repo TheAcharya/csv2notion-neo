@@ -361,6 +361,22 @@ If you want to set the same icon for each row, use the `--default-icon` option. 
 
 If you want to ensure that specific columns always have value and are not allowed to be empty, then use the `--mandatory-column` option. The program execution will stop if validation fails.
 
+### AI/ML Options (Hugging Face)
+
+<details><summary>Model Information</summary>
+<p>
+
+| Model      | Information                                                          | Accuracy |
+| ---------- | -------------------------------------------------------------------- | -------- |
+| vit-gpt2   | [Link](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)  | Medium   |
+| blip-image | [Link](https://huggingface.co/Salesforce/blip-image-captioning-base) | Medium   |
+| git-large  | [Link](https://huggingface.co/microsoft/git-large)                   | Medium   |
+
+</p>
+</details>
+
+
+
 ## Examples
 
 <details><summary>Importing CSV into New Database</summary>
