@@ -33,6 +33,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 - Set a cover or embed an image for each row to enhance visual representation
 - Upload image files for covers or icons
 - Apply validation options for input data to ensure accuracy
+- Automatically analyse and generate captions for images using Hugging Face's open-source AI/ML models
 
 ### Disadvantages over native import
  
