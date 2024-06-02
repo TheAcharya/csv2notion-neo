@@ -363,14 +363,51 @@ If you want to ensure that specific columns always have value and are not allowe
 
 ### AI/ML Options (Hugging Face)
 
-<details><summary>Model Information</summary>
+<details><summary>Obtaining Hugging Face Token</summary>
+<p>
+
+Steps to Obtain a Hugging Face Token with Write Mode
+
+1. **Create a Hugging Face Account (if you don't have one already):**
+   - Go to the [Hugging Face website](https://huggingface.co/).
+   - Click on "Sign Up" in the top right corner.
+   - Fill in your details (username, email, password) and complete the registration process.
+
+2. **Log In to Your Account:**
+   - If you already have an account, simply log in by clicking "Log In" and entering your credentials.
+
+3. **Navigate to Your Profile Settings:**
+   - Once logged in, click on your profile icon in the top right corner of the page.
+   - From the dropdown menu, select "Settings."
+
+4. **Access the API Tokens Section:**
+   - In the settings menu on the left side of the screen, find and click on "Access Tokens."
+
+5. **Create a New API Token:**
+   - In the "Access Tokens" section, you will see an option to create a new token.
+   - Click on "New token."
+
+6. **Set Permissions to Write Mode:**
+   - Provide a name for your token (e.g., "MyWriteToken").
+   - Set the permissions type to "Write" type by selecting the "Write" from the dropdown. This will grant the token write access, allowing you to perform actions that modify data on Hugging Face.
+
+7. **Generate and Copy Your Token:**
+   - Click on the "Generate token" button.
+   - Your new token will be displayed. Copy it and store it in a secure place, as you will need it to access Hugging Face's API services.
+
+**Note:** Keep your token secure and do not share it publicly, as it grants access to your Hugging Face account and its resources.
+
+</p>
+</details>
+
+<details><summary>Avaliable Model Information</summary>
 <p>
 
 | Model      | Information                                                          | Accuracy |
 | ---------- | -------------------------------------------------------------------- | -------- |
-| vit-gpt2   | [Link](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)  | Medium   |
-| blip-image | [Link](https://huggingface.co/Salesforce/blip-image-captioning-base) | Medium   |
-| git-large  | [Link](https://huggingface.co/microsoft/git-large)                   | Medium   |
+| vit-gpt2   | [Link](https://huggingface.co/nlpconnect/vit-gpt2-image-captioning)  | Low - Medium   |
+| blip-image | [Link](https://huggingface.co/Salesforce/blip-image-captioning-base) | Low - Medium   |
+| git-large  | [Link](https://huggingface.co/microsoft/git-large)                   | Low - Medium   |
 
 </p>
 </details>
