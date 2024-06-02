@@ -125,6 +125,11 @@ general options:
   --version                          show program's version number and exit
   -h, --help                         show this help message and exit
 
+machine learning options:
+  --hugging-face-token              Hugging Face token to use image captioning model online
+  --hf-model                        Provide the model used for generating caption <vit-gpt2 | blip-image| git-large> (defaults: vit-gpt2)
+  --caption-column                  Provide both image column and column where caption would be written
+
 column options:
   --column-types                     comma-separated list of column types to use for non-key columns;
                                      if none is provided, types will be guessed from CSV values
