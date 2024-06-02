@@ -88,7 +88,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--hf-model":{
                 "help": (
-                    "Provide the model used for generating caption <vit-gpt2 | blip-image| git-large> (defaults: vit-gpt2)"
+                    "Provide the model used for generating caption <vit-gpt2 | blip-image | git-large> (defaults: vit-gpt2)"
                 ),
                 "metavar": "AI",
             },
