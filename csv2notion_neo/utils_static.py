@@ -62,8 +62,11 @@ class ConversionRules(object):
     fail_on_wrong_status_values: bool
 
     rename_notion_key_column: List[str]
-
     payload_key_column: Optional[str]
+
+    hugging_face_token: Optional[str]
+    caption_column: List[str]
+    hf_model:Optional[str]
 
     @property
     def files_search_path(self) -> Path:

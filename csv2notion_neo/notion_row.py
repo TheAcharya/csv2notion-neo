@@ -70,6 +70,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
         self.cover_meta = cover_meta
         CollectionRowBlock.cover.fset(self, new_image)
+        
 
     @property
     def cover_block(self) -> Optional[str]:
@@ -77,6 +78,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
     @cover_block.setter
     def cover_block(self, image: FileType) -> None:
+        
         
         new_images = []
         if image:

@@ -37,6 +37,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         notion_rows = []
         # starting with 2nd row, because first is header
         self._current_row = 2
+        self.csv_data = csv_data
 
         for row in csv_data:
 
@@ -77,6 +78,18 @@ class NotionRowConverter(object):  # noqa:  WPS214
                 properties["payload_key_column"] = new_id
             else:
                 properties["payload_key_column"] = self.rules.payload_key_column
+
+        #ai features
+        if self.rules.hugging_face_token:
+            if self.rules.caption_column:
+                properties['AI'] = {"caption":{
+                    "hftoken":self.rules.hugging_face_token,
+                    "image_path": self.rules.csv_file.parent / Path(row[self.rules.caption_column[0]]),
+                    "caption_column":self.rules.caption_column[1],
+                    "model_url":self.csv_data.model_url
+                }}
+
+        
 
         if self.rules.image_column_mode == "block":
             properties["cover_block"] = self._map_image(row)
@@ -182,9 +195,10 @@ class NotionRowConverter(object):  # noqa:  WPS214
                     image = row.get(image_column, "").strip()
                     if image:
                         image = map_url_or_file(image)
+                        
                         if isinstance(image, Path):
                             image = self._relative_path(image)
-
+                        #ic(image)
                     self._raise_if_mandatory_empty(image_column, image)
 
                     images.append(image)
@@ -279,6 +293,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         return ensured_path
 
     def _relative_path(self, path: Path) -> Optional[Path]:
+        #PATH
         search_path = self.rules.files_search_path
 
         if not path.is_absolute():
