@@ -587,6 +587,18 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 </p>
 </details>
 
+<details><summary>Utilising Hugging Face's AI/ML Model to Automatically Analyse and Generate Captions from Images</summary>
+<p>
+
+```shell
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --hugging-face-token YOUR_HUGGING_FACE_HERE --hf-model blip-image --caption-column "Image Filename" "Frame Description" --image-column "Image Filename" --image-column-keep --mandatory-column "Cat ID" --merge big_cats.csv
+```
+
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_12.gif?raw=true"> </p>
+
+</p>
+</details>
+
 ## Utilised By
 
 ### Marker Data
