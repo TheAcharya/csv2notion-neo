@@ -94,7 +94,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             },
             "--caption-column":{
                 "help":(
-                    "Provide both image column and column where caption must be saved"
+                    "Provide both image column and column where caption would be written"
                 ),
                 "metavar":"AI",
                 "nargs":2,
