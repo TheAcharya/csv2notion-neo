@@ -409,6 +409,8 @@ Steps to Obtain a Hugging Face Token with Write Mode
 | blip-image | [Link](https://huggingface.co/Salesforce/blip-image-captioning-base) | Low - Medium   |
 | git-large  | [Link](https://huggingface.co/microsoft/git-large)                   | Low - Medium   |
 
+**Note:** Additional models will be integrated in the future from Hugging Face as better models are identified.
+
 </p>
 </details>
 
