@@ -140,11 +140,11 @@ class NotionClient(object):
                     self.current_space = self.get_space(workspace_dict[self.workspace])
                 except:
                     self.current_space = self.get_space(list(records["space"].keys())[0])
-                    logger.warning(f"Workspace {self.workspace} does not exist, defaulting to {self.current_space.name}")
+                    logger.warning(f"Workspace {self.workspace} does not exist or invalid, defaulting to {self.current_space.name}")
 
         else:
             self.current_space = self.get_space(list(records["space"].keys())[0])
-            logger.warning(f"Workspace not provided, defaulting to {self.current_space.name}")
+            logger.warning(f"Workspace not provided or invalid, defaulting to {self.current_space.name}")
 
         self._store.store_recordmap(records)
         self.current_user = self.get_user(list(records["notion_user"].keys())[0])
