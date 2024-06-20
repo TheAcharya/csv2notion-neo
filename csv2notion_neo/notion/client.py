@@ -18,7 +18,8 @@ from .collection import (
     COLLECTION_VIEW_TYPES,
     TemplateBlock,
 )
-from .logger import logger
+
+import logging
 from .monitor import Monitor
 from .operations import operation_update_last_edited, build_operation
 from .settings import API_BASE_URL
@@ -28,6 +29,7 @@ from .user import User
 from .utils import extract_id, now
 
 from icecream import ic
+logger = logging.getLogger(__name__)
 
 def create_session(client_specified_retry=None):
     """
