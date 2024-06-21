@@ -3,7 +3,7 @@
 ### 1.3.1
 
 **🎉 Released:**
-- 20th June 2024
+- 21st June 2024
 
 **🔨 Improvements:**
 - Improved log output for `--workspace`
