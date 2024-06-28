@@ -60,6 +60,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
   - [Mandatory Columns](#mandatory-columns)
   - [AI/ML Options (Hugging Face)](#aiml-options-hugging-face)
 - [Examples](#examples)
+- [Utilised By](#utilised-by)
 - [Credits](#credits)
 - [License](#license)
 - [Reporting Bugs](#reporting-bugs)
