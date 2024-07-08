@@ -88,7 +88,7 @@ jobs:
         with:
           name: release_dist_reqs
 
-    - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: 1
