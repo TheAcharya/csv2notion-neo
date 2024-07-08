@@ -25,16 +25,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.BUILD_PYTHON_VERSION }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Set up Poetry ${{ env.BUILD_POETRY_VERSION }}
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ env.BUILD_POETRY_VERSION }}
-
+          
       - name: Export requirements
         run: poetry export --without-hashes -f requirements.txt --output requirements.txt
 
@@ -88,12 +88,12 @@ jobs:
         with:
           name: release_dist_reqs
 
-      - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
+    - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: 1
         with:
-          python-version: ${{ env.BUILD_PYTHON_VERSION }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
