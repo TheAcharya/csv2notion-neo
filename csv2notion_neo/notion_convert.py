@@ -89,12 +89,12 @@ class NotionRowConverter(object):  # noqa:  WPS214
                     "model_url":self.csv_data.model_url
                 }}
 
-        
-
         if self.rules.image_column_mode == "block":
             properties["cover_block"] = self._map_image(row)
             properties["cover_block_caption"] = self._map_image_caption(row)
         else:
+            # properties["cover_block"] = self._map_image(row)
+            # properties["cover_block_caption"] = self._map_image_caption(row)
             properties["cover"] = self._map_image(row)
 
         properties["icon"] = self._map_icon(row)
@@ -198,7 +198,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
                         
                         if isinstance(image, Path):
                             image = self._relative_path(image)
-                        #ic(image)
+
                     self._raise_if_mandatory_empty(image_column, image)
 
                     images.append(image)

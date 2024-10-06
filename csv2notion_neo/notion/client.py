@@ -293,7 +293,7 @@ class NotionClient(object):
         return response
 
     def submit_transaction(self, operations, update_last_edited=True):
-
+        
         if not operations:
             return
 
@@ -409,8 +409,7 @@ class NotionClient(object):
         args.update(kwargs)
 
         with self.as_atomic_transaction():
-            
-            # create the new record
+            # create the new record 
             self.submit_transaction(
                 build_operation(
                     args=args, command="set", id=record_id, path=[], table=table
@@ -434,13 +433,14 @@ class NotionClient(object):
 
 class Transaction(object):
 
+    
     is_dummy_nested_transaction = False
 
     def __init__(self, client):
         self.client = client
 
     def __enter__(self):
-
+        
         if hasattr(self.client, "_transaction_operations"):
             # client is already in a transaction, so we'll just make this one a nullop and let the outer one handle it
             self.is_dummy_nested_transaction = True

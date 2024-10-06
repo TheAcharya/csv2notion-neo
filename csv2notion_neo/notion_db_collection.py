@@ -65,7 +65,6 @@ class CollectionExtended(Collection):
         properties = {} if properties is None else properties
 
         with self._client.as_atomic_transaction():
-        
             for key, val in properties.items():
                 setattr(row, key, val)
 

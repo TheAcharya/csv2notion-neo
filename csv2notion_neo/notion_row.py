@@ -18,9 +18,7 @@ from csv2notion_neo.utils_static import FileType
 from icecream import ic
 from csv2notion_neo.notion_row_upload_file import get_file_id
 
-
 NamedURLs = Dict[str, str]
-
 
 class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
     icon_meta = field_map("properties.meta.icon")
@@ -52,12 +50,22 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
     @property
     def cover(self) -> Optional[str]:
-        return super().cover  # type: ignore
+        #return super().cover  # type: ignore
+        return self.image_block.url  # type: ignore
 
     @cover.setter
-    def cover(self, image: FileType) -> None:
+    def cover(self, image: FileType) -> None:   
         
-        new_image: Optional[FileType] = image if image else None
+        new_images = []
+        if image:
+            cover_img = image.pop(0)
+        else:
+            cover_img = None
+
+        if self._client.in_transaction():
+            raise RuntimeError("Cannot set cover_block during atomic transaction")
+        
+        new_image: Optional[FileType] = cover_img if cover_img else None
 
         if not self._is_meta_changed("cover_meta", new_image, self.cover):
             return
@@ -65,20 +73,22 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         if new_image is None:
             cover_meta = None
         else:
-
             new_image, cover_meta = upload_filetype(self, new_image)
 
         self.cover_meta = cover_meta
-        CollectionRowBlock.cover.fset(self, new_image)
-        
+        #CollectionRowBlock.cover.fset(self, new_image)
 
+        new_images.append(new_image)
+
+        self.image_block.url = new_images
+
+        
     @property
     def cover_block(self) -> Optional[str]:
         return self.image_block.url  # type: ignore
 
     @cover_block.setter
     def cover_block(self, image: FileType) -> None:
-        
         
         new_images = []
         if image:
@@ -107,7 +117,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             for im in image:
                 new_img,meta = upload_filetype(self,im)
                 new_images.append(new_img)
-        
+
         self.image_block.url = new_images
 
     def upload_non_cover_images(self, image_url: Optional[str]) -> None:

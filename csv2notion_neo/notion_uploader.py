@@ -43,7 +43,7 @@ class NotionRowUploader(object):
       
         existing_row = self.db.rows.get(row.key()) if is_merge else None
 
-        if is_merge and existing_row:       
+        if is_merge and existing_row:
             cur_row = existing_row
             cur_row.update(properties=row.properties, columns=row.columns)
         else:
@@ -55,5 +55,5 @@ def _extract_post_properties(properties: Dict[str, Any]) -> Dict[str, Any]:
     return {
         p: properties.pop(p)
         for p in properties.copy()
-        if p in {"cover_block", "cover_block_caption", "last_edited_time"}
+        if p in {"cover_block", "cover_block_caption", "last_edited_time","cover"}
     }

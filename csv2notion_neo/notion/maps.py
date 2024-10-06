@@ -35,6 +35,7 @@ def field_map(path, python_to_api=lambda x: x, api_to_python=lambda x: x):
 
     def fget(self):
         kwargs = {}
+        from icecream import ic
         if (
             "client" in signature(api_to_python).parameters
             and "id" in signature(api_to_python).parameters
@@ -44,7 +45,6 @@ def field_map(path, python_to_api=lambda x: x, api_to_python=lambda x: x):
         return api_to_python(self.get(path), **kwargs)
 
     def fset(self, value):
-        from icecream import ic
         kwargs = {}
         if "client" in signature(python_to_api).parameters:
             kwargs["client"] = self._client

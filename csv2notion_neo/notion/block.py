@@ -25,7 +25,6 @@ from .utils import (
     get_by_path,
 )
 
-
 class Children(object):
 
     child_list_key = "content"
@@ -51,6 +50,7 @@ class Children(object):
         return self._parent.get(self.child_list_key) or []
 
     def _get_block(self, id):
+
 
         block = self._client.get_block(id)
 
@@ -323,7 +323,6 @@ class Block(Record):
 
             # If it's not an alias, we actually remove the block
             with self._client.as_atomic_transaction():
-
                 # Mark the block as inactive
                 self._client.submit_transaction(
                     build_operation(
@@ -385,7 +384,6 @@ class Block(Record):
             list_args[position] = target_block.id
 
         with self._client.as_atomic_transaction():
-
             # First, remove the node, before we re-insert and re-activate it at the target location
             #self.remove()
 
