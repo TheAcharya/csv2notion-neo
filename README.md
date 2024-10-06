@@ -4,20 +4,7 @@
 </p>
 
 
-<p align="center">
-  <a href="https://github.com/TheAcharya/csv2notion-neo/blob/main/LICENSE">
-    <img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/>
-  </a>
-  <a href="https://pypi.python.org/pypi/csv2notion-neo">
-    <img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/>
-  </a>
-  <a href="https://pypi.org/project/csv2notion-neo/">
-    <img src="https://img.shields.io/pypi/pyversions/csv2notion-neo.svg" alt="Python"/>
-  </a>
-  <a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml">
-    <img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/>
-  </a>
-</p>
+<p align="center"><a href="https://github.com/TheAcharya/csv2notion-neo/blob/main/LICENSE"><img src="http://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat" alt="license"/></a>&nbsp;<a href="https://pypi.python.org/pypi/csv2notion-neo"><img src="https://img.shields.io/pypi/v/csv2notion-neo?label=version" alt="PyPI"/></a>&nbsp;<a href="https://pypi.org/project/csv2notion-neo/"><img src="https://img.shields.io/pypi/pyversions/csv2notion-neo.svg" alt="Python"/></a>&nbsp;<a href="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml"><img src="https://github.com/TheAcharya/csv2notion-neo/actions/workflows/release_github.yml/badge.svg" alt="release_github"/></a>&nbsp;<a href="Github All Releases"><img src="https://img.shields.io/github/downloads/TheAcharya/csv2notion-neo/total.svg" alt="release_github"/></a></p>
 
 An advance method to upload & merge *.csv or *.json files with images to <a href="https://notion.so/" target="_blank">Notion</a> database.
 
@@ -60,6 +47,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
   - [Mandatory Columns](#mandatory-columns)
   - [AI/ML Options (Hugging Face)](#aiml-options-hugging-face)
 - [Examples](#examples)
+- [Utilised By](#utilised-by)
 - [Credits](#credits)
 - [License](#license)
 - [Reporting Bugs](#reporting-bugs)
@@ -638,7 +626,7 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 
 ## Utilised By
 
-### Marker Data
+### [Marker Data](https://markerdata.theacharya.co)
 
 <details><summary>Marker Data's Notion Panel</summary>
 <p>
