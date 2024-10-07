@@ -21,7 +21,13 @@ def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
         url, meta = upload_file(parent, filetype)
     else:
         url = filetype
-        meta = {"type": "url", "url": filetype}
+        meta = {
+        "source": [
+            [
+                url
+            ]
+        ]
+    }
 
     return url, meta
 
