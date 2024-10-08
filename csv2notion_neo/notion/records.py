@@ -113,7 +113,6 @@ class Record(object):
         Set a specific `value` (under the specific `path`) on the record's data structure on the server.
         """
         
-        
         command = 'set'
         if 'cover_block' in path:
             path = ['properties']
@@ -125,8 +124,8 @@ class Record(object):
             value = {"display_source":value}
             command = 'update'
         elif 'cover' in path:
-            path = ['properties']
-            command = 'update' 
+            path = ['format','page_cover']
+            #command = 'update' 
         
         if value:
             self._client.submit_transaction(

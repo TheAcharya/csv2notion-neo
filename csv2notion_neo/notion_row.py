@@ -50,13 +50,12 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
     @property
     def cover(self) -> Optional[str]:
-        #return super().cover  # type: ignore
-        return self.image_block.url  # type: ignore
+        return super().cover  # type: ignore
+        #return self.image_block.url  # type: ignore
 
     @cover.setter
     def cover(self, image: FileType) -> None:   
-        
-        new_images = []
+    
         if image:
             cover_img = image.pop(0)
         else:
@@ -76,11 +75,11 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             new_image, cover_meta = upload_filetype(self, new_image)
 
         self.cover_meta = cover_meta
-        #CollectionRowBlock.cover.fset(self, new_image)
+        CollectionRowBlock.cover.fset(self, new_image)
 
-        new_images.append(new_image)
+        #new_images.append(new_image)
 
-        self.image_block.url = new_images
+        #self.image_block.url = new_images
 
         
     @property
