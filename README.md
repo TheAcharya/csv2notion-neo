@@ -30,6 +30,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 ## Table of contents
 
 - [Background](#background)
+- [System Requirements](#system-requirements)
 - [Installation](#installation)
   - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
   - [From Source](#from-source)
@@ -57,6 +58,23 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to address the lack of advanced importing support for `*.csv` files in [Notion](https://notion.so). We took inspiration from [Airtable](https://www.airtable.com)’s [CSV import extension](https://support.airtable.com/docs/csv-import-extension).
 
 **CSV2Notion Neo** was created as a spin-off project to address inactivity in the original repository and maintain compatibility with Notion. As Notion changes or updates its backend API periodically, we aim to fix, update and add new features to the tool in a timely manner. Any dependent tools or project that relied on [csv2notion](https://github.com/vzhd1701/csv2notion), can use our **CSV2Notion Neo** tool interchangeably requiring additional augments.
+
+## System Requirements
+
+### Linux (x64)
+- Operating System: Linux (64-bit)
+- Architecture: x64
+- Dependencies: None (ensure basic Linux shell tools are available)
+
+### macOS (ARM64)
+- Operating System: macOS 11 (Big Sur) or later
+- Architecture: ARM64 (Apple Silicon)
+- Dependencies: None
+
+### Windows (x64)
+- Operating System: Windows 10 or later (64-bit)
+- Architecture: x64
+- Dependencies: None
 
 ## Installation
 
