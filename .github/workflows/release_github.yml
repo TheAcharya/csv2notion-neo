@@ -158,7 +158,7 @@ jobs:
           cp ./LICENSE dist/
 
 
-          zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
+          zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_arm64.zip "dist/"
       
       - name: Create pkg and productsign it
         if: matrix.os == 'macos-latest'
