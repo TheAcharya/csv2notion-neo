@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.3.2
+
+**🎉 Released:**
+- Date Pending
+
+**🐞 Bug Fix:**
+- Fixed image uploading when using `--image-column-mode cover` (#40)
+
+---
+
 ### 1.3.1
 
 **🎉 Released:**
