@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def cli(*argv: str) -> None:
     try:
-        ic.enable()
+        ic.disable()
         args = parse_args(argv)
             
         setup_logging(is_verbose=args.verbose, log_file=args.log)
@@ -45,10 +45,10 @@ def cli(*argv: str) -> None:
             is_randomize_select_colors=args.randomize_select_colors,
         )
 
-        if args.url:
-            collection_id = get_collection_id(client, args.url)
-        else:
-            collection_id = new_database(args, client, csv_data)
+        if not args.url:
+            args.url = new_database(args, client, csv_data)
+        
+        collection_id = get_collection_id(client, args.url)
 
         notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
 
