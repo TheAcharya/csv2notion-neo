@@ -40,7 +40,7 @@ def new_database(
 
     logger.info(f"New database URL: {url}")
 
-    return collection_id
+    return url
 
 
 def convert_csv_to_notion_rows(
