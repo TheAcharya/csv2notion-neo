@@ -3,10 +3,11 @@
 ### 1.3.2
 
 **🎉 Released:**
-- Data Pending
+- 5th November 2024
 
 **🔨 Improvements:**
 - Updated dependencies packages
+- Improved logic when `-url` and `-merge` is not provided (#41)
 
 **🐞 Bug Fix:**
 - Fixed can't able to create new Notion Database (#39)
