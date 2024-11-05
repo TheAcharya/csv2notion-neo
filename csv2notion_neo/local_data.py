@@ -114,6 +114,7 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         self.key_col = key_col_json
         self.types = self._column_types(column_types)
 
+
         #ai features
         try:
             if args.hugging_face_token:

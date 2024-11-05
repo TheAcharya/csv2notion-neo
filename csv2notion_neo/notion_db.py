@@ -180,15 +180,15 @@ def _schema_from_csv(
     csv_data: LocalData, skip_columns: Optional[List[str]] = None
 ) -> Dict[str, Dict[str, str]]:
     if skip_columns:
-        columns = [c for c in csv_data.columns if c not in skip_columns]
+        columns = [c for c in csv_data.content_columns if c not in skip_columns]
     else:
-        columns = csv_data.columns
+        columns = csv_data.content_columns
 
-    schema_ids = rand_id_list(len(columns) - 1, 4)
+    schema_ids = rand_id_list(len(columns), 4)
 
-    schema = {"title": {"name": columns[0], "type": "title"}}
+    schema = {"title": {"name": csv_data.key_column, "type": "title"}}
 
-    for col_id, col_key in zip(schema_ids, columns[1:]):
+    for col_id, col_key in zip(schema_ids, columns):
         schema[col_id] = {
             "name": col_key,
             "type": csv_data.col_type(col_key),
