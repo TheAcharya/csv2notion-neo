@@ -3,9 +3,13 @@
 ### 1.3.2
 
 **🎉 Released:**
-- Date Pending
+- 5th November 2024
+
+**🔨 Improvements:**
+- Updated dependencies packages
 
 **🐞 Bug Fix:**
+- Fixed can't able to create new Notion Database (#39)
 - Fixed image uploading when using `--image-column-mode cover` (#40)
 
 ---
