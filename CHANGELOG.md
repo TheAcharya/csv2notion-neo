@@ -3,7 +3,7 @@
 ### 1.3.2
 
 **🎉 Released:**
-- 5th November 2024
+- Data Pending
 
 **🔨 Improvements:**
 - Updated dependencies packages
