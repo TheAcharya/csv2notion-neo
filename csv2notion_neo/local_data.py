@@ -14,13 +14,15 @@ CSVRowType = Dict[str, str]
 logger = logging.getLogger(__name__)
 
 
-def data_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowType]:
+
+
+def data_read(file_path: Path, fail_on_duplicate_columns: bool,args:Dict) -> List[CSVRowType]:
     suffix = Path(file_path).suffix
 
     if "csv" in suffix:
         try:
             with open(file_path, "r", encoding="utf-8-sig") as csv_file:
-                return _csv_read_rows(csv_file, fail_on_duplicate_columns)
+                return _csv_read_rows(csv_file, fail_on_duplicate_columns,args.delimiter)
         except FileNotFoundError as e:
             raise CriticalError(f"File {file_path} not found") from e
     elif "json" in suffix:
@@ -35,10 +37,11 @@ def data_read(file_path: Path, fail_on_duplicate_columns: bool) -> List[CSVRowTy
 
 
 def _csv_read_rows(
-    csv_file: Iterable[str], fail_on_duplicate_columns: bool
+    csv_file: Iterable[str], fail_on_duplicate_columns: bool, delemiter: str = ','
 ) -> List[CSVRowType]:
-    reader = csv.DictReader(csv_file, restval="")
-
+    
+    reader = csv.DictReader(csv_file,delimiter=delemiter,restval="")
+    
     if not reader.fieldnames:
         raise CriticalError("CSV file has no columns.")
 
@@ -99,7 +102,6 @@ def _convert_int_to_string(src_dict:Dict[Any,Any]):
     
     return src_dict
 
-
 class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
     def __init__(
         self,
@@ -110,7 +112,7 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
         args:dict = None
     ) -> None:
         self.csv_file = csv_file
-        self.rows = data_read(self.csv_file, fail_on_duplicate_columns)
+        self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
         self.key_col = key_col_json
         self.types = self._column_types(column_types)
 

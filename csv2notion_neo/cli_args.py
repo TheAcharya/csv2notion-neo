@@ -110,6 +110,13 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "metavar": "TYPES",
                 "type": _parse_column_types,
             },
+            "--delimiter": {
+                "help": (
+                    "Delimiter that is used to seperate columns and rows in csv file"
+                    "\nif none is provided, ',' is taken as default"
+                ),
+                "default": ","
+            },
             "--add-missing-columns": {
                 "action": "store_true",
                 "help": (
