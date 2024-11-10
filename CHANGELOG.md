@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.3.3
+
+**🎉 Released:**
+- Date Pending
+
+**🔨 Improvements:**
+- Added `--delimiter`: Delimiter that is used to seperate columns and rows in csv file if none is provided, `,` is taken as default (#43)
+
+---
+
 ### 1.3.2
 
 **🎉 Released:**
