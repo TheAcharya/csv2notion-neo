@@ -3,7 +3,7 @@
 ### 1.3.3
 
 **🎉 Released:**
-- Date Pending
+- 11th November 2024
 
 **🔨 Improvements:**
 - Added `--delimiter`: Delimiter that is used to seperate columns and rows in csv file if none is provided, `,` is taken as default (#43)
