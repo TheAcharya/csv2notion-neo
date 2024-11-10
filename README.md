@@ -142,6 +142,7 @@ column options:
   --column-types                     comma-separated list of column types to use for non-key columns;
                                      if none is provided, types will be guessed from CSV values
                                      (can also be used with --add-missing-columns flag)
+  --delimiter                        Delimiter that is used to seperate columns and rows in csv file if none is provided, ',' is taken as default
   --add-missing-columns              if columns are present in CSV but not in Notion DB, add them to Notion DB
   --rename-notion-key-column         rename the key column in the file to a different key column in Airtable
   --randomize-select-colors          randomize colors for added options in select and multi select columns
