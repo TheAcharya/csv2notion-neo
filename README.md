@@ -263,9 +263,11 @@ Enable Web Inspector
 <details><summary>Obtaining Notion Session Token (Brave, Chrome or Edge)</summary>
 <p>
 
-Go to Setting, Privacy and security
+- Press ⌥ + ⌘ + i (Mac) or  Shift + Crtl + i (Win) to show Developer Tools.
+- Go to Application tab.
+- Copy and obtain your token_v2 value.
 
-<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_brave.gif?raw=true"> </p>
+<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_brave.png?raw=true"> </p>
 
 </p>
 </details>
