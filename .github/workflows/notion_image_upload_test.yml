@@ -45,12 +45,19 @@ jobs:
         ls -l ./notion-test/data-set/json
 
     - name: Get CSV2Notion Neo Latest Release URL
-      run: |
-        LATEST_URL=$(curl -s https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest | \
-        jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
-        
-        echo "Latest release URL: $LATEST_URL"
-        echo "DOWNLOAD_URL=$LATEST_URL" >> $GITHUB_ENV
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    run: |
+      LATEST_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest | \
+      jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
+      
+      if [ -z "$LATEST_URL" ]; then
+        echo "No .pkg asset found in the latest release."
+        exit 1
+      fi
+      
+      echo "Latest release URL: $LATEST_URL"
+      echo "DOWNLOAD_URL=$LATEST_URL" >> $GITHUB_ENV
 
     - name: Download CSV2Notion Neo macOS Package
       run: |
