@@ -83,11 +83,11 @@ jobs:
         PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
         UPLOAD_PAYLOAD="$PARENT/notion-test/data-set/json/Notion Upload Test.json"
 
-        echo "Running csv2notion_neo upload test..."
+        echo "Running CSV2Notion Neo upload test..."
         csv2notion_neo \
           --workspace "$NOTION_WORKSPACE" \
           --token "$NOTION_TOKEN" \
-          --url "$UPLOAD_PAYLOAD" \
+          --url "$NOTION_URL" \
           --image-column "Image Filename" "Palette Filename" \
           --image-column-keep \
           --mandatory-column "Marker ID" \
@@ -95,4 +95,5 @@ jobs:
           --payload-key-column "Marker ID" \
           --max-threads 10 \
           --merge \
-          --verbose
+          --verbose \
+          "$UPLOAD_PAYLOAD"
