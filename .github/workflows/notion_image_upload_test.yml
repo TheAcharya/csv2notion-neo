@@ -46,7 +46,7 @@ jobs:
         ls -l ./notion-test/data-set
         ls -l ./notion-test/data-set/json
 
-     - name: Get Latest Release URL
+    - name: Get Latest Release URL
       run: |
         API_URL="https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest"
         
