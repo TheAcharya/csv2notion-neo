@@ -10,9 +10,18 @@ on:
       
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-15  # GitHub's latest macOS runner (could be Intel or ARM)
 
     steps:
+    - name: Verify Runner Architecture (ARM64 Check)
+      run: |
+        ARCH=$(uname -m)
+        echo "Running on architecture: $ARCH"
+        if [[ "$ARCH" != "arm64" ]]; then
+          echo "❌ ERROR: This workflow requires an ARM-based Mac (M1/M2)."
+          exit 1
+        fi
+
     - name: Checkout Repository
       uses: actions/checkout@v4
       
