@@ -94,4 +94,4 @@ jobs:
           --max-threads 10 \
           --merge \
           --verbose \
-          "$UPLOAD_PAYLOAD"
+          $UPLOAD_PAYLOAD
