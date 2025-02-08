@@ -64,7 +64,7 @@ jobs:
       run: |
         if ! command -v csv2notion_neo &> /dev/null
         then
-          echo "❌ ERROR: csv2notion_neo is not installed or not in PATH."
+          echo "❌ ERROR: CSV2Notion Neo is not installed or not in PATH."
           exit 1
         fi
 
