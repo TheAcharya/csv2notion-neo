@@ -10,7 +10,7 @@ on:
       
 jobs:
   build:
-    runs-on: macos-15  # Ensure we run on macOS
+    runs-on: macos-15
 
     steps:
     - name: Verify Runner Architecture (ARM64 Check)
@@ -28,12 +28,12 @@ jobs:
     - name: Create Test Directory
       run: mkdir -p notion-test/data-set
     
-    - name: Prepare Directories
+    - name: Prepare Runnder Test Directories
       run: |
         PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
         mkdir -p "$PARENT/notion-test/data-set/json"
 
-    - name: Copy Test Directory
+    - name: Copy Local Data Set Directories to Runnder Test Directories
       run: |
         mkdir -p notion-test/data-set
         mkdir -p notion-test/data-set/json
@@ -46,7 +46,7 @@ jobs:
         ls -l ./notion-test/data-set
         ls -l ./notion-test/data-set/json
 
-    - name: Get Latest Release URL
+    - name: Get CSV2Notion Neo Latest Release URL
       run: |
         LATEST_URL=$(curl -s https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest | \
         jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
@@ -54,15 +54,15 @@ jobs:
         echo "Latest release URL: $LATEST_URL"
         echo "DOWNLOAD_URL=$LATEST_URL" >> $GITHUB_ENV
 
-    - name: Download CSV2Notion-Neo macOS Package
+    - name: Download CSV2Notion Neo macOS Package
       run: |
         curl -L -o ./notion-test/CSV2Notion-Neo.pkg "$DOWNLOAD_URL"
 
-    - name: Install CSV2Notion-Neo Package
+    - name: Install CSV2Notion Neo Package
       run: |
         sudo installer -pkg ./notion-test/CSV2Notion-Neo.pkg -target /
 
-    - name: Verify CSV2Notion-Neo Installation
+    - name: Verify CSV2Notion Neo Installation
       run: |
         if ! command -v csv2notion_neo &> /dev/null
         then
@@ -70,11 +70,11 @@ jobs:
           exit 1
         fi
 
-        echo "✅ CSV2Notion-Neo installed successfully!"
+        echo "✅ CSV2Notion Neo installed successfully!"
         echo "Checking version..."
         csv2notion_neo --version
 
-    - name: Run Upload Test with CSV2Notion-Neo
+    - name: Run Upload Test with CSV2Notion Neo
       env:
         NOTION_WORKSPACE: ${{ secrets.NOTION_WS_V }}
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN_V }}
