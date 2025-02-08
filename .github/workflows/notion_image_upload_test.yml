@@ -1,0 +1,38 @@
+name: notion_image_upload_test
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Release after build'
+        required: true
+        default: 'no'
+      
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Create Test Directory
+      run: mkdir -p notion-test/data-set
+    
+    - name: Prepare Directories
+      run: |
+        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+        mkdir -p "$PARENT/notion-test/data-set/json"
+
+    - name: Copy Test Directory
+      run: |
+        mkdir -p notion-test/data-set
+        mkdir -p notion-test/data-set/json
+        cp -R ./test/json/. ./notion-test/data-set/json
+
+    - name: Verify Copied Files
+      run: |
+        echo "Checking copied files..."
+        ls -l ./notion-test/
+        ls -l ./notion-test/data-set
+        ls -l ./notion-test/data-set/json
