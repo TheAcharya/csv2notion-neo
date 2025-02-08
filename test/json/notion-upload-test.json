@@ -1,0 +1,152 @@
+[
+  {
+    "Clip Keywords" : [
+
+    ],
+    "Audio Role & Subrole" : [
+      "Not Assigned"
+    ],
+    "Reel" : "",
+    "Library Name" : "Markers",
+    "Clip Duration" : "00:01:31:18",
+    "Event Name" : "Demo 1",
+    "Marker Name" : "Marker 1",
+    "Scene" : "",
+    "Palette Filename" : "notion-upload-test_00-00-08-06-Palette.jpg",
+    "Marker ID" : "notion-upload-test_00:00:08:06",
+    "Checked" : "false",
+    "Take" : "",
+    "Marker Type" : "To Do",
+    "Clip Out" : "00:01:31:18",
+    "Project Name" : "notion-upload-test",
+    "Video Role & Subrole" : "Video",
+    "Clip Name" : "Atom",
+    "Status" : "In Progress",
+    "Clip Type" : "Video",
+    "Clip In" : "00:00:00:00",
+    "Icon Image" : "icon-marker-todo-incomplete.png",
+    "Notes" : "",
+    "Marker Position" : "00:00:08:06",
+    "Image Filename" : "notion-upload-test_00-00-08-06.gif"
+  },
+  {
+    "Project Name" : "notion-upload-test",
+    "Clip Type" : "Video",
+    "Audio Role & Subrole" : [
+      "Not Assigned"
+    ],
+    "Clip Out" : "00:01:31:18",
+    "Clip Keywords" : [
+
+    ],
+    "Icon Image" : "icon-marker-todo-complete.png",
+    "Marker Name" : "Marker 2",
+    "Clip Name" : "Atom",
+    "Clip Duration" : "00:01:31:18",
+    "Video Role & Subrole" : "Video",
+    "Scene" : "",
+    "Library Name" : "Markers",
+    "Reel" : "",
+    "Event Name" : "Demo 1",
+    "Image Filename" : "notion-upload-test_00-00-22-07.gif",
+    "Checked" : "true",
+    "Marker ID" : "notion-upload-test_00:00:22:07",
+    "Notes" : "",
+    "Marker Position" : "00:00:22:07",
+    "Clip In" : "00:00:00:00",
+    "Take" : "",
+    "Status" : "Done",
+    "Palette Filename" : "notion-upload-test_00-00-22-07-Palette.jpg",
+    "Marker Type" : "To Do"
+  },
+  {
+    "Marker Type" : "Chapter",
+    "Clip Keywords" : [
+
+    ],
+    "Reel" : "",
+    "Palette Filename" : "notion-upload-test_00-00-50-08-Palette.jpg",
+    "Checked" : "false",
+    "Marker Name" : "Chapter 2",
+    "Marker Position" : "00:00:50:08",
+    "Icon Image" : "icon-marker-chapter.png",
+    "Clip Type" : "Video",
+    "Take" : "",
+    "Status" : "Not Started",
+    "Library Name" : "Markers",
+    "Video Role & Subrole" : "Video",
+    "Audio Role & Subrole" : [
+      "Not Assigned"
+    ],
+    "Clip In" : "00:00:00:00",
+    "Image Filename" : "notion-upload-test_00-00-50-08.gif",
+    "Event Name" : "Demo 1",
+    "Clip Name" : "Atom",
+    "Notes" : "",
+    "Clip Duration" : "00:01:31:18",
+    "Clip Out" : "00:01:31:18",
+    "Project Name" : "notion-upload-test",
+    "Marker ID" : "notion-upload-test_00:00:50:08",
+    "Scene" : ""
+  },
+  {
+    "Clip Name" : "Atom",
+    "Take" : "",
+    "Library Name" : "Markers",
+    "Video Role & Subrole" : "Video",
+    "Status" : "Not Started",
+    "Icon Image" : "icon-marker.png",
+    "Image Filename" : "notion-upload-test_00-01-09-10.gif",
+    "Marker ID" : "notion-upload-test_00:01:09:10",
+    "Clip Keywords" : [
+
+    ],
+    "Project Name" : "notion-upload-test",
+    "Marker Type" : "Standard",
+    "Clip Out" : "00:01:31:18",
+    "Marker Name" : "Marker 4",
+    "Palette Filename" : "notion-upload-test_00-01-09-10-Palette.jpg",
+    "Clip Type" : "Video",
+    "Clip In" : "00:00:00:00",
+    "Reel" : "",
+    "Notes" : "",
+    "Checked" : "false",
+    "Event Name" : "Demo 1",
+    "Scene" : "",
+    "Marker Position" : "00:01:09:10",
+    "Audio Role & Subrole" : [
+      "Not Assigned"
+    ],
+    "Clip Duration" : "00:01:31:18"
+  },
+  {
+    "Clip Type" : "Video",
+    "Clip In" : "00:00:00:00",
+    "Notes" : "",
+    "Clip Keywords" : [
+
+    ],
+    "Marker ID" : "notion-upload-test_00:01:21:01",
+    "Marker Position" : "00:01:21:01",
+    "Clip Out" : "00:01:31:18",
+    "Status" : "Not Started",
+    "Clip Name" : "Atom",
+    "Library Name" : "Markers",
+    "Take" : "",
+    "Checked" : "false",
+    "Reel" : "",
+    "Palette Filename" : "notion-upload-test_00-01-21-01-Palette.jpg",
+    "Marker Name" : "Marker 5",
+    "Icon Image" : "icon-marker.png",
+    "Image Filename" : "notion-upload-test_00-01-21-01.gif",
+    "Scene" : "",
+    "Audio Role & Subrole" : [
+      "Not Assigned"
+    ],
+    "Video Role & Subrole" : "Video",
+    "Project Name" : "notion-upload-test",
+    "Marker Type" : "Standard",
+    "Clip Duration" : "00:01:31:18",
+    "Event Name" : "Demo 1"
+  }
+]
