@@ -89,4 +89,4 @@ jobs:
         UPLOAD_PAYLOAD="$PARENT/notion-test/data-set/json/notion-upload-test.json"
 
         echo "Running CSV2Notion Neo image upload test..."
-        csv2notion_neo --workspace "$NOTION_WORKSPACE" --token "$NOTION_TOKEN" --url $NOTION_URL --image-column "Image Filename" "Palette Filename" --image-column-keep --mandatory-column "Marker ID" --icon-column "Icon Image" --payload-key-column "Marker ID" --max-threads 10 --merge --verbose $UPLOAD_PAYLOAD
+        csv2notion_neo --workspace $NOTION_WORKSPACE --token $NOTION_TOKEN --url $NOTION_URL --image-column "Image Filename" "Palette Filename" --image-column-keep --mandatory-column "Marker ID" --icon-column "Icon Image" --payload-key-column "Marker ID" --max-threads 10 --merge --verbose $UPLOAD_PAYLOAD
