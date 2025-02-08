@@ -4,9 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       release:
-        description: 'Release after build'
+        description: 'Perfom Manual Image Upload Test'
         required: true
         default: 'no'
+  schedule:
+    # Runs at 8 AM Singapore time (00:00 UTC) every Saturday
+    - cron: '0 0 * * 6'
       
 jobs:
   build:
