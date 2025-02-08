@@ -48,23 +48,10 @@ jobs:
 
     - name: Get Latest Release URL
       run: |
-        API_URL="https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest"
+        LATEST_URL=$(curl -s https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest | \
+        jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
         
-        echo "Fetching latest release from: $API_URL"
-        
-        RESPONSE=$(curl -s $API_URL)
-        
-        # Extract the download URL for the macOS package (.pkg)
-        LATEST_URL=$(echo "$RESPONSE" | jq -r '.assets[]? | select(.name | endswith(".pkg")) | .browser_download_url')
-
-        # Handle errors if the URL is missing
-        if [[ -z "$LATEST_URL" || "$LATEST_URL" == "null" ]]; then
-          echo "❌ ERROR: Could not fetch the latest macOS release URL!"
-          echo "GitHub API response: $RESPONSE"
-          exit 1
-        fi
-
-        echo "✅ Latest release URL: $LATEST_URL"
+        echo "Latest release URL: $LATEST_URL"
         echo "DOWNLOAD_URL=$LATEST_URL" >> $GITHUB_ENV
 
     - name: Download CSV2Notion-Neo macOS Package
