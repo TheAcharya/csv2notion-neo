@@ -70,7 +70,7 @@ jobs:
           exit 1
         fi
 
-        echo "✅ CSV2Notion-Neo installed successfully!"
+        echo "✅ CSV2Notion Neo installed successfully!"
         echo "Checking version..."
         csv2notion_neo --version
 
@@ -81,7 +81,7 @@ jobs:
         NOTION_URL: ${{ secrets.NOTION_URL_V }}
       run: |
         PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-        UPLOAD_PAYLOAD="$PARENT/notion-test/data-set/json/Notion Upload Test.json"
+        UPLOAD_PAYLOAD="$PARENT/notion-test/data-set/json/json/Notion Upload Test.json"
 
         echo "Running csv2notion_neo upload test..."
         csv2notion_neo \
