@@ -10,7 +10,7 @@ on:
       
 jobs:
   build:
-    runs-on: macos-15  # Ensure we run on macOS
+    runs-on: macos-15
 
     steps:
     - name: Verify Runner Architecture (ARM64 Check)
@@ -26,27 +26,29 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Create Test Directory
-      run: mkdir -p notion-test/data-set
+      run: mkdir -p notion-test/data-set/json
     
-    - name: Prepare Directories
-      run: |
-        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-        mkdir -p "$PARENT/notion-test/data-set/json"
-
     - name: Copy Test Directory
       run: |
-        mkdir -p notion-test/data-set
-        mkdir -p notion-test/data-set/json
+        echo "Copying test JSON files..."
         cp -R ./test/json/. ./notion-test/data-set/json
 
-    - name: Verify Copied Files
+    - name: Debug - List Directory Structure
       run: |
-        echo "Checking copied files..."
-        ls -l ./notion-test/
-        ls -l ./notion-test/data-set
-        ls -l ./notion-test/data-set/json
+        echo "Verifying directory contents..."
+        ls -R ./notion-test/data-set/json || true  # List all files to check if they exist
 
-    - name: Get Latest CSV2Notion Neo Release URL
+    - name: Verify Copied File Exists
+      run: |
+        FILE="./notion-test/data-set/json/Notion Upload Test.json"
+        if [[ ! -f "$FILE" ]]; then
+          echo "❌ ERROR: File '$FILE' not found!"
+          exit 1
+        else
+          echo "✅ File '$FILE' found."
+        fi
+
+    - name: Get Latest Release URL
       run: |
         LATEST_URL=$(curl -s https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest | \
         jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
@@ -54,40 +56,42 @@ jobs:
         echo "Latest release URL: $LATEST_URL"
         echo "DOWNLOAD_URL=$LATEST_URL" >> $GITHUB_ENV
 
-    - name: Download CSV2Notion Neo macOS Package
+    - name: Download CSV2Notion-Neo macOS Package
       run: |
         curl -L -o ./notion-test/CSV2Notion-Neo.pkg "$DOWNLOAD_URL"
 
-    - name: Install CSV2Notion Neo Package
+    - name: Install CSV2Notion-Neo Package
       run: |
         sudo installer -pkg ./notion-test/CSV2Notion-Neo.pkg -target /
 
-    - name: Verify CSV2Notion Neo Installation
+    - name: Verify CSV2Notion-Neo Installation
       run: |
         if ! command -v csv2notion_neo &> /dev/null
         then
           echo "❌ ERROR: csv2notion_neo is not installed or not in PATH."
           exit 1
         fi
-
-        echo "✅ CSV2Notion Neo installed successfully!"
-        echo "Checking version..."
+        echo "✅ CSV2Notion-Neo installed successfully!"
         csv2notion_neo --version
 
-    - name: Run Upload Test with CSV2Notion Neo
+    - name: Run Upload Test with CSV2Notion-Neo
       env:
         NOTION_WORKSPACE: ${{ secrets.NOTION_WS_V }}
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN_V }}
         NOTION_URL: ${{ secrets.NOTION_URL_V }}
       run: |
-        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-        UPLOAD_PAYLOAD="$PARENT/notion-test/data-set/Notion Upload Test.json"
+        FILE="./notion-test/data-set/json/Notion Upload Test.json"
+        
+        if [[ ! -f "$FILE" ]]; then
+          echo "❌ ERROR: File '$FILE' not found!"
+          exit 1
+        fi
 
-        echo "Running csv2notion_neo upload test..."
+        echo "✅ Found '$FILE'. Running csv2notion_neo upload test..."
         csv2notion_neo \
           --workspace "$NOTION_WORKSPACE" \
           --token "$NOTION_TOKEN" \
-          --url "$UPLOAD_PAYLOAD" \
+          --url "$FILE" \
           --image-column "Image Filename" "Palette Filename" \
           --image-column-keep \
           --mandatory-column "Marker ID" \
