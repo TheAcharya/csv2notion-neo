@@ -72,7 +72,7 @@ jobs:
         echo "Checking version..."
         csv2notion_neo --version
 
-    - name: Run Upload Test with CSV2Notion Neo
+    - name: Run Image Upload Test with CSV2Notion Neo
       env:
         NOTION_WORKSPACE: ${{ secrets.NOTION_WS_V }}
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN_V }}
