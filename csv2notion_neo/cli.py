@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def cli(*argv: str) -> None:
     try:
-        ic.disable()
+        ic.enable()
         args = parse_args(argv)
             
         setup_logging(is_verbose=args.verbose, log_file=args.log)
