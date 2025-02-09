@@ -1,12 +1,25 @@
 # Changelog
 
+### 1.3.4
+
+**🎉 Released:**
+- TBA
+
+**🔨 Improvements:**
+- Updated dependencies packages
+
+**🐞 Bug Fix:**
+- Fixed can't able to upload images due to Notion API changes (#46)
+
+---
+
 ### 1.3.3
 
 **🎉 Released:**
 - 11th November 2024
 
 **🔨 Improvements:**
-- Added `--delimiter`: Delimiter that is used to seperate columns and rows in csv file if none is provided, `,` is taken as default (#43)
+- Added `--delimiter`: Delimiter that is used to separate columns and rows in csv file if none is provided, `,` is taken as default (#43)
 
 ---
 
