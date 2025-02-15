@@ -1,5 +1,7 @@
 # Editors
 .vscode/
+.zed/
+.ropeproject/
 .idea/
 .nova
 
