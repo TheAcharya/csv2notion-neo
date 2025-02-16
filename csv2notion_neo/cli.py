@@ -20,7 +20,7 @@ def cli(*argv: str) -> None:
     try:
         ic.enable()
         args = parse_args(argv)
-            
+        
         setup_logging(is_verbose=args.verbose, log_file=args.log)
         logger.info(f"CSV2Notion Neo version {__version__}")
 
@@ -51,7 +51,6 @@ def cli(*argv: str) -> None:
         collection_id = get_collection_id(client, args.url)
 
         notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
-
 
         logger.info("Uploading {0}...".format(args.csv_file.name))
 

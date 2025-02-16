@@ -6,87 +6,47 @@ on:
   schedule:
     - cron: '0 0 * * 6' # Runs at 8 AM Singapore time (00:00 UTC) every Saturday
       
+env:
+  BUILD_PYTHON_VERSION: 3.8
+  BUILD_POETRY_VERSION: 1.4
+  PACKAGE_NAME: csv2notion_neo
+
 jobs:
-  build:
-    runs-on: macos-15
-
+  test:
+    runs-on: ubuntu-latest
     steps:
-    - name: Verify Runner Architecture (ARM64 Check)
-      run: |
-        ARCH=$(uname -m)
-        echo "Running on architecture: $ARCH"
-        if [[ "$ARCH" != "arm64" ]]; then
-          echo "❌ ERROR: This workflow requires an ARM-based Mac (M1/M2)."
-          exit 1
-        fi
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.BUILD_PYTHON_VERSION }}
+
+      - name: Set up Poetry ${{ env.BUILD_POETRY_VERSION }}
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ env.BUILD_POETRY_VERSION }}
       
-    - name: Create Test Directory
-      run: mkdir -p notion-test/data-set
-    
-    - name: Prepare Runnder Test Directories
-      run: |
-        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-        mkdir -p "$PARENT/notion-test/data-set/json"
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with: 
+          path: |
+            .venv
+            ~/.cache/pypoetry
+          key: ${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-
+              
+      - name: Install the neccessary libraries to run csv2notion_neo
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-root
 
-    - name: Copy Local Data Set Directories to Runnder Test Directories
-      run: |
-        mkdir -p notion-test/data-set
-        mkdir -p notion-test/data-set/json
-        cp -R ./test/json/. ./notion-test/data-set/json
+      - name: Run tests
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+          NOTION_TOKEN_A: ${{secrets.NOTION_TOKEN_A}}
+          NOTION_URL_A: ${{secrets.NOTION_URL_A}}
 
-    - name: Verify Copied Files
-      run: |
-        echo "Checking copied files..."
-        ls -l ./notion-test/
-        ls -l ./notion-test/data-set
-        ls -l ./notion-test/data-set/json
-
-    - name: Get CSV2Notion Neo Latest Release URL
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        LATEST_URL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/TheAcharya/csv2notion-neo/releases/latest | \
-        jq -r '.assets[] | select(.name | endswith(".pkg")) | .browser_download_url')
-        
-        if [ -z "$LATEST_URL" ]; then
-          echo "No .pkg asset found in the latest release."
-          exit 1
-        fi
-        
-        echo "Latest release URL: $LATEST_URL"
-        echo "DOWNLOAD_URL=$LATEST_URL" >> $GITHUB_ENV
-
-    - name: Download CSV2Notion Neo macOS Package
-      run: |
-        curl -L -o ./notion-test/CSV2Notion-Neo.pkg "$DOWNLOAD_URL"
-
-    - name: Install CSV2Notion Neo Package
-      run: |
-        sudo installer -pkg ./notion-test/CSV2Notion-Neo.pkg -target /
-
-    - name: Verify CSV2Notion Neo Installation
-      run: |
-        if ! command -v csv2notion_neo &> /dev/null
-        then
-          echo "❌ ERROR: CSV2Notion Neo is not installed or not in PATH."
-          exit 1
-        fi
-
-        echo "✅ CSV2Notion Neo installed successfully!"
-        echo "Checking version..."
-        csv2notion_neo --version
-
-    - name: Run Image Upload Test with CSV2Notion Neo
-      env:
-        NOTION_WORKSPACE: ${{ secrets.NOTION_WS_V }}
-        NOTION_TOKEN: ${{ secrets.NOTION_TOKEN_V }}
-        NOTION_URL: ${{ secrets.NOTION_URL_V }}
-      run: |
-        PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
-        UPLOAD_PAYLOAD="$PARENT/notion-test/data-set/json/notion-upload-test.json"
-
-        echo "Running CSV2Notion Neo image upload test..."
-        csv2notion_neo --workspace "$NOTION_WORKSPACE" --token "$NOTION_TOKEN" --url "$NOTION_URL" --image-column "Image Filename" "Palette Filename" --image-column-keep --mandatory-column "Marker ID" --icon-column "Icon Image" --payload-key-column "Marker ID" --max-threads 10 --merge --verbose "$UPLOAD_PAYLOAD"
+        run: pytest -v -s 

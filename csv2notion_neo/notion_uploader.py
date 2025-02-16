@@ -23,7 +23,6 @@ class NotionRowUploader(object):
 
     def upload_row(self, row: NotionUploadRow, is_merge: bool) -> None:
 
-        #CHECK
         if 'AI' in row.properties:
             ai_client = AI(row.properties['AI'])
             row.columns = ai_client.out(row.columns)
