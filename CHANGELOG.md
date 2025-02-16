@@ -3,7 +3,7 @@
 ### 1.3.4
 
 **🎉 Released:**
-- TBA
+- 17th February 2025
 
 **🔨 Improvements:**
 - Updated dependencies packages
