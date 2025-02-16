@@ -31,5 +31,6 @@ USER root
 
 RUN mkdir -p /run/sshd && chmod 0755 /run/sshd
 
+RUN pytest -v -s
 #CMD ["tail","-f","/dev/null"]
 CMD ["/usr/sbin/sshd","-D"]
