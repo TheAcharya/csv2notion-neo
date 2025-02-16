@@ -5,8 +5,8 @@ import os
 
 ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'), 
             'workspace': "Arjun's notion", 
-            'token': os.getenv("TOKEN"), 
-            'url': os.getenv("URL"), 
+            'token': os.getenv("NOTION_TOKEN_A"), 
+            'url': os.getenv("NOTION_URL_A"), 
             'max_threads': 1, 
             'log': PosixPath('log.txt'), 
             'verbose': True, 

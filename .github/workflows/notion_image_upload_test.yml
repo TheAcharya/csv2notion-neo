@@ -12,7 +12,7 @@ env:
   PACKAGE_NAME: csv2notion_neo
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,13 +27,26 @@ jobs:
         uses: abatilo/actions-poetry@v2.0.0
         with:
           poetry-version: ${{ env.BUILD_POETRY_VERSION }}
-
+      
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with: 
+          path: |
+            .venv
+            ~/.cache/pypoetry
+          key: ${{ runner.os }}-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-
+              
       - name: Install the neccessary libraries to run csv2notion_neo
-        run: poetry config virtualenvs.create false && \
-             poetry install --no-root && \
-             rm -rf /root/.cache/pypoetry
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-root
 
       - name: Run tests
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-        run: poetry publish
+          NOTION_TOKEN_A: ${{secrets.NOTION_TOKEN_A}}
+          NOTION_URL_A: ${{secrets.NOTION_URL_A}}
+
+        run: pytest -v -s 
