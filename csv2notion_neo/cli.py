@@ -20,7 +20,7 @@ def cli(*argv: str) -> None:
     try:
         ic.enable()
         args = parse_args(argv)
-            
+        
         setup_logging(is_verbose=args.verbose, log_file=args.log)
         logger.info(f"CSV2Notion Neo version {__version__}")
 

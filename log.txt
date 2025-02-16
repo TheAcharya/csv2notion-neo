@@ -1,0 +1,164 @@
+2025-02-16 06:53:04,103 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:53:04,103 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:53:04,104 [ERROR   ] Error at division
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/local_data.py", line 30, in data_read
+    with open(file_path, "r", encoding="utf-8-sig") as json_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'assets/notion-upload-test.json'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/cli.py", line 35, in cli
+    csv_data = LocalData(
+               ^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 115, in __init__
+    self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 33, in data_read
+    raise CriticalError(f"File {file_path} not found") from e
+csv2notion_neo.utils_exceptions.CriticalError: File assets/notion-upload-test.json not found
+2025-02-16 06:53:16,144 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:53:16,144 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:53:16,145 [ERROR   ] Error at division
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/local_data.py", line 30, in data_read
+    with open(file_path, "r", encoding="utf-8-sig") as json_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'assets/notion-upload-test.json'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/cli.py", line 35, in cli
+    csv_data = LocalData(
+               ^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 115, in __init__
+    self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 33, in data_read
+    raise CriticalError(f"File {file_path} not found") from e
+csv2notion_neo.utils_exceptions.CriticalError: File assets/notion-upload-test.json not found
+2025-02-16 06:53:41,271 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:53:41,272 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:53:41,272 [ERROR   ] Error at division
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/local_data.py", line 30, in data_read
+    with open(file_path, "r", encoding="utf-8-sig") as json_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '.assets/notion-upload-test.json'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/cli.py", line 35, in cli
+    csv_data = LocalData(
+               ^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 115, in __init__
+    self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 33, in data_read
+    raise CriticalError(f"File {file_path} not found") from e
+csv2notion_neo.utils_exceptions.CriticalError: File .assets/notion-upload-test.json not found
+2025-02-16 06:54:03,528 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:54:03,529 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:54:03,529 [ERROR   ] Error at division
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/local_data.py", line 30, in data_read
+    with open(file_path, "r", encoding="utf-8-sig") as json_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'app/csv2notion_neo/assets/notion-upload-test.json'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/cli.py", line 35, in cli
+    csv_data = LocalData(
+               ^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 115, in __init__
+    self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 33, in data_read
+    raise CriticalError(f"File {file_path} not found") from e
+csv2notion_neo.utils_exceptions.CriticalError: File app/csv2notion_neo/assets/notion-upload-test.json not found
+2025-02-16 06:55:57,454 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:55:57,454 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:55:57,455 [ERROR   ] Error at division
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/local_data.py", line 30, in data_read
+    with open(file_path, "r", encoding="utf-8-sig") as json_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'app/csv2notion_neo/assets/notion-upload-test.json'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/cli.py", line 35, in cli
+    csv_data = LocalData(
+               ^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 115, in __init__
+    self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 33, in data_read
+    raise CriticalError(f"File {file_path} not found") from e
+csv2notion_neo.utils_exceptions.CriticalError: File app/csv2notion_neo/assets/notion-upload-test.json not found
+2025-02-16 06:56:53,753 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:56:53,753 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:56:53,754 [ERROR   ] Error at division
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/local_data.py", line 30, in data_read
+    with open(file_path, "r", encoding="utf-8-sig") as json_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'app/csv2notion_neo/tests/assets/notion-upload-test.json'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/csv2notion_neo/cli.py", line 35, in cli
+    csv_data = LocalData(
+               ^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 115, in __init__
+    self.rows = data_read(self.csv_file, fail_on_duplicate_columns, args)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/csv2notion_neo/local_data.py", line 33, in data_read
+    raise CriticalError(f"File {file_path} not found") from e
+csv2notion_neo.utils_exceptions.CriticalError: File app/csv2notion_neo/tests/assets/notion-upload-test.json not found
+2025-02-16 06:57:06,496 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:57:06,496 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:57:08,558 [WARNING ] Column Take would be skipped!
+2025-02-16 06:57:08,559 [WARNING ] Column Clip Out would be skipped!
+2025-02-16 06:57:08,559 [WARNING ] Column Palette Filename would be skipped!
+2025-02-16 06:57:08,559 [WARNING ] Column Reel would be skipped!
+2025-02-16 06:57:08,560 [WARNING ] Column Scene would be skipped!
+2025-02-16 06:57:08,560 [WARNING ] Column Clip In would be skipped!
+2025-02-16 06:57:08,560 [WARNING ] Column Clip Keywords would be skipped!
+2025-02-16 06:57:08,566 [INFO    ] Uploading notion-upload-test.json...
+2025-02-16 06:57:43,922 [INFO    ] Done!
+2025-02-16 06:59:02,292 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 06:59:02,293 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 06:59:03,282 [WARNING ] Column Palette Filename would be skipped!
+2025-02-16 06:59:03,282 [WARNING ] Column Take would be skipped!
+2025-02-16 06:59:03,282 [WARNING ] Column Reel would be skipped!
+2025-02-16 06:59:03,283 [WARNING ] Column Clip Out would be skipped!
+2025-02-16 06:59:03,283 [WARNING ] Column Scene would be skipped!
+2025-02-16 06:59:03,283 [WARNING ] Column Clip In would be skipped!
+2025-02-16 06:59:03,284 [WARNING ] Column Clip Keywords would be skipped!
+2025-02-16 06:59:03,290 [INFO    ] Uploading notion-upload-test.json...
+2025-02-16 06:59:40,877 [INFO    ] Done!
+2025-02-16 07:02:15,484 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 07:02:15,485 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 07:02:16,475 [WARNING ] Column Scene would be skipped!
+2025-02-16 07:02:16,475 [WARNING ] Column Reel would be skipped!
+2025-02-16 07:02:16,475 [WARNING ] Column Palette Filename would be skipped!
+2025-02-16 07:02:16,476 [WARNING ] Column Take would be skipped!
+2025-02-16 07:02:16,476 [WARNING ] Column Clip Keywords would be skipped!
+2025-02-16 07:02:16,476 [WARNING ] Column Clip Out would be skipped!
+2025-02-16 07:02:16,476 [WARNING ] Column Clip In would be skipped!
+2025-02-16 07:02:16,483 [INFO    ] Uploading notion-upload-test.json...
+2025-02-16 07:03:22,463 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 07:03:22,463 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 07:04:00,326 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 07:04:00,327 [INFO    ] Validating json & csv2notion_neo.notion DB schema
+2025-02-16 07:04:32,563 [INFO    ] CSV2Notion Neo version 1.3.4
+2025-02-16 07:04:32,564 [INFO    ] Validating json & csv2notion_neo.notion DB schema
