@@ -7,7 +7,7 @@ on:
     - cron: '0 0 * * 6' # Runs at 8 AM Singapore time (00:00 UTC) every Saturday
       
 env:
-  BUILD_PYTHON_VERSION: 3.8
+  BUILD_PYTHON_VERSION: 3.11
   BUILD_POETRY_VERSION: 1.4
   PACKAGE_NAME: csv2notion_neo
 
