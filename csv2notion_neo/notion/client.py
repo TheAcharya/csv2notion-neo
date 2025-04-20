@@ -2,6 +2,7 @@ import hashlib
 import json
 import re
 import uuid
+import time
 
 from requests import Session, HTTPError
 from requests.cookies import cookiejar_from_dict
@@ -235,7 +236,7 @@ class NotionClient(object):
         """
         # if it's a URL for a database page, try extracting the collection and view IDs
         if url_or_id.startswith("http"):
-            match = re.search("([a-f0-9]{32})\?v=([a-f0-9]{32})", url_or_id)
+            match = re.search(r"([a-f0-9]{32})\?v=([a-f0-9]{32})", url_or_id)
             if not match:
                 raise Exception("Invalid collection view URL")
             block_id, view_id = match.groups()
@@ -276,20 +277,41 @@ class NotionClient(object):
         All API requests on Notion.so are done as POSTs (except the websocket communications).
         """
         url = urljoin(API_BASE_URL, endpoint)
-        response = self.session.post(url, json=data)
-        if response.status_code == 400:
-            if endpoint != 'getRecordValues':
-                logger.error(
-                    "Got 400 error attempting to POST to {}, with data: {}".format(
-                        endpoint, json.dumps(data, indent=2)
-                    )
-                )
-                raise HTTPError(
-                    response.json().get(
-                        "message", "There was an error (400) submitting the request."
-                    )
-                )
+
+        # Retry logic has been implemented, maximum retry is 6 with each retry waiting for 1(base time) * (1.5 ^ retry_count), the wait time increase exponentially in terms of 1.5 ^ n and maximum wait time is 1.5 ^ 9 = 38 sec
+        # ie, for the first retry count, the sleep time is 1 * 1.5 = 1.5 sec. for 2nd it is 1 * (1.5 ^ 2) = 2.25 sec and so on. 
+        retry_count = 0
+        retry_limit = 9
+
+        while True:
             
+            if retry_count > retry_limit:
+                break
+
+            #print(retry_count)
+            response = self.session.post(url, json=data)
+            if response.status_code == 400:
+                if endpoint != 'getRecordValues':
+                    logger.error(
+                        "Got 400 error attempting to POST to {}, with data: {}".format(
+                            endpoint, json.dumps(data, indent=2)
+                        )
+                    )
+                    raise HTTPError(
+                        response.json().get(
+                            "message", "There was an error (400) submitting the request."
+                        )
+                    )
+            
+            # Only retry if its an internal server error (ie 500)
+            if response.status_code == 500:
+                retry_count += 1
+            else:
+                break
+            
+            # Exponential backoff wait time
+            wait_time = (1.5 ** retry_count) 
+            time.sleep(wait_time)
             
         response.raise_for_status()
         return response

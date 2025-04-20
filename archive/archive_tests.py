@@ -12,7 +12,43 @@ from csv2notion_neo.utils_exceptions import CriticalError
 from .input_command import ARGS_DICT
 from argparse import Namespace
 from pathlib import Path
+
+# for test
+from requests.cookies import cookiejar_from_dict
+from requests import Session, HTTPError
+from requests.packages.urllib3.util.retry import Retry
+from urllib.parse import urljoin
+from requests.adapters import HTTPAdapter
+###
+
 # Use this ficture to load the client and load the data, use yield to load client more than once with different parameters
+
+def create_session(client_specified_retry=None):
+    """
+    retry on 502
+    """
+    session = Session()
+    if client_specified_retry:
+        retry = client_specified_retry
+    else:
+        retry = Retry(
+            5,
+            backoff_factor=0.3,
+            status_forcelist=(502, 503, 504),
+            # CAUTION: adding 'POST' to this list which is not technically idempotent
+            allowed_methods=(
+                "POST",
+                "HEAD",
+                "TRACE",
+                "GET",
+                "PUT",
+                "OPTIONS",
+                "DELETE",
+            ),
+        )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    return session
 
 @pytest.fixture(scope="session")
 def load_client_and_data() -> Generator[Union[LocalData,NotionClientExtended,Namespace],None,None]:
@@ -33,6 +69,29 @@ def load_client_and_data() -> Generator[Union[LocalData,NotionClientExtended,Nam
         args.url = new_database(args, client, csv_data)
 
     yield csv_data,client,args
+
+# def test_getPublicPageData(
+#     load_client_and_data
+# ) -> None:
+
+#     data,client,args = load_client_and_data
+#     token = args.token
+#     session = create_session()
+#     session.cookies = cookiejar_from_dict({"token_v2": token})
+
+#     end_point = "https://www.notion.so/api/v3/getPublicPageData"
+
+#     count = 0
+#     for i in range (10):
+#         id_d = "nop"
+#         data =  {"blockId": id_d}
+#         response = session.post(end_point, json=data)
+
+#         if response.status_code == 200:
+#             count+=1
+#         print(response)
+#         # print(response.text)
+#     print(count)
 
 def test_upload_rows(load_client_and_data) -> None:
     data,client,args = load_client_and_data

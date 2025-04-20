@@ -70,7 +70,6 @@ def _upload_file(block: Block, file_path: Path) -> str:
         },
     }
 
-
     upload_data = block._client.post("getUploadFileUrl", post_data).json()
 
     
