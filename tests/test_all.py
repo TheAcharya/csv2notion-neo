@@ -49,16 +49,12 @@ def test_upload_rows(load_client_and_data) -> None:
         args
     )
 
-    try:
-        upload_rows(
-            notion_rows,
-            client=client,
-            collection_id=collection,
-            is_merge=args.merge,
-            max_threads=args.max_threads,
-        )
+    upload_rows(
+        notion_rows,
+        client=client,
+        collection_id=collection,
+        is_merge=args.merge,
+        max_threads=args.max_threads,
+    )
 
-        assert 1 == 1
-
-    except Exception as e:
-        CriticalError(e)
+    assert 1 == 1
