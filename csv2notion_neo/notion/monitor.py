@@ -184,7 +184,7 @@ class Monitor(object):
 
                 if key.startswith("versions/"):
 
-                    match = re.match("versions/([^\:]+):(.+)", key)
+                    match = re.match(r"versions/([^\:]+):(.+)", key)
                     if not match:
                         continue
 
