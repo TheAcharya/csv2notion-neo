@@ -281,7 +281,7 @@ class NotionClient(object):
         # Retry logic has been implemented, maximum retry is 6 with each retry waiting for 1(base time) * (1.5 ^ retry_count), the wait time increase exponentially in terms of 1.5 ^ n and maximum wait time is 1.5 ^ 9 = 38 sec
         # ie, for the first retry count, the sleep time is 1 * 1.5 = 1.5 sec. for 2nd it is 1 * (1.5 ^ 2) = 2.25 sec and so on. 
         retry_count = 0
-        retry_limit = 30
+        retry_limit = 15
 
         while True:
             
