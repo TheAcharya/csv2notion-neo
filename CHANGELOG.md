@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.3.5
+
+**🎉 Released:**
+- 25th April 2025
+
+**🐞 Bug Fix:**
+- Fixed issue where Notion API rate limits triggered `HTTPError: 500 Server Error: Internal Server` (#54)
+
+---
+
 ### 1.3.4
 
 **🎉 Released:**
