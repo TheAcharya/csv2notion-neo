@@ -56,7 +56,6 @@ jobs:
           name: release_dist_python
           path: dist
 
-  # Rest of the workflow remains unchanged
   build_binaries:
     needs: build_python
     runs-on: ${{ matrix.os }}
