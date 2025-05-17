@@ -8,7 +8,7 @@ on:
       
 env:
   BUILD_PYTHON_VERSION: 3.11
-  BUILD_POETRY_VERSION: 1.4
+  BUILD_POETRY_VERSION: 1.7.1  # Updated from 1.4 to 1.7.1
   PACKAGE_NAME: csv2notion_neo
 
 jobs:
@@ -22,6 +22,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
+
+      # Added setuptools installation to prevent PEP 517 build issues
+      - name: Install setuptools
+        run: pip install setuptools==69.0.0
 
       - name: Set up Poetry ${{ env.BUILD_POETRY_VERSION }}
         uses: abatilo/actions-poetry@v2.0.0
@@ -48,5 +52,4 @@ jobs:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
           NOTION_TOKEN_A: ${{secrets.NOTION_TOKEN_A}}
           NOTION_URL_A: ${{secrets.NOTION_URL_A}}
-
-        run: pytest -v -s 
+        run: pytest -v -s
