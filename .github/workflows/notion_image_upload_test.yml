@@ -8,7 +8,7 @@ on:
       
 env:
   BUILD_PYTHON_VERSION: 3.11
-  BUILD_POETRY_VERSION: 1.7.1  # Updated from 1.4 to 1.7.1
+  BUILD_POETRY_VERSION: 1.7.1
   PACKAGE_NAME: csv2notion_neo
 
 jobs:
@@ -23,7 +23,6 @@ jobs:
         with:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
 
-      # Added setuptools installation to prevent PEP 517 build issues
       - name: Install setuptools
         run: pip install setuptools==69.0.0
 
