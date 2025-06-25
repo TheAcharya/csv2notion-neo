@@ -428,6 +428,7 @@ class NotionClient(object):
             "created_time": now(),
             "parent_id": parent.id,
             "parent_table": parent._table,
+            "space_id":self.current_space.id #this is required to create a CRDT metadata by notion
         }
 
         args.update(kwargs)

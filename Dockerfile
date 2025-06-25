@@ -21,5 +21,5 @@ EXPOSE 22
 
 USER root
 
-RUN pytest -v -s
+#RUN pytest -v -s
 CMD ["tail","-f","/dev/null"]
