@@ -1,5 +1,15 @@
 # Changelog
 
+### 1.3.6
+
+**🎉 Released:**
+- 26th June 2025
+
+**🐞 Bug Fix:**
+- Fixed a CRDT-related issue in `submitTransaction` that was preventing payloads from being uploaded
+
+---
+
 ### 1.3.5
 
 **🎉 Released:**
