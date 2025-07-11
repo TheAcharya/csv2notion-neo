@@ -116,21 +116,4 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build with pyinstaller
-        run: pyinstaller ${{ env.PACKAGE_NAME }}.spec
-
-      - name: Verify build output
-        run: |
-          echo "Build completed successfully for ${{ matrix.OS_CODE }}"
-          ls -la dist/
-          if [ -f "dist/${{ env.PACKAGE_NAME }}" ]; then
-            echo "Binary created successfully"
-          else
-            echo "Binary not found - build may have failed"
-            exit 1
-          fi
-
-      - name: Save build artifacts for ${{ matrix.OS_CODE }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: build_artifacts_${{ matrix.OS_CODE }}
-          path: dist/ 
+        run: pyinstaller ${{ env.PACKAGE_NAME }}.spec 
