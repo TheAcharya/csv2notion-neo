@@ -1,0 +1,279 @@
+# CSV2Notion Neo - Cursor Rules
+
+## Project Context
+
+This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.8+ and uses Poetry for dependency management.
+
+## Code Style and Standards
+
+### Python Code Style
+- Use Black formatting with 88 character line length
+- Follow PEP 8 guidelines
+- Use type hints throughout the codebase
+- Use dataclasses for configuration objects
+- Implement proper error handling with custom exceptions
+
+### Import Organization
+- Use isort for import organization
+- Group imports: standard library, third-party, local
+- Use absolute imports for local modules
+- Avoid wildcard imports
+
+### Naming Conventions
+- Use snake_case for variables, functions, and modules
+- Use PascalCase for classes
+- Use UPPER_CASE for constants
+- Use descriptive names that clearly indicate purpose
+
+## Architecture Guidelines
+
+### Module Structure
+- Keep modules focused on single responsibility
+- Use clear separation between CLI, data processing, and Notion integration
+- Maintain loose coupling between components
+- Use dependency injection where appropriate
+
+### Error Handling
+- Use custom exceptions (CriticalError, NotionError) for specific error types
+- Provide meaningful error messages with context
+- Log errors appropriately with proper levels
+- Handle API rate limits gracefully
+
+### Logging
+- Use structured logging throughout the application
+- Include context in log messages
+- Support configurable log levels
+- Use file-based logging for debugging
+
+## Development Workflow
+
+### Code Quality Tools
+- Run Black for code formatting
+- Use isort for import sorting
+- Apply flake8 and wemake-python-styleguide for linting
+- Use mypy for type checking
+- Maintain pre-commit hooks
+
+### Testing Requirements
+- Write unit tests for all new functionality
+- Use pytest for testing framework
+- Maintain good test coverage
+- Use VCR for API response testing
+- Test both success and failure scenarios
+
+### Git Workflow
+- Use descriptive commit messages
+- Create feature branches for new development
+- Require pull request reviews
+- Keep commits atomic and focused
+
+## API Integration Patterns
+
+### Notion API
+- Use the custom Notion client in csv2notion_neo/notion/
+- Handle CRDT operations properly
+- Implement proper rate limiting
+- Use atomic transactions where possible
+- Handle file uploads with signed URLs
+- Note: Uses unofficial private APIs that may change without notice
+
+### Hugging Face API
+- Implement retry logic for model loading
+- Handle authentication securely
+- Provide fallback options for API failures
+- Log AI processing steps appropriately
+
+## Data Processing Guidelines
+
+### CSV/JSON Handling
+- Validate input data thoroughly
+- Handle missing or malformed data gracefully
+- Support different delimiters and encodings
+- Implement proper column type detection
+
+### File Operations
+- Use pathlib for file path handling
+- Validate file extensions and types
+- Handle file uploads securely
+- Implement proper cleanup of temporary files
+
+## Performance Considerations
+
+### Multithreading
+- Use ThreadPoolExecutor for concurrent operations
+- Implement proper thread safety
+- Monitor thread usage and performance
+- Handle thread-local data appropriately
+
+### Memory Management
+- Process large files in chunks when possible
+- Avoid loading entire datasets into memory
+- Implement proper resource cleanup
+- Monitor memory usage in long-running operations
+
+## Security Best Practices
+
+### Authentication
+- Never hardcode credentials in source code
+- Use environment variables for sensitive data
+- Implement secure token handling
+- Validate authentication before operations
+
+### Data Privacy
+- Handle user data securely
+- Implement proper data validation
+- Log sensitive operations appropriately
+- Follow privacy guidelines for AI features
+
+## Configuration Management
+
+### Command Line Arguments
+- Use argparse for CLI argument parsing
+- Provide clear help messages
+- Validate argument combinations
+- Support both required and optional arguments
+
+### Environment Variables
+- Use python-dotenv for environment configuration
+- Provide clear documentation for required variables
+- Implement fallback values where appropriate
+- Validate environment configuration on startup
+
+## Documentation Standards
+
+### Code Documentation
+- Use docstrings for all public functions and classes
+- Follow Google or NumPy docstring format
+- Include type information in docstrings
+- Document exceptions and edge cases
+
+### README and Documentation
+- Keep README.md up to date
+- Document installation and usage instructions
+- Provide clear examples for common use cases
+- Maintain changelog for version history
+
+## Testing Strategy
+
+### Unit Tests
+- Test individual functions and methods
+- Mock external dependencies
+- Test both success and failure paths
+- Maintain high test coverage
+
+### Integration Tests
+- Test API integrations with real endpoints
+- Use VCR for recording API responses
+- Test end-to-end workflows
+- Validate error handling in real scenarios
+
+### Performance Tests
+- Test with large datasets
+- Monitor memory usage
+- Test concurrent operations
+- Validate rate limiting behavior
+
+## Deployment and Distribution
+
+### Packaging
+- Use Poetry for dependency management
+- Maintain pyproject.toml configuration
+- Support multiple Python versions
+- Provide pre-compiled binaries
+
+### CI/CD
+- Automate testing and quality checks
+- Use GitHub Actions for CI/CD
+- Implement automated releases
+- Monitor build and test status
+
+## Maintenance Guidelines
+
+### Version Management
+- Follow semantic versioning (MAJOR.MINOR.PATCH)
+- Maintain backward compatibility
+- Document breaking changes
+- Update dependencies regularly
+
+### Bug Fixes
+- Reproduce issues reliably
+- Write tests for bug fixes
+- Document the root cause
+- Verify fixes in multiple scenarios
+
+### Feature Development
+- Plan features thoroughly
+- Consider backward compatibility
+- Update documentation
+- Add appropriate tests
+
+## Common Patterns
+
+### Data Conversion
+- Use the NotionRowConverter for data transformation
+- Handle different column types appropriately
+- Validate data before conversion
+- Provide clear error messages for conversion failures
+
+### File Upload
+- Use the upload_filetype function for file handling
+- Validate file types and sizes
+- Handle upload failures gracefully
+- Implement retry logic for transient failures
+
+### Error Recovery
+- Implement graceful degradation
+- Provide fallback options
+- Log recovery actions
+- Notify users of issues appropriately
+
+## Code Review Checklist
+
+### Functionality
+- Does the code work as intended?
+- Are edge cases handled properly?
+- Is error handling appropriate?
+- Are performance implications considered?
+
+### Code Quality
+- Is the code readable and maintainable?
+- Are type hints used correctly?
+- Is the code properly documented?
+- Are tests included and comprehensive?
+
+### Security
+- Are security best practices followed?
+- Is sensitive data handled properly?
+- Are input validations in place?
+- Are authentication mechanisms secure?
+
+### Integration
+- Do unofficial API integrations work correctly?
+- Are rate limits respected?
+- Is error handling robust?
+- Are fallback mechanisms in place?
+- Are unofficial API changes monitored and handled?
+
+## Troubleshooting Guidelines
+
+### Debug Mode
+- Enable verbose logging for detailed analysis
+- Use file-based logging for persistent debugging
+- Include context in error messages
+- Preserve error state for analysis
+
+### Common Issues
+- Authentication token expiration
+- Unofficial API rate limiting
+- File upload failures
+- Network connectivity issues
+- Memory usage problems
+- Unofficial API breaking changes from Notion updates
+
+### Performance Issues
+- Monitor thread usage
+- Check for memory leaks
+- Analyze API call patterns
+- Optimize data processing
+
+This cursorrule file should be kept in sync with the AGENT.MD file to ensure consistent development practices and project understanding. 

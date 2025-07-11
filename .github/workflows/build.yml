@@ -1,0 +1,136 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - 'Docs/**'       # Docs folder in root of repo
+      - '**/*.md'       # .md files anywhere in the repo
+      - '**/LICENSE'    # LICENSE files anywhere in the repo
+      - '**/.gitignore' # .gitignore files anywhere in the repo
+      
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - 'Docs/**'       # Docs folder in root of repo
+      - '**/*.md'       # .md files anywhere in the repo
+      - '**/LICENSE'    # LICENSE files anywhere in the repo
+      - '**/.gitignore' # .gitignore files anywhere in the repo
+      
+  workflow_dispatch:
+    
+  schedule:
+    - cron: '0 0 * * *'   # once a day @ 12:00am UTC (8:00am Singapore time)
+
+env:
+  BUILD_PYTHON_VERSION: 3.8
+  BUILD_POETRY_VERSION: 1.7.1
+  PACKAGE_NAME: csv2notion_neo
+
+jobs:
+  build_python:
+    runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_CREATE: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.BUILD_PYTHON_VERSION }}
+
+      - name: Install setuptools
+        run: pip install setuptools==69.0.0
+
+      - name: Set up Poetry ${{ env.BUILD_POETRY_VERSION }}
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ env.BUILD_POETRY_VERSION }}
+
+      - name: Export requirements
+        run: poetry export --without-hashes -f requirements.txt --output requirements.txt
+
+      - name: Build project for distribution
+        run: poetry build
+
+      - name: Save build python requirements
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_dist_reqs
+          path: requirements.txt
+
+      - name: Save build python packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_dist_python
+          path: dist
+
+  build_binaries:
+    needs: build_python
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            OS_CODE: macos
+          - os: ubuntu-latest
+            OS_CODE: linux
+          - os: windows-latest
+            OS_CODE: win
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          APP_VERSION=$(perl -n -e'/^__version__ = "([^"]+)"$/ && print $1' ${{ env.PACKAGE_NAME }}/version.py)
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+
+      - name: Get version
+        if: matrix.os != 'macos-latest'
+        shell: bash
+        run: |
+          APP_VERSION=$(sed -n 's/^__version__ = "\([^"]\+\)"$/\1/p' ${{ env.PACKAGE_NAME }}/version.py)
+          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
+
+      - name: Load build python requirements
+        uses: actions/download-artifact@v4
+        with:
+          name: build_dist_reqs
+
+      - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        env:
+          PIP_DISABLE_PIP_VERSION_CHECK: 1
+        with:
+          python-version: ${{ env.BUILD_PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+
+      - name: Build with pyinstaller
+        run: pyinstaller ${{ env.PACKAGE_NAME }}.spec
+
+      - name: Verify build output
+        run: |
+          echo "Build completed successfully for ${{ matrix.OS_CODE }}"
+          ls -la dist/
+          if [ -f "dist/${{ env.PACKAGE_NAME }}" ]; then
+            echo "Binary created successfully"
+          else
+            echo "Binary not found - build may have failed"
+            exit 1
+          fi
+
+      - name: Save build artifacts for ${{ matrix.OS_CODE }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_artifacts_${{ matrix.OS_CODE }}
+          path: dist/ 
