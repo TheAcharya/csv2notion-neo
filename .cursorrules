@@ -47,6 +47,13 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 
 ## Development Workflow
 
+### Local Development Environment
+- Use the ephemeral build script (`scripts/local-test-build.sh`) for consistent local development
+- Creates isolated build environment in `.build/` directory
+- No system-level Python or Poetry installation required
+- Supports dependency management, testing, and binary creation
+- Produces identical builds to CI/CD pipeline
+
 ### Code Quality Tools
 - Run Black for code formatting
 - Use isort for import sorting
@@ -60,6 +67,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Maintain good test coverage
 - Use VCR for API response testing
 - Test both success and failure scenarios
+- Use ephemeral environment for local testing
 
 ### Git Workflow
 - Use descriptive commit messages
@@ -186,6 +194,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Use GitHub Actions for CI/CD
 - Implement automated releases
 - Monitor build and test status
+- Support ephemeral local build system for development
 
 ## Maintenance Guidelines
 
@@ -261,6 +270,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Use file-based logging for persistent debugging
 - Include context in error messages
 - Preserve error state for analysis
+- Use ephemeral build environment for isolated debugging
 
 ### Common Issues
 - Authentication token expiration
@@ -269,6 +279,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Network connectivity issues
 - Memory usage problems
 - Unofficial API breaking changes from Notion updates
+- Build environment issues (use `./scripts/local-test-build.sh --clean` to reset)
 
 ### Performance Issues
 - Monitor thread usage

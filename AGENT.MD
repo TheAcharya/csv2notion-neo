@@ -66,11 +66,19 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 - Implement proper error handling with custom exceptions
 - Maintain comprehensive logging
 
+### Local Development Workflow
+- Use the ephemeral build script (`scripts/local-test-build.sh`) for local development
+- Creates self-contained build environment in `.build/` directory
+- No system-level installations required
+- Supports dependency updates and testing workflows
+- Produces identical builds to CI/CD pipeline
+
 ### Testing Strategy
 - Unit tests for core functionality
 - Integration tests for Notion API interactions
 - VCR-based testing for API responses
 - Coverage reporting for quality assurance
+- Local testing with ephemeral environment
 
 ### Code Quality
 - Black formatting with 88 character line length
@@ -163,6 +171,7 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 - Code quality checks with pre-commit hooks
 - Automated releases with GitHub Actions
 - Docker image building and publishing
+- Ephemeral local build system for development and testing
 
 ## Maintenance and Updates
 
@@ -181,10 +190,35 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 
 ### Development Setup
 1. Clone the repository
-2. Install Poetry
-3. Run `poetry install` for dependencies
+2. Install Poetry (optional - ephemeral build script handles this)
+3. Run `poetry install` for dependencies OR use `./scripts/local-test-build.sh`
 4. Set up pre-commit hooks
 5. Configure environment variables for testing
+
+### Ephemeral Build System
+- **Script**: `scripts/local-test-build.sh`
+- **Environment**: Self-contained in `.build/` directory
+- **Features**:
+  - Automatic Python virtual environment setup
+  - Poetry installation and configuration
+  - Dependency management with update options
+  - PyInstaller binary creation
+  - Testing integration
+  - Clean build artifacts management
+- **Usage**:
+  ```bash
+  # Basic build
+  ./scripts/local-test-build.sh
+  
+  # Build with tests
+  ./scripts/local-test-build.sh --test
+  
+  # Update dependencies
+  ./scripts/local-test-build.sh --update-deps
+  
+  # Clean build environment
+  ./scripts/local-test-build.sh --clean
+  ```
 
 ### Code Review Process
 - All changes require pull request review
