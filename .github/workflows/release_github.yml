@@ -62,7 +62,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-15
             OS_CODE: macos
           - os: ubuntu-latest
             OS_CODE: linux
@@ -73,14 +73,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get version
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-15'
         shell: bash
         run: |
           APP_VERSION=$(perl -n -e'/^__version__ = "([^"]+)"$/ && print $1' ${{ env.PACKAGE_NAME }}/version.py)
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
 
       - name: Get version
-        if: matrix.os != 'macos-latest'
+        if: matrix.os != 'macos-15'
         shell: bash
         run: |
           APP_VERSION=$(sed -n 's/^__version__ = "\([^"]\+\)"$/\1/p' ${{ env.PACKAGE_NAME }}/version.py)
@@ -116,7 +116,7 @@ jobs:
         if: success()
 
       - name: Pack up binary for macos
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-15'
         env: 
           APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
           APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
@@ -164,7 +164,7 @@ jobs:
           zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_arm64.zip "dist/"
       
       - name: Create pkg and productsign it
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-15'
         env:
           APPLE_INSTALL_CERT_DATA: ${{ secrets.APPLE_INSTALL_CERT_DATA }}
           APPLE_INSTALL_CERT_PASSWORD: ${{ secrets.APPLE_INSTALL_CERT_PASSWORD }}
@@ -245,7 +245,7 @@ jobs:
           path: dist_bin
 
       - name: Save release binaries for macos
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-15'
         uses: actions/upload-artifact@v4
         with:
           name: release_csv2notion_neo_pkg
