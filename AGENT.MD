@@ -88,7 +88,7 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 - Pre-commit hooks for automated quality checks
 
 ### Dependencies
-- Python 3.8+ required
+- Python 3.9+ required
 - Poetry for dependency management
 - Key dependencies: requests, tqdm, emoji, python-dateutil, icecream
 

@@ -2,7 +2,7 @@
 
 ## Project Context
 
-This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.8+ and uses Poetry for dependency management.
+This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.9+ and uses Poetry for dependency management.
 
 ## Code Style and Standards
 

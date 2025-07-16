@@ -17,7 +17,7 @@ The `local-test-build.sh` script provides a completely ephemeral build environme
 
 ### System Requirements
 - macOS (Apple Silicon)
-- System Python 3.8+ installed (matches GitHub Actions workflow)
+- System Python 3.9+ installed (matches GitHub Actions workflow)
 - Basic tools: `curl`, `xar`, `cpio` (usually pre-installed on macOS)
 
 ## Quick Start
@@ -30,8 +30,8 @@ The `local-test-build.sh` script provides a completely ephemeral build environme
 
 This will:
 1. Create a virtual environment in `.build/python/`
-2. Install setuptools 69.0.0 (matches GitHub Actions)
-3. Install Poetry 1.7.1 in the virtual environment
+2. Install setuptools 80.9.0 (matches GitHub Actions)
+3. Install Poetry 2.1.3 in the virtual environment
 4. Install project dependencies via Poetry
 5. Install PyInstaller for building
 6. Build the application
@@ -155,18 +155,18 @@ The script is designed to work seamlessly with GitHub Actions and uses identical
 ```
 
 Version Alignment with GitHub Actions:
-- Python: 3.8+ (matches `BUILD_PYTHON_VERSION: 3.8`)
-- Poetry: 1.7.1 (matches `BUILD_POETRY_VERSION: 1.7.1`)
-- Setuptools: 69.0.0 (matches `setuptools==69.0.0`)
+- Python: 3.9+ (matches `BUILD_PYTHON_VERSION: 3.9`)
+- Poetry: 2.1.3 (matches `BUILD_POETRY_VERSION: 2.1.3`)
+- Setuptools: 80.9.0 (matches `setuptools==80.9.0`)
 - PyInstaller: Latest version (matches CI workflow)
 
 ## Environment Details
 
 ### Virtual Environment
 - Location: `.build/python/`
-- Python: Uses system Python 3.8+ with `python3 -m venv`
-- Setuptools: 69.0.0 (installed before Poetry)
-- Poetry: 1.7.1 (installed via pip in the virtual environment)
+- Python: Uses system Python 3.9+ with `python3 -m venv`
+- Setuptools: 80.9.0 (installed before Poetry)
+- Poetry: 2.1.3 (installed via pip in the virtual environment)
 - Dependencies: Managed by Poetry in `.build/venv/`
 
 ### Build Output
