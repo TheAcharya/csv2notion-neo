@@ -3,7 +3,7 @@ group "default" {
 }
 
 target "neo_python" {
-  context = "."
-  dockerfile = "Dockerfile"
+  context = ".."
+  dockerfile = "docker/Dockerfile"
   tags = ["neo_python:latest"]
 }

@@ -154,7 +154,7 @@ The script is designed to work seamlessly with GitHub Actions and uses identical
     ./scripts/local-test-build.sh
 ```
 
-**Version Alignment with GitHub Actions:**
+Version Alignment with GitHub Actions:
 - Python: 3.8+ (matches `BUILD_PYTHON_VERSION: 3.8`)
 - Poetry: 1.7.1 (matches `BUILD_POETRY_VERSION: 1.7.1`)
 - Setuptools: 69.0.0 (matches `setuptools==69.0.0`)
@@ -249,74 +249,56 @@ rm -rf .build/ test-build/
 - `dist/` - Legacy build output (if exists)
 - `build/` - Legacy build artifacts (if exists)
 
-## Best Practices
-
-### For Developers
-1. Always run from project root: The script expects `pyproject.toml` in the current directory
-2. Use clean builds: Run `--clean` when switching branches or after dependency changes
-3. Test the binary: Always verify `./test-build/airlift --help` works after building
-4. Keep dependencies updated: Use `--show-outdated` to check for updates
-5. Version consistency: Local builds use identical versions to production CI/CD
-
-### For CI/CD
-1. Use exact versions: The script uses identical versions to GitHub Actions workflow
-2. Clean before build: Always run `--clean` in CI to ensure fresh builds
-3. Cache dependencies: Consider caching `.build/` in CI for faster builds
-4. Test the output: Verify the built binary works in your deployment environment
-5. Version consistency: Local builds match production builds exactly
-
-## Script Configuration
-
-### Environment Variables
-The script uses these configuration variables (aligned with GitHub Actions):
-```bash
-BUILD_DIR=".build"           # Ephemeral build environment
-TEST_BUILD_DIR="test-build"  # Build output directory
-PYTHON_VERSION="3.8"         # Target Python version (matches CI)
-POETRY_VERSION="1.7.1"       # Poetry version (matches CI)
-SETUPTOOLS_VERSION="69.0.0"  # Setuptools version (matches CI)
-```
-
-### Customization
-To modify the script behavior, edit the configuration section at the top of `local-test-build.sh`.
-
-## Support
-
-### Getting Help
-```bash
-# Show script help
-./scripts/local-test-build.sh --help
-
-# Check script version and configuration
-head -20 scripts/local-test-build.sh
-```
-
-### Reporting Issues
-If you encounter issues with the build script:
-1. Run `./scripts/local-test-build.sh --clean`
-2. Try a fresh build
-3. Check the prerequisites
-4. Review the troubleshooting section above
-
-## Security Notes
-
-- The script only downloads and installs packages from trusted sources (PyPI, Poetry)
-- All dependencies are installed in isolated virtual environments
-- No system-wide installations or modifications are made
-- The build environment is completely ephemeral and can be safely deleted
-- Version pinning ensures reproducible builds across environments
-
-## Version Alignment
-
-This build script is designed to produce identical builds to the GitHub Actions workflow:
-
-- **Python**: 3.8+ (matches `BUILD_PYTHON_VERSION: 3.8`)
-- **Poetry**: 1.7.1 (matches `BUILD_POETRY_VERSION: 1.7.1`)
-- **Setuptools**: 69.0.0 (matches `setuptools==69.0.0`)
-- **PyInstaller**: Latest version (matches CI workflow)
-
-This ensures that local development builds are identical to production releases, eliminating any potential issues caused by version mismatches.
-
 ---
 
-Note: This script is designed to be completely self-contained and safe to run. It will not modify your system Python installation or install any packages globally. 
+# Docker Run Script
+
+## Overview
+
+The `docker-run.sh` script provides a convenient way to set up and run CSV2Notion Neo in a Docker container environment.
+
+## Quick Start
+
+```bash
+# From the project root directory
+./scripts/docker-run.sh
+```
+
+This will:
+1. Build the Docker image using Docker Buildx
+2. Create and start a container with the project mounted
+3. Set up SSH access on port 2222
+
+## Container Details
+
+- Base Image: Python 3.11-slim
+- Package Manager: Poetry
+- Memory Limit: 512MB
+- CPU Limit: 1.0 cores
+- Port: 2222 (SSH)
+- Volume Mount: Current directory mounted to `/app`
+
+## Container Access
+
+The container runs in detached mode with SSH access on port 2222:
+
+```bash
+ssh -p 2222 root@localhost
+```
+
+## Alternative Usage
+
+You can also run the Docker setup directly:
+
+```bash
+# From the docker directory
+cd docker
+./install_from_docker.sh
+```
+
+## Prerequisites
+
+- Docker and Docker Buildx installed
+- SSH client (for container access)
+
+For more detailed information, see the [Docker README](../docker/README.md). 

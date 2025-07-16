@@ -8,7 +8,7 @@ ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'),
             'token': os.getenv("NOTION_TOKEN_A"), 
             'url': os.getenv("NOTION_URL_A"), 
             'max_threads': 3, 
-            'log': PosixPath('log.txt'), 
+            'log': PosixPath('tests/log.txt'), 
             'verbose': True, 
             # Ai options
             'hugging_face_token': None, 
