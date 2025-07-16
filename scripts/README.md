@@ -211,6 +211,12 @@ Version Alignment with GitHub Actions:
    chmod +x scripts/local-test-build.sh
    ```
 
+5. SSL Warning during build
+   ```
+   urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+   ```
+   This warning is normal on macOS when building locally due to different SSL library versions between the build environment and system. It doesn't affect the functionality of the built binary and can be safely ignored.
+
 ### Debug Mode
 
 If you encounter issues, you can inspect the build environment:

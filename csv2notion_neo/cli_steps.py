@@ -44,7 +44,10 @@ def new_database(
 
 
 def convert_csv_to_notion_rows(
-    csv_data: LocalData, client: NotionClientExtended, collection_id: str, args: Namespace
+    csv_data: LocalData,
+    client: NotionClientExtended,
+    collection_id: str,
+    args: Namespace,
 ) -> List[NotionUploadRow]:
     notion_db = NotionDB(client, collection_id)
 
@@ -52,9 +55,8 @@ def convert_csv_to_notion_rows(
 
     NotionPreparator(notion_db, csv_data, conversion_rules).prepare()
 
-
     converter = NotionRowConverter(notion_db, conversion_rules)
-    
+
     return converter.convert_to_notion_rows(csv_data)
 
 

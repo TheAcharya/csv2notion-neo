@@ -243,9 +243,9 @@ def notion_to_markdown(notion):
 
         sorted_format = sorted(
             format,
-            key=lambda x: FORMAT_PRECEDENCE.index(x[0])
-            if x[0] in FORMAT_PRECEDENCE
-            else -1,
+            key=lambda x: (
+                FORMAT_PRECEDENCE.index(x[0]) if x[0] in FORMAT_PRECEDENCE else -1
+            ),
         )
 
         for f in sorted_format:

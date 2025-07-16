@@ -13,10 +13,12 @@ ArgOption = Dict[str, Any]
 ArgSchema = Dict[str, Dict[ArgToken, ArgOption]]
 HELP_ARGS_WIDTH = 50
 
+
 class CustomHelpFormatter(argparse.RawTextHelpFormatter):
     def _format_args(self, action, default_metavar):
         return ""
-    
+
+
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
@@ -37,11 +39,9 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             }
         },
         "general options": {
-            "--workspace":{
-                "help": (
-                    "active Notion workspace name"
-                ),
-                "required":True,
+            "--workspace": {
+                "help": ("active Notion workspace name"),
+                "required": True,
                 "metavar": "workspace",
             },
             "--token": {
@@ -79,26 +79,24 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "help": "show this help message and exit",
             },
         },
-        "machine learning options":{
-            "--hugging-face-token":{
-                "help": (
-                    "Hugging Face token to use image captioning model online"
-                ),
+        "machine learning options": {
+            "--hugging-face-token": {
+                "help": ("Hugging Face token to use image captioning model online"),
                 "metavar": "AI",
             },
-            "--hf-model":{
+            "--hf-model": {
                 "help": (
                     "Provide the model used for generating caption <vit-gpt2 | blip-image | git-large> (defaults: vit-gpt2)"
                 ),
                 "metavar": "AI",
             },
-            "--caption-column":{
-                "help":(
+            "--caption-column": {
+                "help": (
                     "Provide both image column and column where caption would be written"
                 ),
-                "metavar":"AI",
-                "nargs":2,
-            }
+                "metavar": "AI",
+                "nargs": 2,
+            },
         },
         "column options": {
             "--column-types": {
@@ -115,7 +113,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "Delimiter that is used to seperate columns and rows in csv file"
                     "\nif none is provided, ',' is taken as default"
                 ),
-                "default": ","
+                "default": ",",
             },
             "--add-missing-columns": {
                 "action": "store_true",
@@ -124,10 +122,10 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     " add them to Notion DB"
                 ),
             },
-            "--rename-notion-key-column":{
-                "nargs":2,
-                "help":"rename the key column in the file to a different key column in Notion DB",
-                "metavar":"column",
+            "--rename-notion-key-column": {
+                "nargs": 2,
+                "help": "rename the key column in the file to a different key column in Notion DB",
+                "metavar": "column",
             },
             "--randomize-select-colors": {
                 "action": "store_true",
@@ -175,7 +173,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "One or more CSV or JSON column that points to URL or image file"
                     " that will be embedded for that row"
                 ),
-                "nargs":"*",
+                "nargs": "*",
                 "metavar": "COLUMN",
             },
             "--image-column-keep": {
@@ -239,7 +237,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "JSON object that is the key in notion db."
                     " if json file is used, this cannot be empty!"
                 ),
-                "metavar": "key column"
+                "metavar": "key column",
             },
             "--fail-on-relation-duplicates": {
                 "action": "store_true",
@@ -318,7 +316,7 @@ def _parse_schema(  # noqa: WPS210
     for group_name, group_args in schema.items():
         if group_name == "POSITIONAL":
             group = parser
-        else: 
+        else:
             group = parser.add_argument_group(group_name)
 
         for arg, arg_params in group_args.items():

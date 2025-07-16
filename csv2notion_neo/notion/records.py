@@ -5,6 +5,7 @@ from .operations import build_operation
 from .utils import extract_id, get_by_path
 from icecream import ic
 
+
 class Record(object):
 
     # if a subclass has a list of ids that should be update when child records are removed, it should specify the key here
@@ -112,24 +113,30 @@ class Record(object):
         """
         Set a specific `value` (under the specific `path`) on the record's data structure on the server.
         """
-        
-        command = 'set'
-        if 'cover_block' in path:
-            path = ['properties']
-            command = 'update'
-        elif 'icon' in path:
-            path = ['format','page_icon']
-        elif 'display_source' in path:
-            path = ['format']
-            value = {"display_source":value}
-            command = 'update'
-        elif 'cover' in path:
-            path = ['format','page_cover']
-            #command = 'update' 
-        
+
+        command = "set"
+        if "cover_block" in path:
+            path = ["properties"]
+            command = "update"
+        elif "icon" in path:
+            path = ["format", "page_icon"]
+        elif "display_source" in path:
+            path = ["format"]
+            value = {"display_source": value}
+            command = "update"
+        elif "cover" in path:
+            path = ["format", "page_cover"]
+            # command = 'update'
+
         if value:
             self._client.submit_transaction(
-                build_operation(id=self.id, path=path, args=value, table=self._table,command=command)
+                build_operation(
+                    id=self.id,
+                    path=path,
+                    args=value,
+                    table=self._table,
+                    command=command,
+                )
             )
 
     def __eq__(self, other):

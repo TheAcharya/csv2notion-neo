@@ -1,13 +1,19 @@
 import random
 from typing import Any, Dict, List, Optional, Tuple, cast
 
-from csv2notion_neo.notion.collection import Collection, NotionSelect, CollectionRowBlock, CalendarView
+from csv2notion_neo.notion.collection import (
+    Collection,
+    NotionSelect,
+    CollectionRowBlock,
+    CalendarView,
+)
 from csv2notion_neo.notion.operations import build_operation
 
 from csv2notion_neo.notion_row import CollectionRowBlockExtended
 from csv2notion_neo.utils_db import make_status_column
 from csv2notion_neo.utils_rand_id import rand_id_unique
 from icecream import ic
+
 
 class CollectionExtended(Collection):
     def get_rows(self) -> List[CollectionRowBlockExtended]:  # noqa: WPS615
@@ -24,7 +30,7 @@ class CollectionExtended(Collection):
 
         for row in sorted_rows:
             rows.setdefault(row.title, row)
-        
+
         return rows
 
     def add_row_block(
@@ -68,7 +74,6 @@ class CollectionExtended(Collection):
             for key, val in properties.items():
                 setattr(row, key, val)
 
-        
             for key, val in columns.items():
                 setattr(row.columns, key, val)
 

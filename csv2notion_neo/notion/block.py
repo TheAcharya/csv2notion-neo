@@ -25,6 +25,7 @@ from .utils import (
     get_by_path,
 )
 
+
 class Children(object):
 
     child_list_key = "content"
@@ -50,7 +51,6 @@ class Children(object):
         return self._parent.get(self.child_list_key) or []
 
     def _get_block(self, id):
-
 
         block = self._client.get_block(id)
 
@@ -385,7 +385,7 @@ class Block(Record):
 
         with self._client.as_atomic_transaction():
             # First, remove the node, before we re-insert and re-activate it at the target location
-            #self.remove()
+            # self.remove()
 
             if not self.is_alias:
                 # Set the parent_id of the moving block to the new parent, and mark it as active again
@@ -636,7 +636,7 @@ class EmbedOrUploadBlock(EmbedBlock):
 
         mimetype = mimetypes.guess_type(path)[0] or "text/plain"
         filename = os.path.split(path)[-1]
-        
+
         data = self._client.post(
             "getUploadFileUrl",
             {
@@ -646,7 +646,7 @@ class EmbedOrUploadBlock(EmbedBlock):
                 "record": {
                     "id": self.id,
                     "spaceId": self.space_info["spaceId"],
-                    "table": "block"
+                    "table": "block",
                 },
             },
         ).json()

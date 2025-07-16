@@ -30,7 +30,9 @@ from .user import User
 from .utils import extract_id, now
 
 from icecream import ic
+
 logger = logging.getLogger(__name__)
+
 
 def create_session(client_specified_retry=None):
     """
@@ -77,7 +79,7 @@ class NotionClient(object):
         email=None,
         password=None,
         client_specified_retry=None,
-        workspace=None
+        workspace=None,
     ):
         self.workspace = workspace
         self.session = create_session(client_specified_retry)
@@ -102,7 +104,7 @@ class NotionClient(object):
 
     def start_monitoring(self):
         self._monitor.poll_async()
-    
+
     def _fetch_guest_space_data(self, records):
         """
         guest users have an empty `space` dict, so get the space_id from the `space_view` dict instead,
@@ -120,7 +122,6 @@ class NotionClient(object):
             space["id"]: {"value": space} for space in space_data["results"]
         }
 
-
     def _set_token(self, email=None, password=None):
         if not email:
             email = input("Enter your Notion email address:\n")
@@ -136,18 +137,24 @@ class NotionClient(object):
 
         if self.workspace:
             workspace_dict = {}
-            for x in records['space']:
-                workspace_dict[records['space'][x]['value']['name']] = x
-                
+            for x in records["space"]:
+                workspace_dict[records["space"][x]["value"]["name"]] = x
+
                 try:
                     self.current_space = self.get_space(workspace_dict[self.workspace])
                 except:
-                    self.current_space = self.get_space(list(records["space"].keys())[0])
-                    logger.warning(f"Workspace {self.workspace} does not exist or invalid, defaulting to {self.current_space.name}")
+                    self.current_space = self.get_space(
+                        list(records["space"].keys())[0]
+                    )
+                    logger.warning(
+                        f"Workspace {self.workspace} does not exist or invalid, defaulting to {self.current_space.name}"
+                    )
 
         else:
             self.current_space = self.get_space(list(records["space"].keys())[0])
-            logger.warning(f"Workspace not provided or invalid, defaulting to {self.current_space.name}")
+            logger.warning(
+                f"Workspace not provided or invalid, defaulting to {self.current_space.name}"
+            )
 
         self._store.store_recordmap(records)
         self.current_user = self.get_user(list(records["notion_user"].keys())[0])
@@ -193,7 +200,9 @@ class NotionClient(object):
         Retrieve an instance of a subclass of Block that maps to the block/page identified by the URL or ID passed in.
         """
         block_id = extract_id(url_or_id)
-        block = self.get_record_data("block", block_id, force_refresh=force_refresh, limit=limit)
+        block = self.get_record_data(
+            "block", block_id, force_refresh=force_refresh, limit=limit
+        )
         if not block:
             return None
         if block.get("parent_table") == "collection":
@@ -279,19 +288,19 @@ class NotionClient(object):
         url = urljoin(API_BASE_URL, endpoint)
 
         # Retry logic has been implemented, maximum retry is 6 with each retry waiting for 1(base time) * (1.5 ^ retry_count), the wait time increase exponentially in terms of 1.5 ^ n and maximum wait time is 1.5 ^ 9 = 38 sec
-        # ie, for the first retry count, the sleep time is 1 * 1.5 = 1.5 sec. for 2nd it is 1 * (1.5 ^ 2) = 2.25 sec and so on. 
+        # ie, for the first retry count, the sleep time is 1 * 1.5 = 1.5 sec. for 2nd it is 1 * (1.5 ^ 2) = 2.25 sec and so on.
         retry_count = 0
         retry_limit = 15
 
         while True:
-            
+
             if retry_count > retry_limit:
                 break
 
-            #print(retry_count)
+            # print(retry_count)
             response = self.session.post(url, json=data)
             if response.status_code == 400:
-                if endpoint != 'getRecordValues':
+                if endpoint != "getRecordValues":
                     logger.error(
                         "Got 400 error attempting to POST to {}, with data: {}".format(
                             endpoint, json.dumps(data, indent=2)
@@ -299,25 +308,26 @@ class NotionClient(object):
                     )
                     raise HTTPError(
                         response.json().get(
-                            "message", "There was an error (400) submitting the request."
+                            "message",
+                            "There was an error (400) submitting the request.",
                         )
                     )
-            
+
             # Only retry if its an internal server error (ie 500)
             if response.status_code == 500:
                 retry_count += 1
             else:
                 break
-            
+
             # Exponential backoff wait time
-            wait_time = (1.5 ** retry_count) 
+            wait_time = 1.5**retry_count
             time.sleep(wait_time)
-            
+
         response.raise_for_status()
         return response
 
     def submit_transaction(self, operations, update_last_edited=True):
-        
+
         if not operations:
             return
 
@@ -338,7 +348,7 @@ class NotionClient(object):
             self._transaction_operations += operations
         else:
             data = {"operations": operations}
-            
+
             self.post("submitTransaction", data)
             self._store.run_local_operations(operations)
 
@@ -428,13 +438,13 @@ class NotionClient(object):
             "created_time": now(),
             "parent_id": parent.id,
             "parent_table": parent._table,
-            "space_id":self.current_space.id #this is required to create a CRDT metadata by notion
+            "space_id": self.current_space.id,  # this is required to create a CRDT metadata by notion
         }
 
         args.update(kwargs)
 
         with self.as_atomic_transaction():
-            # create the new record 
+            # create the new record
             self.submit_transaction(
                 build_operation(
                     args=args, command="set", id=record_id, path=[], table=table
@@ -458,14 +468,13 @@ class NotionClient(object):
 
 class Transaction(object):
 
-    
     is_dummy_nested_transaction = False
 
     def __init__(self, client):
         self.client = client
 
     def __enter__(self):
-        
+
         if hasattr(self.client, "_transaction_operations"):
             # client is already in a transaction, so we'll just make this one a nullop and let the outer one handle it
             self.is_dummy_nested_transaction = True

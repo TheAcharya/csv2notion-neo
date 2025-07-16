@@ -13,6 +13,7 @@ from csv2notion_neo.utils_static import FileType
 from csv2notion_neo.utils_str import split_str
 from icecream import ic
 
+
 def map_checkbox(s: str) -> bool:
     return s == "true"
 

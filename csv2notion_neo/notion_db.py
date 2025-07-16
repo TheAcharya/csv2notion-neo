@@ -47,7 +47,6 @@ class NotionDB(object):  # noqa: WPS214
         if not self._cache_rows:
             self._cache_rows = self.collection.get_unique_rows()
 
-
         return self._cache_rows
 
     @property
@@ -200,9 +199,11 @@ def _schema_from_csv(
     return schema
 
 
-def get_notion_client(token: str,workspace: str, **options: Dict[str, Any]) -> NotionClientExtended:
+def get_notion_client(
+    token: str, workspace: str, **options: Dict[str, Any]
+) -> NotionClientExtended:
     try:
-        client = NotionClientExtended(token_v2=token,workspace=workspace)
+        client = NotionClientExtended(token_v2=token, workspace=workspace)
     except requests.exceptions.HTTPError as e:
         raise NotionError("Invalid Notion token") from e
 

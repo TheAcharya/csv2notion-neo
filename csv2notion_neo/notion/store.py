@@ -16,6 +16,7 @@ from .settings import CACHE_DIR
 from .utils import extract_id
 from icecream import ic
 
+
 class MissingClass(object):
     def __bool__(self):
         return False
@@ -181,7 +182,7 @@ class RecordStore(object):
         # if it's not found, try refreshing the record from the server
         if result is Missing or force_refresh:
             if table == "block":
-                self.call_load_page_chunk(id,limit=limit)
+                self.call_load_page_chunk(id, limit=limit)
             else:
                 self.call_get_record_values(**{table: id})
             result = self._get(table, id)
@@ -313,7 +314,7 @@ class RecordStore(object):
         sort=[],
         calendar_by="",
         group_by="",
-        limit=50
+        limit=50,
     ):
 
         assert not (
@@ -329,23 +330,23 @@ class RecordStore(object):
         data = {
             "collection": {
                 "id": collection_id,
-                "spaceId": self._client.current_space.id
+                "spaceId": self._client.current_space.id,
             },
             "collectionView": {
                 "id": collection_view_id,
-                "spaceId": self._client.current_space.id
+                "spaceId": self._client.current_space.id,
             },
             "loader": {
-                'reducers': {
-                    'collection_group_results': {
-                        'limit': limit,
-                        'type': 'results',
+                "reducers": {
+                    "collection_group_results": {
+                        "limit": limit,
+                        "type": "results",
                     },
                 },
                 "searchQuery": search,
-                'sort': sort,
+                "sort": sort,
                 "userTimeZone": str(get_localzone()),
-                "type": 'reducer',
+                "type": "reducer",
             },
         }
 
