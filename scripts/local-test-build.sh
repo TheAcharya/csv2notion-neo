@@ -305,6 +305,9 @@ show_outdated() {
     setup_poetry
     configure_poetry
     
+    # Set environment variable to prevent pytest cache creation
+    export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+    
     # Install current dependencies first
     if ! $poetry_bin install; then
         print_error "Failed to install dependencies for outdated check"
@@ -313,6 +316,12 @@ show_outdated() {
     
     # Show outdated packages
     $poetry_bin show --outdated
+    
+    # Clean up any pytest cache that might have been created
+    if [ -d ".pytest_cache" ]; then
+        rm -rf .pytest_cache
+        print_status "Cleaned up pytest cache directory"
+    fi
     
     exit 0
 }
