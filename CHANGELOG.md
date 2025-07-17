@@ -1,5 +1,19 @@
 # Changelog
 
+### 1.3.7
+
+**🎉 Released:**
+- TBD
+
+**🔨 Improvements:**
+- Upgraded from Python 3.8 to Python 3.9
+- Updated to latest security patches across most dependencies
+- Improved build reproducibility across environments
+- Enhanced ephemeral build `local-test-build.sh` reliability
+- Improved codebase formatting
+
+---
+
 ### 1.3.6
 
 **🎉 Released:**
