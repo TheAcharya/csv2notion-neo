@@ -29,12 +29,12 @@ class Monitor(object):
 
         thing = thing.decode().strip()
 
-        for ping in re.findall('\d+:\d+"primus::ping::\d+"', thing):
+        for ping in re.findall(r'\d+:\d+"primus::ping::\d+"', thing):
             logger.debug("Received ping: {}".format(ping))
             self.post_data(ping.replace("::ping::", "::pong::"))
 
         results = []
-        for blob in re.findall("\d+:\d+(\{.*?\})(?=\d|$)", thing):
+        for blob in re.findall(r"\d+:\d+(\{.*?\})(?=\d|$)", thing):
             results.append(json.loads(blob))
         if thing and not results and "::ping::" not in thing:
             logger.debug("Could not parse monitoring response: {}".format(thing))

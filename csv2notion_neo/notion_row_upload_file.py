@@ -21,34 +21,21 @@ def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
         url, meta = upload_file(parent, filetype)
     else:
         url = filetype
-        meta = {
-        "source": [
-            [
-                url
-            ]
-        ]
-    }
+        meta = {"source": [[url]]}
 
     return url, meta
 
 
 def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
 
-        
     file_url = _upload_file(block, file_path)
 
     file_id = get_file_id(file_url)
 
     if file_id is None:
         raise NotionError(f"Could not upload file {file_path}")
-    
-    return file_url, {
-        "source": [
-            [
-                file_url
-            ]
-        ]
-    }
+
+    return file_url, {"source": [[file_url]]}
     # return file_url, {
     #     "type": "file",
     #     "file_id": file_id,
@@ -72,7 +59,6 @@ def _upload_file(block: Block, file_path: Path) -> str:
 
     upload_data = block._client.post("getUploadFileUrl", post_data).json()
 
-    
     with open(file_path, "rb") as f:
         requests.put(
             upload_data["signedPutUrl"],
@@ -85,9 +71,8 @@ def _upload_file(block: Block, file_path: Path) -> str:
 
 def get_file_id(image_url: str) -> Optional[str]:
 
-    
     # aws_host/space_id/file_id/filename
-    #aws_re = r"^https://(.*?\.amazonaws\.com)/([a-f0-9\-]+)/([a-f0-9\-]+)/(.*?)$"
+    # aws_re = r"^https://(.*?\.amazonaws\.com)/([a-f0-9\-]+)/([a-f0-9\-]+)/(.*?)$"
     attachment_re = r"^attachment:([a-f0-9\-]+):(.+)$"
     aws_match = re.search(attachment_re, image_url)
 

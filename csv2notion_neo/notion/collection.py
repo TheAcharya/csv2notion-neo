@@ -19,6 +19,7 @@ from .utils import (
 
 from icecream import ic
 
+
 class NotionDate(object):
 
     start = None
@@ -377,7 +378,7 @@ class CollectionQuery(object):
         sort=[],
         calendar_by="",
         group_by="",
-        limit=100
+        limit=100,
     ):
         assert not (
             aggregate and aggregations
@@ -398,31 +399,27 @@ class CollectionQuery(object):
 
         result_class = QUERY_RESULT_TYPES.get(self.type, QueryResult)
 
-
         kwargs = {
-            'collection_id':self.collection.id,
-            'collection_view_id':self.collection_view.id,
-            'search':self.search,
-            'type':self.type,
-            'aggregate':self.aggregate,
-            'aggregations':self.aggregations,
-            'sort':self.sort,
-            'calendar_by':self.calendar_by,
-            'group_by':self.group_by,
-            'limit':0
+            "collection_id": self.collection.id,
+            "collection_view_id": self.collection_view.id,
+            "search": self.search,
+            "type": self.type,
+            "aggregate": self.aggregate,
+            "aggregations": self.aggregations,
+            "sort": self.sort,
+            "calendar_by": self.calendar_by,
+            "group_by": self.group_by,
+            "limit": 0,
         }
 
         if self.limit == -1:
             self.limit = self._get_total_rows()
 
-        kwargs['limit'] = self.limit
+        kwargs["limit"] = self.limit
 
-        
         return result_class(
             self.collection,
-            self._client.query_collection(
-                **kwargs
-            ),
+            self._client.query_collection(**kwargs),
             self,
         )
 
@@ -606,10 +603,7 @@ class CollectionRowBlock(PageBlock):
         return val
 
     def get_all_properties(self):
-        return {
-            prop["slug"]: self.get_property(prop["slug"])
-            for prop in self.schema
-        }
+        return {prop["slug"]: self.get_property(prop["slug"]) for prop in self.schema}
 
     def set_property(self, identifier, val):
         prop = self.collection.get_schema_property(identifier)
@@ -737,9 +731,7 @@ class CollectionRowBlock(PageBlock):
     def remove(self):
         # Mark the block as inactive
         self._client.submit_transaction(
-            build_operation(
-                id=self.id, path=[], args={"alive": True}, command="update"
-            )
+            build_operation(id=self.id, path=[], args={"alive": True}, command="update")
         )
 
 
@@ -783,7 +775,7 @@ class QueryResult(object):
         self.query = query
 
     def _get_block_ids(self, result):
-        return result['reducerResults']['collection_group_results']["blockIds"]
+        return result["reducerResults"]["collection_group_results"]["blockIds"]
 
     def _get_block(self, id):
         block = CollectionRowBlock(self._client, id)
@@ -825,6 +817,7 @@ class QueryResult(object):
         else:
             return False
         return item_id in self._block_ids
+
 
 class TableQueryResult(QueryResult):
 

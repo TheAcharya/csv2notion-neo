@@ -8,7 +8,11 @@ from icecream import ic
 
 from csv2notion_neo.version import __version__
 from csv2notion_neo.cli_args import parse_args
-from csv2notion_neo.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
+from csv2notion_neo.cli_steps import (
+    convert_csv_to_notion_rows,
+    new_database,
+    upload_rows,
+)
 from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import get_collection_id, get_notion_client
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
@@ -20,7 +24,7 @@ def cli(*argv: str) -> None:
     try:
         ic.enable()
         args = parse_args(argv)
-        
+
         setup_logging(is_verbose=args.verbose, log_file=args.log)
         logger.info(f"CSV2Notion Neo version {__version__}")
 
@@ -29,11 +33,15 @@ def cli(*argv: str) -> None:
         if "json" in path:
             if not args.payload_key_column:
                 raise CriticalError("Json file found, please enter the key column!")
-            
+
         logger.info(f"Validating {path[1::]} & csv2notion_neo.notion DB schema")
 
         csv_data = LocalData(
-            args.csv_file, args.column_types, args.fail_on_duplicate_csv_columns, args.payload_key_column,args=args
+            args.csv_file,
+            args.column_types,
+            args.fail_on_duplicate_csv_columns,
+            args.payload_key_column,
+            args=args,
         )
 
         if not csv_data:
@@ -47,7 +55,7 @@ def cli(*argv: str) -> None:
 
         if not args.url:
             args.url = new_database(args, client, csv_data)
-        
+
         collection_id = get_collection_id(client, args.url)
 
         notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
@@ -66,7 +74,7 @@ def cli(*argv: str) -> None:
 
     except Exception as e:
         if args.verbose:
-            logger.error('Error at %s', 'division', exc_info=e)
+            logger.error("Error at %s", "division", exc_info=e)
         else:
             logger.error(e)
 

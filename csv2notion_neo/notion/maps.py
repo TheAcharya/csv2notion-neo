@@ -3,6 +3,7 @@ from inspect import signature
 from .logger import logger
 from .markdown import markdown_to_notion, notion_to_markdown
 
+
 class mapper(property):
     def __init__(self, path, python_to_api, api_to_python, *args, **kwargs):
         self.python_to_api = python_to_api
@@ -18,7 +19,7 @@ class mapper(property):
 def field_map(path, python_to_api=lambda x: x, api_to_python=lambda x: x):
     """
     Returns a property that maps a Block attribute onto a field in the API data structures.
-    
+
     - `path` can either be a top-level field-name, a list that specifies the key names to traverse,
       or a dot-delimited string representing the same traversal.
 
@@ -35,6 +36,7 @@ def field_map(path, python_to_api=lambda x: x, api_to_python=lambda x: x):
     def fget(self):
         kwargs = {}
         from icecream import ic
+
         if (
             "client" in signature(api_to_python).parameters
             and "id" in signature(api_to_python).parameters
@@ -45,6 +47,7 @@ def field_map(path, python_to_api=lambda x: x, api_to_python=lambda x: x):
 
     def fset(self, value):
         from icecream import ic
+
         kwargs = {}
         if "client" in signature(python_to_api).parameters:
             kwargs["client"] = self._client

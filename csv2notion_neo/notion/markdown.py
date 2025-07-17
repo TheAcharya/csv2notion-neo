@@ -230,7 +230,7 @@ def notion_to_markdown(notion):
         format = item[1] if len(item) == 2 else []
 
         match = re.match(
-            "^(?P<leading>\s*)(?P<stripped>(\s|.)*?)(?P<trailing>\s*)$", text
+            r"^(?P<leading>\s*)(?P<stripped>(\s|.)*?)(?P<trailing>\s*)$", text
         )
         if not match:
             raise Exception("Unable to extract text from: %r" % text)
@@ -243,9 +243,9 @@ def notion_to_markdown(notion):
 
         sorted_format = sorted(
             format,
-            key=lambda x: FORMAT_PRECEDENCE.index(x[0])
-            if x[0] in FORMAT_PRECEDENCE
-            else -1,
+            key=lambda x: (
+                FORMAT_PRECEDENCE.index(x[0]) if x[0] in FORMAT_PRECEDENCE else -1
+            ),
         )
 
         for f in sorted_format:

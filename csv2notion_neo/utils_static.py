@@ -66,7 +66,7 @@ class ConversionRules(object):
 
     hugging_face_token: Optional[str]
     caption_column: List[str]
-    hf_model:Optional[str]
+    hf_model: Optional[str]
 
     @property
     def files_search_path(self) -> Path:

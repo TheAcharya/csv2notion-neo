@@ -13,12 +13,17 @@ from csv2notion_neo.notion.utils import remove_signed_prefix_as_needed
 
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.notion_row_image_block import RowCoverImageBlock
-from csv2notion_neo.notion_row_upload_file import Meta, is_meta_different, upload_filetype
+from csv2notion_neo.notion_row_upload_file import (
+    Meta,
+    is_meta_different,
+    upload_filetype,
+)
 from csv2notion_neo.utils_static import FileType
 from icecream import ic
 from csv2notion_neo.notion_row_upload_file import get_file_id
 
 NamedURLs = Dict[str, str]
+
 
 class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
     icon_meta = field_map("properties.meta.icon")
@@ -51,11 +56,11 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
     @property
     def cover(self) -> Optional[str]:
         return super().cover  # type: ignore
-        #return self.image_block.url  # type: ignore
+        # return self.image_block.url  # type: ignore
 
     @cover.setter
-    def cover(self, image: FileType) -> None:   
-    
+    def cover(self, image: FileType) -> None:
+
         if image:
             cover_img = image.pop(0)
         else:
@@ -63,7 +68,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
         if self._client.in_transaction():
             raise RuntimeError("Cannot set cover_block during atomic transaction")
-        
+
         new_image: Optional[FileType] = cover_img if cover_img else None
 
         if not self._is_meta_changed("cover_meta", new_image, self.cover):
@@ -77,18 +82,17 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         self.cover_meta = cover_meta
         CollectionRowBlock.cover.fset(self, new_image)
 
-        #new_images.append(new_image)
+        # new_images.append(new_image)
 
-        #self.image_block.url = new_images
+        # self.image_block.url = new_images
 
-        
     @property
     def cover_block(self) -> Optional[str]:
         return self.image_block.url  # type: ignore
 
     @cover_block.setter
     def cover_block(self, image: FileType) -> None:
-        
+
         new_images = []
         if image:
             cover_img = image.pop(0)
@@ -98,7 +102,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             raise RuntimeError("Cannot set cover_block during atomic transaction")
 
         new_image: Optional[FileType] = cover_img if cover_img else None
-     
+
         if not self._is_meta_changed("cover_block_meta", new_image, self.cover_block):
             return
 
@@ -107,14 +111,12 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
         else:
             new_image, cover_block_meta = upload_filetype(self, new_image)
 
-
         self.cover_block_meta = cover_block_meta
         new_images.append(new_image)
-        
 
         if image:
             for im in image:
-                new_img,meta = upload_filetype(self,im)
+                new_img, meta = upload_filetype(self, im)
                 new_images.append(new_img)
 
         self.image_block.url = new_images
@@ -129,7 +131,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             "display_source": image_url,
             "source": image_url,
         }
-        
+
         file_id = get_file_id(image_url)
         if file_id:
             attrs["file_id"] = file_id
@@ -236,15 +238,16 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
 
         if result_value is not None:
             return ["properties", prop["id"]], result_value
-        
+
         try:
             return super()._convert_python_to_notion(raw_value, prop, identifier)
         except:
-            raise NotionError(f"Column {prop['name']} seems to have an property mismatch, please check and change the property to appropriate value in notion database!")
-        
+            raise NotionError(
+                f"Column {prop['name']} seems to have an property mismatch, please check and change the property to appropriate value in notion database!"
+            )
 
     def _upload_column_files(self, column_id: str, files: List[FileType]) -> NamedURLs:
-        
+
         column_files_meta, column_files_urls = self._process_column_files(files)
 
         self.set(f"properties.meta.file_columns.{column_id}", column_files_meta)
@@ -254,8 +257,7 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
     def _process_column_files(
         self, files: List[FileType]
     ) -> Tuple[List[Meta], NamedURLs]:
-        
-       
+
         column_files_meta: List[Meta] = []
         column_files_urls: NamedURLs = {}
 
@@ -293,7 +295,6 @@ class CollectionRowBlockExtended(CollectionRowBlock):  # noqa: WPS214
             return True
 
         current_value_meta = getattr(self, meta_parameter)
-
 
         return is_meta_different(new_val, current_val, current_value_meta)
 

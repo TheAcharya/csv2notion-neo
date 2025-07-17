@@ -12,7 +12,6 @@ from icecream import ic
 class CoverImageBlock(ImageBlock):
     is_cover_block = field_map("properties.is_cover_block")
 
-    
     def update(self, **attrs: Any) -> None:
         with self._client.as_atomic_transaction():
             file_id = attrs.pop("file_id", None)
@@ -73,7 +72,7 @@ class RowCoverImageBlock(object):  # noqa: WPS214
 
     @url.setter
     def url(self, image_url: Optional[str]) -> None:
-        
+
         cover_img = image_url.pop(0)
         if cover_img is None:
             if self.image_block is not None:
@@ -84,7 +83,6 @@ class RowCoverImageBlock(object):  # noqa: WPS214
             "display_source": cover_img,
             "source": cover_img,
         }
-
 
         file_id = get_file_id(cover_img)
         if file_id:
@@ -99,7 +97,6 @@ class RowCoverImageBlock(object):  # noqa: WPS214
         else:
             self.image_block = self._add_new_image_block(**attrs)
 
-
         self.image_block.is_cover_block = True
 
         if image_url:
@@ -113,7 +110,6 @@ class RowCoverImageBlock(object):  # noqa: WPS214
                     "source": img,
                 }
 
-
                 file_id = get_file_id(img)
                 if file_id:
                     attrs["file_id"] = file_id
@@ -121,7 +117,7 @@ class RowCoverImageBlock(object):  # noqa: WPS214
                 self.new_image_block = self._add_new_image_block(**attrs)
 
     def _add_new_image_block(self, **attrs: Any) -> CoverImageBlock:
-      
+
         image_block = self.row.children.add_new(ImageBlock, **attrs)
         # image_block = CoverImageBlock(image_block._client, image_block._id)
         return cast(CoverImageBlock, image_block)

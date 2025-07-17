@@ -17,7 +17,7 @@ class NotionPreparator(object):  # noqa: WPS214
         self.db = db
         self.csv = csv
         self.rules = conversion_rules
-        
+
     def prepare(self) -> None:
         steps: List[Callable[[], None]] = [
             self._validate_image_column,
@@ -43,7 +43,7 @@ class NotionPreparator(object):  # noqa: WPS214
             step()
 
     def _validate_image_column(self) -> None:
-        
+
         if self.rules.image_caption_column is None:
             return
 
@@ -183,7 +183,7 @@ class NotionPreparator(object):  # noqa: WPS214
             raise NotionError("Duplicate values found in DB key column.")
 
     def _validate_key_column(self, key_column: str) -> None:
-        
+
         if key_column not in self.db.columns:
             raise NotionError(f"Key column '{key_column}' does not exist in Notion DB.")
         if self.db.columns[key_column]["type"] != "title":
