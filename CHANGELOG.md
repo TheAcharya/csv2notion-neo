@@ -7,7 +7,7 @@
 
 **🔨 Improvements:**
 - Migrated from unofficial Notion private API to official [Notion API](https://developers.notion.com/)
-- Added `--delete-all-database-entries`: Archive all entries in a specified database with progress tracking
+- Added `--delete-all-database-entries`: Archive all entries in a specified database with progress tracking (#48)
 - Integrated [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library for official API support
 - Changed authentication from `token_v2` session cookies to Notion integration tokens
 - Made `--url` parameter mandatory for all operations (database URL required)
