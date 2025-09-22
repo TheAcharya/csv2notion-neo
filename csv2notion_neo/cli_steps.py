@@ -18,6 +18,27 @@ from csv2notion_neo.utils_threading import ThreadRowUploader, process_iter
 logger = logging.getLogger(__name__)
 
 
+def delete_all_database_entries(
+    client: NotionClientOfficial, collection_id: str
+) -> int:
+    """
+    Delete all entries from a Notion database.
+    
+    Args:
+        client: Official Notion client
+        collection_id: Database ID
+        
+    Returns:
+        Number of entries deleted
+    """
+    logger.info("Starting deletion of all database entries...")
+    
+    notion_db = NotionDBOfficial(client, collection_id)
+    deleted_count = notion_db.delete_all_entries()
+    
+    return deleted_count
+
+
 def new_database(
     args: Namespace, client: NotionClientOfficial, csv_data: LocalData
 ) -> str:

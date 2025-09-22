@@ -67,6 +67,8 @@ class ConversionRules(object):
     hugging_face_token: Optional[str]
     caption_column: List[str]
     hf_model: Optional[str]
+    
+    delete_all_database_entries: bool
 
     @property
     def files_search_path(self) -> Path:

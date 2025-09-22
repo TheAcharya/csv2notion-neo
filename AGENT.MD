@@ -85,6 +85,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - File upload support for images and documents
 - Icon and cover image assignment
 - Mandatory column validation
+- Database management: Archive all entries in a database using --delete-all-database-entries
 
 ### AI Integration
 - Hugging Face integration for image captioning
@@ -155,6 +156,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Image and icon handling options
 - Merge and validation flags
 - AI model configuration
+- Database management: --delete-all-database-entries for archiving all pages in a database
 
 ### Environment Variables
 - Notion integration tokens (starts with 'secret_' or 'ntn_')
@@ -281,6 +283,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - AI model loading issues
 - Column type conversion errors
 - Database access permissions and sharing requirements
+- Database deletion operations requiring proper permissions and database URL validation
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

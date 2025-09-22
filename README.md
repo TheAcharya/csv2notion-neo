@@ -178,6 +178,10 @@ merge options:
 relations options:
   --add-missing-relations            add missing entries into linked Notion DB
 
+database management options:
+  --delete-all-database-entries     delete (archive) all entries in the specified database;
+                                    WARNING: This action cannot be undone!
+
 page cover options:
   --image-column COLUMN              one or more CSV or JSON column that points to URL or image file that will be embedded for that row
   --image-column-keep                keep image CSV or JSON column as a Notion DB column

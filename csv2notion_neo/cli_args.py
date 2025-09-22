@@ -36,6 +36,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "type": Path,
                 "help": "CSV or JSON file to upload",
                 "metavar": "FILE",
+                "nargs": "?",  # Make optional
             }
         },
         "general options": {
@@ -163,6 +164,15 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--add-missing-relations": {
                 "action": "store_true",
                 "help": "add missing entries into linked Notion DB",
+            },
+        },
+        "database management options": {
+            "--delete-all-database-entries": {
+                "action": "store_true",
+                "help": (
+                    "delete (archive) all entries in the specified database;"
+                    "\nWARNING: This action cannot be undone!"
+                ),
             },
         },
         "page cover options": {

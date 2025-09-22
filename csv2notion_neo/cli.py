@@ -12,6 +12,7 @@ from csv2notion_neo.cli_steps import (
     convert_csv_to_notion_rows,
     new_database,
     upload_rows,
+    delete_all_database_entries,
 )
 from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db_official import get_collection_id_official, get_notion_client_official
@@ -28,6 +29,27 @@ def cli(*argv: str) -> None:
         setup_logging(is_verbose=args.verbose, log_file=args.log)
         logger.info(f"CSV2Notion Neo version {__version__}")
 
+        client = get_notion_client_official(
+            args.token,
+            workspace=args.workspace,
+            is_randomize_select_colors=args.randomize_select_colors,
+        )
+
+        # Handle delete all database entries operation
+        if hasattr(args, 'delete_all_database_entries') and args.delete_all_database_entries:
+            if not args.url:
+                raise CriticalError("Database URL is required for --delete-all-database-entries operation")
+            
+            collection_id = get_collection_id_official(client, args.url)
+            deleted_count = delete_all_database_entries(client, collection_id)
+            logger.info(f"Successfully deleted {deleted_count} entries from database")
+            return
+
+        # Check if file is provided for normal operations
+        if not args.csv_file:
+            raise CriticalError("CSV or JSON file is required for upload operations")
+
+        # Process file type and validation
         path = Path(args.csv_file).suffix
 
         if "json" in path:
@@ -46,12 +68,6 @@ def cli(*argv: str) -> None:
 
         if not csv_data:
             raise CriticalError(f"{path} file is empty")
-
-        client = get_notion_client_official(
-            args.token,
-            workspace=args.workspace,
-            is_randomize_select_colors=args.randomize_select_colors,
-        )
 
         if not args.url:
             args.url = new_database(args, client, csv_data)

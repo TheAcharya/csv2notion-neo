@@ -181,6 +181,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Validate argument combinations
 - Support both required and optional arguments
 - Note: --token (integration token) and --url (database URL) are now mandatory
+- Database management: --delete-all-database-entries for archiving all pages in a database
 
 ### Environment Variables
 - Use python-dotenv for environment configuration
@@ -321,6 +322,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Memory usage problems
 - Database access permissions and sharing requirements
 - Build environment issues (use `./scripts/local-test-build.sh --clean` to reset)
+- Database deletion operations requiring proper permissions and database URL validation
 
 ### Performance Issues
 - Monitor thread usage

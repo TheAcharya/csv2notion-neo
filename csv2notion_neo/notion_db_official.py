@@ -332,6 +332,68 @@ class NotionDBOfficial:
         except Exception as e:
             raise NotionError(f"Failed to add select option '{option_name}' to property '{prop_name}': {e}") from e
     
+    def delete_all_entries(self) -> int:
+        """
+        Delete (archive) all entries in the database.
+        
+        Returns:
+            Number of entries deleted
+        """
+        from tqdm import tqdm
+        import time
+        
+        deleted_count = 0
+        all_pages = []
+        
+        try:
+            # First, collect all pages with pagination
+            has_more = True
+            next_cursor = None
+            
+            while has_more:
+                # Query database for all pages
+                response = self.client.query_database(
+                    self.collection_id,
+                    start_cursor=next_cursor,
+                    page_size=100  # Maximum page size
+                )
+                
+                all_pages.extend(response.get("results", []))
+                
+                # Check if there are more pages
+                has_more = response.get("has_more", False)
+                next_cursor = response.get("next_cursor")
+            
+            # Now archive all pages with progress bar
+            if all_pages:
+                with tqdm(total=len(all_pages), desc="Deleting database entries", unit="entries") as pbar:
+                    for page in all_pages:
+                        page_id = page["id"]
+                        try:
+                            # Archive the page (soft delete)
+                            self.client.client.pages.update(
+                                page_id=page_id,
+                                archived=True
+                            )
+                            deleted_count += 1
+                            
+                            # Rate limiting: wait 0.35 seconds between requests
+                            time.sleep(0.35)
+                            
+                        except Exception as e:
+                            logger.warning(f"Failed to archive page {page_id}: {e}")
+                            continue
+                        
+                        pbar.update(1)
+            
+            # Clear cache since we've modified the database
+            self._cache_rows = None
+            
+            return deleted_count
+            
+        except Exception as e:
+            raise NotionError(f"Failed to delete all database entries: {e}") from e
+    
     def add_row(
         self,
         properties: Optional[Dict[str, Any]] = None,
