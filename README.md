@@ -20,7 +20,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 - Set a cover or embed an image for each row to enhance visual representation
 - Upload image files for covers or icons
 - Apply validation options for input data to ensure accuracy
-- Automatically analyse and generate captions for images using Hugging Face's open-source AI/ML models
+- Automatically analyse and generate captions for images using Hugging Face's open-source AI/ML models (Experimental)
 
 ### Disadvantages over native import
  
@@ -33,7 +33,10 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 - [System Requirements](#system-requirements)
 - [Installation](#installation)
   - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
-  - [From Source](#from-source)
+  - [With Homebrew (Recommended for macOS)](#with-homebrew-recommended-for-macos)
+  - [With PIP](#with-pip)
+  - [From source](#from-source)
+- [Migration Guide (v2.0.0+)](#migration-guide-v200)
 - [Guide](#guide)
   - [macOS Release](#macos-release)
   - [Prerequisite](#prerequisite)
@@ -41,12 +44,12 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
   - [Duplicate CSV Columns](#duplicate-csv-columns)
   - [Missing Columns](#missing-columns)
   - [Column Types](#column-types)
-  - [Mergin](#merging)
+  - [Merging](#merging)
   - [Relation Columns](#relation-columns)
   - [Cover Image & Embedded Image](#cover-image--embedded-image)
   - [Icons](#icons)
   - [Mandatory Columns](#mandatory-columns)
-  - [AI/ML Options (Hugging Face)](#aiml-options-hugging-face)
+  - [AI/ML Options (Hugging Face) (Experimental)](#aiml-options-hugging-face-experimental)
 - [Examples](#examples)
 - [Utilised By](#utilised-by)
 - [Credits](#credits)
@@ -399,7 +402,7 @@ If you want to set the same icon for each row, use the `--default-icon` option. 
 
 If you want to ensure that specific columns always have value and are not allowed to be empty, then use the `--mandatory-column` option. The program execution will stop if validation fails.
 
-### AI/ML Options (Hugging Face)
+### AI/ML Options (Hugging Face) (Experimental)
 
 Hugging Face is a prominent AI company known for its contributions to natural language processing (NLP) through its comprehensive open-source platform. It offers an extensive library called Transformers, which provides pre-trained models for a wide range of NLP tasks, including text generation, sentiment analysis, translation, and more. These models are based on state-of-the-art architectures like BERT, GPT, and T5.
 
@@ -465,7 +468,11 @@ Steps to Obtain a Hugging Face Token with Write Mode
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRATION_TOKEN_HERE test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_01.png?raw=true"> </p>
 
@@ -476,8 +483,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRAT
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRATION_TOKEN_HERE \
-  --column-types "number,multi_select" test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  --column-types "number,multi_select" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_02.png?raw=true"> </p>
 
@@ -488,8 +499,11 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRAT
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRATION_TOKEN_HERE \
-  --url NOTION_URL test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_03.gif?raw=true"> </p>
 
@@ -500,9 +514,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRAT
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
   --url NOTION_URL \
-  --merge test.csv
+  --merge \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_04.gif?raw=true"> </p>
 
@@ -513,11 +530,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE \
-  --url NOTION URL \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
   --merge \
   --merge-only-column "Column 2" \
-  --merge-onLy-column "Column 3" test.csv
+  --merge-only-column "Column 3" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_05.gif?raw=true"> </p>
 
@@ -528,8 +548,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
---image-column "Image Column" test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --image-column "Image Column" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_06.gif?raw=true"> </p>
 
@@ -540,9 +564,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
   --image-column "Colour Image" "Black & White Image" "Map" \
-  --image-column-keep --mandatory-column "Cat ID" test.csv
+  --image-column-keep \
+  --mandatory-column "Cat ID" \
+  test.csv
 ```
 
 Example CSV
@@ -598,8 +627,12 @@ Example Folder Structure
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE  \
-  --icon-column "Icon Column" test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --icon-column "Icon Column" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_07.gif?raw=true"> </p>
 
@@ -610,11 +643,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE  \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
   --url NOTION_URL \
   --default-icon 👍 \
   --merge \
-  --merge-only-column "Key" test.csv
+  --merge-only-column "Key" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_08.gif?raw=true"> </p>
 
@@ -625,11 +661,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
   --url NOTION_URL \
   --mandatory-column "Cat ID" \
   --payload-key-column "Cat ID" \
-  --merge JSON-Demo.json
+  --merge \
+  JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_09.gif?raw=true"> </p>
@@ -641,12 +680,15 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
   --url NOTION_URL \
   --mandatory-column "Cat ID" \
   --payload-key-column "Cat ID" \
   --rename-notion-key-column "Cat ID" "Anything ID" \
-  --merge JSON-Demo.json
+  --merge \
+  JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_10.gif?raw=true"> </p>
@@ -658,13 +700,18 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --hugging-face-token YOUR_HUGGING_FACE_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token YOUR_TOKEN_HERE \
+  --url NOTION_URL \
+  --hugging-face-token YOUR_HUGGING_FACE_TOKEN_HERE \
   --hf-model blip-image \
   --caption-column "Image Filename" "Frame Description" \
   --image-column "Image Filename" \
   --image-column-keep \
   --mandatory-column "Cat ID" \
-  --merge big_cats.csv
+  --merge \
+  big_cats.csv
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_12.gif?raw=true"> </p>
