@@ -7,6 +7,8 @@ maintaining compatibility with the existing CSV2Notion Neo codebase.
 
 import logging
 import random
+import re
+import threading
 from typing import Any, Dict, List, Optional, Tuple
 
 from csv2notion_neo.notion_client_official import NotionClientOfficial
@@ -46,6 +48,7 @@ class NotionDBOfficial:
         self.client = client
         self.collection_id = collection_id
         self.logger = logging.getLogger(__name__)
+        self._option_lock = threading.Lock()  # Lock for preventing race conditions when adding select options
         
         # Cache for performance
         self._cache_columns: Optional[Dict[str, Dict[str, str]]] = None
@@ -275,62 +278,65 @@ class NotionDBOfficial:
     
     def add_select_option(self, prop_name: str, option_name: str, color: Optional[str] = None) -> None:
         """Add a new option to a select, multi_select, or status property."""
-        try:
-            if prop_name not in self.columns:
-                raise NotionError(f"Property '{prop_name}' not found in database")
-            
-            prop_info = self.columns[prop_name]
-            prop_type = prop_info["type"]
-            
-            if prop_type not in ["select", "multi_select", "status"]:
-                raise NotionError(f"Property '{prop_name}' is not a select, multi_select, or status type")
-            
-            # Get current options
-            current_options = prop_info.get("options", [])
-            
-            # Check if option already exists
-            existing_names = [opt["name"] for opt in current_options]
-            if option_name in existing_names:
-                logger.debug(f"Option '{option_name}' already exists in property '{prop_name}'")
-                return
-            
-            # Determine color
-            if color is None:
-                # Check if we should randomize colors
-                if hasattr(self.client, 'options') and self.client.options.get("is_randomize_select_colors"):
-                    color = _get_random_select_color()
-                else:
-                    color = "default"
-            
-            # Create new option
-            new_option = {
-                "name": option_name,
-                "color": color
-            }
-            
-            # Add to existing options
-            updated_options = current_options + [new_option]
-            
-            # Update the database property
-            self.client.client.databases.update(
-                database_id=self.collection_id,
-                properties={
-                    prop_name: {
-                        prop_type: {
-                            "options": updated_options
+        # Use lock to prevent race conditions when multiple threads try to add the same option
+        with self._option_lock:
+            try:
+                if prop_name not in self.columns:
+                    raise NotionError(f"Property '{prop_name}' not found in database")
+                
+                prop_info = self.columns[prop_name]
+                prop_type = prop_info["type"]
+                
+                if prop_type not in ["select", "multi_select", "status"]:
+                    raise NotionError(f"Property '{prop_name}' is not a select, multi_select, or status type")
+                
+                # Get current options
+                current_options = prop_info.get("options", [])
+                
+                # Check if option already exists
+                existing_names = [opt["name"] for opt in current_options]
+                if option_name in existing_names:
+                    # Option already exists, no need to add it
+                    return
+                
+                # Determine color
+                if color is None:
+                    # Check if we should randomize colors
+                    if hasattr(self.client, 'options') and self.client.options.get("is_randomize_select_colors"):
+                        color = _get_random_select_color()
+                    else:
+                        color = "default"
+                
+                # Create new option
+                new_option = {
+                    "name": option_name,
+                    "color": color
+                }
+                
+                # Add to existing options
+                updated_options = current_options + [new_option]
+                
+                # Update the database property
+                self.client.client.databases.update(
+                    database_id=self.collection_id,
+                    properties={
+                        prop_name: {
+                            prop_type: {
+                                "options": updated_options
+                            }
                         }
                     }
-                }
-            )
-            
-            # Clear cache to refresh schema
-            self._cache_columns = None
-            self._database_info = self._get_database_info()
-            
-            logger.debug(f"Added option '{option_name}' with color '{color}' to property '{prop_name}'")
-            
-        except Exception as e:
-            raise NotionError(f"Failed to add select option '{option_name}' to property '{prop_name}': {e}") from e
+                )
+                
+                # Clear cache to refresh schema
+                self._cache_columns = None
+                self._database_info = self._get_database_info()
+                
+                # Commented out for cleaner output - uncomment for debugging
+                # logger.debug(f"Added option '{option_name}' with color '{color}' to property '{prop_name}'")
+                
+            except Exception as e:
+                raise NotionError(f"Failed to add select option '{option_name}' to property '{prop_name}': {e}") from e
     
     def delete_all_entries(self) -> int:
         """
@@ -537,13 +543,15 @@ class NotionDBOfficial:
                 
                 if str(value) not in option_names:
                     # Automatically add the new select option
-                    logger.info(f"Adding new select option '{value}' to property '{prop_name}'")
+                    # Commented out for cleaner output - uncomment for debugging
+                    # logger.info(f"Adding new select option '{value}' to property '{prop_name}'")
                     try:
                         self.add_select_option(prop_name, str(value))
                         # Refresh the columns cache to get the updated schema
                         self._cache_columns = None
                     except Exception as e:
-                        logger.warning(f"Failed to add select option '{value}' to property '{prop_name}': {e}. Skipping property.")
+                        # Commented out for cleaner output - uncomment for debugging
+                        # logger.warning(f"Failed to add select option '{value}' to property '{prop_name}': {e}. Skipping property.")
                         return None
             
             return {"select": {"name": str(value)}}
@@ -568,13 +576,16 @@ class NotionDBOfficial:
                     
                     # Automatically add new options for invalid values
                     if invalid_values:
-                        logger.info(f"Adding new multi-select options {invalid_values} to property '{prop_name}'")
+                        # Commented out for cleaner output - uncomment for debugging
+                        # logger.info(f"Adding new multi-select options {invalid_values} to property '{prop_name}'")
                         for invalid_value in invalid_values:
                             try:
                                 self.add_select_option(prop_name, invalid_value)
                                 valid_values.append(invalid_value)
                             except Exception as e:
-                                logger.warning(f"Failed to add multi-select option '{invalid_value}' to property '{prop_name}': {e}")
+                                # Commented out for cleaner output - uncomment for debugging
+                                # logger.warning(f"Failed to add multi-select option '{invalid_value}' to property '{prop_name}': {e}")
+                                pass
                         
                         # Refresh the columns cache to get the updated schema
                         if invalid_values:
@@ -662,13 +673,15 @@ class NotionDBOfficial:
                 
                 if str(value) not in option_names:
                     # Automatically add the new status option
-                    logger.info(f"Adding new status option '{value}' to property '{prop_name}'")
+                    # Commented out for cleaner output - uncomment for debugging
+                    # logger.info(f"Adding new status option '{value}' to property '{prop_name}'")
                     try:
                         self.add_select_option(prop_name, str(value))
                         # Refresh the columns cache to get the updated schema
                         self._cache_columns = None
                     except Exception as e:
-                        logger.warning(f"Failed to add status option '{value}' to property '{prop_name}': {e}. Skipping property.")
+                        # Commented out for cleaner output - uncomment for debugging
+                        # logger.warning(f"Failed to add status option '{value}' to property '{prop_name}': {e}. Skipping property.")
                         return None
             
             return {"status": {"name": str(value)}}
@@ -746,12 +759,8 @@ def get_collection_id_official(client: NotionClientOfficial, notion_url: str) ->
             page = client.client.pages.retrieve(page_id=notion_id)
             if page and page.get("object") == "page":
                 # This is a page URL - we need to create a database within this page
-                # For now, we'll raise an error with a helpful message
-                raise NotionError(
-                    f"Page URL provided: {notion_url}\n"
-                    f"CSV2Notion Neo requires a database URL, not a page URL.\n"
-                    f"Please provide the URL of an existing Notion database, or create a new database first."
-                )
+                # Return the page ID with a special marker to indicate it's a page
+                return f"PAGE:{page['id']}"
         except Exception as page_error:
             # If it's not a page either, it's an invalid URL
             raise NotionError(f"Invalid URL: {notion_url} - Could not retrieve as database or page") from page_error
@@ -761,6 +770,43 @@ def get_collection_id_official(client: NotionClientOfficial, notion_url: str) ->
         raise
     except Exception as e:
         raise NotionError(f"Invalid URL: {e}") from e
+
+
+def create_database_in_page_official(
+    client: NotionClientOfficial,
+    page_id: str,
+    database_name: str,
+    csv_data: LocalData,
+    skip_columns: Optional[List[str]] = None,
+) -> Tuple[str, str]:
+    """
+    Create a database within an existing page using official API.
+    
+    Args:
+        client: Official Notion client
+        page_id: ID of the page to create database in
+        database_name: Name for the new database
+        csv_data: CSV data to determine schema
+        skip_columns: Columns to skip
+        
+    Returns:
+        Tuple of (database_url, database_id)
+    """
+    try:
+        # Create database schema from CSV data
+        schema = _schema_from_csv_official(csv_data, skip_columns)
+        
+        # Create database within the specified page using the wrapper method
+        database = client.create_database(
+            parent_page_id=page_id,
+            title=database_name,
+            properties=schema
+        )
+        
+        return database["url"], database["id"]
+        
+    except Exception as e:
+        raise NotionError(f"Failed to create database in page: {e}") from e
 
 
 def notion_db_from_csv_official(
@@ -809,26 +855,108 @@ def _schema_from_csv_official(
     csv_data: LocalData, skip_columns: Optional[List[str]] = None
 ) -> Dict[str, Dict[str, Any]]:
     """Create database schema from CSV data."""
-    if skip_columns:
-        columns = [c for c in csv_data.content_columns if c not in skip_columns]
+    # Get all columns and ensure key column is first
+    all_columns = csv_data.columns
+    key_column = csv_data.key_column
+    
+    # Create ordered list with key column first, then all other columns
+    if key_column in all_columns:
+        other_columns = [c for c in all_columns if c != key_column]
+        columns = [key_column] + other_columns
     else:
-        columns = csv_data.content_columns
+        columns = all_columns
     
-    schema_ids = rand_id_list(len(columns), 4)
+    # Apply skip_columns filter
+    if skip_columns:
+        columns = [c for c in columns if c not in skip_columns]
     
-    schema = {"title": {"name": csv_data.key_column, "type": "title"}}
+    # Create schema starting with title property using the key column
+    schema = {}
     
-    for col_id, col_key in zip(schema_ids, columns):
-        col_type = csv_data.col_type(col_key)
-        schema[col_id] = {
-            "name": col_key,
-            "type": col_type,
-        }
-        
-        if col_type == "status":
-            schema[col_id].update(make_status_column())
+    for i, col_key in enumerate(columns):
+        # Key column becomes the title property
+        if col_key == key_column:
+            schema[col_key] = {"title": {}}
+        else:
+            # Get column type for non-key columns
+            try:
+                col_type = csv_data.col_type(col_key)
+            except KeyError:
+                # If column type not found, analyze the data to determine type
+                col_type = _analyze_column_type(csv_data, col_key)
+            
+            # Create property based on detected type
+            if col_type == "status":
+                schema[col_key] = {"status": make_status_column()}
+            elif col_type == "select":
+                schema[col_key] = {"select": {"options": []}}
+            elif col_type == "multi_select":
+                schema[col_key] = {"multi_select": {"options": []}}
+            elif col_type == "checkbox":
+                schema[col_key] = {"checkbox": {}}
+            elif col_type == "number":
+                schema[col_key] = {"number": {}}
+            elif col_type == "url":
+                schema[col_key] = {"url": {}}
+            elif col_type == "email":
+                schema[col_key] = {"email": {}}
+            elif col_type == "phone_number":
+                schema[col_key] = {"phone_number": {}}
+            elif col_type == "date":
+                schema[col_key] = {"date": {}}
+            else:
+                # Default to rich_text for all other types
+                schema[col_key] = {"rich_text": {}}
     
     return schema
+
+
+def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
+    """Analyze column data to determine the best property type."""
+    try:
+        values = csv_data.col_values(col_key)
+        if not values:
+            return "rich_text"
+        
+        # Check for multi_select (array values)
+        if any(isinstance(v, list) for v in values):
+            return "multi_select"
+        
+        # Check for checkbox (boolean-like values)
+        checkbox_values = {"true", "false", "yes", "no", "1", "0", ""}
+        if all(str(v).lower() in checkbox_values for v in values if v):
+            return "checkbox"
+        
+        # Check for select (limited unique values, not too many)
+        unique_values = set(str(v) for v in values if v and str(v).strip())
+        if len(unique_values) <= 20 and len(unique_values) > 1:
+            # Check if values look like select options (not too long, not numbers)
+            if all(len(v) <= 50 and not v.replace(".", "").replace("-", "").isdigit() for v in unique_values):
+                return "select"
+        
+        # Check for number
+        try:
+            numeric_count = sum(1 for v in values if v and str(v).replace(".", "").replace("-", "").isdigit())
+            if numeric_count > len(values) * 0.8:  # 80% are numeric
+                return "number"
+        except:
+            pass
+        
+        # Check for URL
+        url_pattern = r'^https?://'
+        if any(re.match(url_pattern, str(v)) for v in values if v):
+            return "url"
+        
+        # Check for email
+        email_pattern = r'^[^@]+@[^@]+\.[^@]+$'
+        if any(re.match(email_pattern, str(v)) for v in values if v):
+            return "email"
+        
+        # Default to rich_text
+        return "rich_text"
+        
+    except Exception:
+        return "rich_text"
 
 
 def get_notion_client_official(

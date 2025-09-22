@@ -123,7 +123,7 @@ $ poetry run csv2notion_neo
 
 ### What Changed:
 - Token Type: Now uses Notion integration tokens (starts with `ntn` or `secret_`) instead of `token_v2` session cookies
-- Database URL: Now requires `--url` parameter (database URL is mandatory)
+- Database URL: Now requires `--url` parameter (database URL or page URL is mandatory)
 - Authentication: More secure and reliable authentication method
 - API: Uses official Notion API for better compatibility and performance
 
@@ -150,7 +150,8 @@ positional arguments:
 general options:
   --workspace                        active Notion workspace name
   --token                            Notion integration token (create at https://www.notion.so/my-integrations)
-  --url URL                          Notion database URL (required)
+  --url URL                          Notion database URL or page URL (required);
+                                     If page URL provided, database will be created within the page
   --max-threads                      upload threads (default: 5)
   --log FILE                         file to store program log
   --verbose                          output debug information
@@ -248,12 +249,22 @@ sudo rm /usr/local/bin/csv2notion_neo
 
 You must pass a single `*.csv` file for upload. The CSV file must contain at least 2 rows. The first row will be used as a header.
 
-You must provide a URL to an existing Notion database with the `--url` option. The URL must link to a database view, not a page.
+You must provide a URL to an existing Notion database or page with the `--url` option. 
+- **Database URL**: Links to an existing database view for uploading data
+- **Page URL**: Links to an empty page where a new database will be created automatically
 
-<details><summary>Obtaining Database URL</summary>
+<details><summary>Obtaining Database URL or Page URL</summary>
 <p>
 
+**For Database URL:**
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/database_url.png?raw=true"> </p>
+
+**For Page URL:**
+1. Navigate to the empty page where you want to create a database
+2. Copy the URL from your browser's address bar
+3. The page URL will look like: `https://www.notion.so/your-workspace/Page-Title-1234567890abcdef1234567890abcdef`
+
+**Note**: When using a page URL, CSV2Notion Neo will automatically create a new database within that page.
 
 </p>
 </details>
@@ -475,6 +486,32 @@ csv2notion_neo \
   test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_01.png?raw=true"> </p>
+
+</p>
+</details>
+
+<details><summary>Creating Database within Existing Page</summary>
+<p>
+
+```shell
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url PAGE_URL \
+  test.csv
+```
+
+**Note**: When you provide a page URL instead of a database URL, CSV2Notion Neo will automatically create a new database within that page using the file name (without extension) as the database title. This works with both CSV and JSON files.
+
+**Example with JSON file:**
+```shell
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url PAGE_URL \
+  --payload-key-column "id" \
+  data.json
+```
 
 </p>
 </details>

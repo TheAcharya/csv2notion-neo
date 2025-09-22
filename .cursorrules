@@ -12,7 +12,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 #### New File Structure
 - `csv2notion_neo/notion_client_official.py`: Official Notion API client wrapper
-- `csv2notion_neo/notion_db_official.py`: Database operations using official API
+- `csv2notion_neo/notion_db_official.py`: Database operations using official API with enhanced schema detection and thread-safe select option management
 - `csv2notion_neo/notion_row_upload_file_official.py`: File upload operations
 - `csv2notion_neo/notion_db_client_official.py`: Compatibility layer for existing code
 
@@ -23,11 +23,12 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 #### Key Implementation Changes
 - Authentication: Integration tokens instead of session cookies
-- Database Operations: Official databases API endpoints
+- Database Operations: Official databases API endpoints with page URL support for creating databases within existing pages
 - File Uploads: Official file_uploads API endpoints
 - Error Handling: Official API error codes and responses
 - Rate Limiting: Built-in official API rate limiting
-- Property Validation: Official API property type validation
+- Property Validation: Official API property type validation with intelligent schema detection
+- Thread Safety: Thread-safe select option management to prevent race conditions during concurrent uploads
 
 #### Compatibility Layer
 - Maintains existing method signatures where possible
@@ -82,6 +83,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Include context in log messages
 - Support configurable log levels
 - Use file-based logging for debugging
+- Provide clean, user-friendly output with verbose debugging options available
 
 ## Development Workflow
 
@@ -149,9 +151,10 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Multithreading
 - Use ThreadPoolExecutor for concurrent operations
-- Implement proper thread safety
+- Implement proper thread safety with locks for shared resources
 - Monitor thread usage and performance
 - Handle thread-local data appropriately
+- Prevent race conditions in select option management during concurrent uploads
 
 ### Memory Management
 - Process large files in chunks when possible
@@ -180,7 +183,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Provide clear help messages
 - Validate argument combinations
 - Support both required and optional arguments
-- Note: --token (integration token) and --url (database URL) are now mandatory
+- Note: --token (integration token) and --url (database URL or page URL) are now mandatory
 - Database management: --delete-all-database-entries for archiving all pages in a database
 
 ### Environment Variables
@@ -323,6 +326,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Database access permissions and sharing requirements
 - Build environment issues (use `./scripts/local-test-build.sh --clean` to reset)
 - Database deletion operations requiring proper permissions and database URL validation
+- Race conditions during concurrent select option creation (resolved with thread-safe implementation)
 
 ### Performance Issues
 - Monitor thread usage

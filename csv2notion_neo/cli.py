@@ -73,6 +73,32 @@ def cli(*argv: str) -> None:
             args.url = new_database(args, client, csv_data)
 
         collection_id = get_collection_id_official(client, args.url)
+        
+        # Check if we got a page ID (indicated by PAGE: prefix)
+        if collection_id.startswith("PAGE:"):
+            page_id = collection_id[5:]  # Remove "PAGE:" prefix
+            logger.info(f"Creating database within page: {page_id}")
+            
+            # Create database within the page
+            skip_columns = []
+            if args.image_column and not args.image_column_keep:
+                skip_columns.append(args.image_column)
+            if args.icon_column and not args.icon_column_keep:
+                skip_columns.append(args.icon_column)
+            if args.image_caption_column and not args.image_caption_column_keep:
+                skip_columns.append(args.image_caption_column)
+            
+            from csv2notion_neo.notion_db_official import create_database_in_page_official
+            database_url, database_id = create_database_in_page_official(
+                client,
+                page_id=page_id,
+                database_name=args.csv_file.stem,  # This works for both CSV and JSON files
+                csv_data=csv_data,
+                skip_columns=skip_columns
+            )
+            
+            logger.info(f"Database created within page. Database URL: {database_url}")
+            collection_id = database_id
 
         notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
 

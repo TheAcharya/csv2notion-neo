@@ -50,7 +50,10 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "required": True,
             },
             "--url": {
-                "help": "Notion database URL (required)",
+                "help": (
+                    "Notion database URL or page URL (required);"
+                    "\nIf page URL provided, database will be created within the page"
+                ),
                 "metavar": "URL",
                 "required": True,
             },

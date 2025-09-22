@@ -22,8 +22,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 #### Database URL Requirements
 - Previous: Optional database URL with automatic database creation
-- Current: Mandatory database URL for all operations
-- Benefits: Clearer workflow, explicit database targeting, better error handling
+- Current: Mandatory database URL for all operations (supports both database URLs and page URLs)
+- Benefits: Clearer workflow, explicit database targeting, better error handling, ability to create databases within existing pages
 
 #### File Upload Implementation
 - Previous: Custom file upload logic with signed URLs
@@ -38,7 +38,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 #### Codebase Structure Changes
 - Removed: `csv2notion_neo/notion/` directory (unofficial API implementation)
 - Added: `csv2notion_neo/notion_client_official.py` (official API client wrapper)
-- Added: `csv2notion_neo/notion_db_official.py` (official database operations)
+- Added: `csv2notion_neo/notion_db_official.py` (official database operations with enhanced schema detection)
 - Added: `csv2notion_neo/notion_row_upload_file_official.py` (official file uploads)
 - Added: `csv2notion_neo/notion_db_client_official.py` (compatibility layer)
 
@@ -75,9 +75,10 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Data Import Capabilities
 - CSV and JSON file support
-- Automatic column type detection
+- Enhanced automatic column type detection with intelligent schema analysis
 - Manual column type specification
 - Support for all Notion column types (text, number, select, multi_select, date, checkbox, url, email, phone_number, file, person, relation, rollup, formula, created_time, last_edited_time, created_by, last_edited_by)
+- Page URL support for creating databases within existing Notion pages
 
 ### Advanced Operations
 - Merge existing databases using key columns
@@ -93,9 +94,10 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Automatic caption generation for uploaded images
 
 ### Performance Features
-- Multithreaded uploads for improved speed
+- Multithreaded uploads for improved speed with race condition prevention
 - Rate limiting to respect Notion API limits
 - Progress tracking with tqdm
+- Thread-safe select option management to prevent conflicts during concurrent uploads
 
 ## Development Guidelines
 
@@ -151,7 +153,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Command Line Arguments
 - Workspace and integration token authentication (mandatory)
-- Database URL specification (mandatory)
+- Database URL or page URL specification (mandatory) - supports both existing databases and page URLs for creating new databases
 - Column type mapping
 - Image and icon handling options
 - Merge and validation flags
@@ -174,6 +176,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Configurable log levels (INFO, DEBUG, WARNING)
 - File-based logging support
 - Structured error messages with context
+- Clean, user-friendly output with verbose debugging options available
 
 ## Security Considerations
 
@@ -284,6 +287,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Column type conversion errors
 - Database access permissions and sharing requirements
 - Database deletion operations requiring proper permissions and database URL validation
+- Race conditions during concurrent select option creation (resolved with thread-safe implementation)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag
