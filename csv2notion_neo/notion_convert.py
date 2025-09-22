@@ -3,8 +3,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-from csv2notion_neo.notion.user import User
-from csv2notion_neo.notion.utils import InvalidNotionIdentifier, extract_id
+from csv2notion_neo.utils_exceptions import NotionError
 
 from csv2notion_neo.local_data import LocalData, CSVRowType
 from csv2notion_neo.notion_convert_map import (
@@ -15,8 +14,7 @@ from csv2notion_neo.notion_convert_map import (
     map_number,
     map_url_or_file,
 )
-from csv2notion_neo.notion_db import NotionDB
-from csv2notion_neo.notion_row import CollectionRowBlockExtended
+from csv2notion_neo.notion_db_official import NotionDBOfficial
 from csv2notion_neo.notion_type_guess import is_email
 from csv2notion_neo.notion_uploader import NotionUploadRow
 from csv2notion_neo.utils_exceptions import (
@@ -32,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 class NotionRowConverter(object):  # noqa:  WPS214
-    def __init__(self, db: NotionDB, conversion_rules: ConversionRules):
+    def __init__(self, db: NotionDBOfficial, conversion_rules: ConversionRules):
         self.db = db
         self.rules = conversion_rules
         self._current_row = 0
@@ -294,7 +292,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         if _is_banned_extension(ensured_path):
             self._error(
                 f"File extension '*{ensured_path.suffix}' is not allowed"
-                f" to upload on csv2notion_neo.notion."
+                f" to upload on Notion."
             )
             return None
 
@@ -315,12 +313,12 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_relation(
         self, relation_column: str, col_value: str
-    ) -> List[CollectionRowBlockExtended]:
+    ) -> List[Dict[str, Any]]:
         col_values = split_str(col_value)
 
         resolved_relations = []
         for v in col_values:
-            if v.startswith("https://www.csv2notion_neo.notion.so/"):
+            if v.startswith("https://www.notion.so/"):
                 resolved_relation = self._resolve_relation_by_url(relation_column, v)
             else:
                 resolved_relation = self._resolve_relation_by_key(relation_column, v)
@@ -332,7 +330,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _resolve_relation_by_key(
         self, relation_column: str, key: str
-    ) -> Optional[CollectionRowBlockExtended]:
+    ) -> Optional[Dict[str, Any]]:
         relation = self.db.relations[relation_column]
 
         try:
@@ -351,7 +349,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _resolve_relation_by_url(
         self, relation_column: str, url: str
-    ) -> Optional[CollectionRowBlockExtended]:
+    ) -> Optional[Dict[str, Any]]:
         block_id = self._extract_id(url)
         if block_id is None:
             return None
@@ -371,13 +369,13 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _extract_id(self, url: str) -> Optional[str]:
         try:
-            return str(extract_id(url))
-        except InvalidNotionIdentifier:
-            self._error(f"'{url}' is not a valid csv2notion_neo.notion URL.")
-
+            from csv2notion_neo.notion_db_official import _extract_database_id_from_url
+            return _extract_database_id_from_url(url)
+        except Exception:
+            self._error(f"'{url}' is not a valid Notion URL.")
             return None
 
-    def _map_person(self, col_value: str) -> List[User]:
+    def _map_person(self, col_value: str) -> List[Dict[str, Any]]:
         col_values = split_str(col_value)
 
         resolved_persons = []

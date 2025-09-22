@@ -45,7 +45,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "metavar": "workspace",
             },
             "--token": {
-                "help": "Notion token, stored in token_v2 cookie for notion.so",
+                "help": "Notion integration token (create at https://www.notion.so/my-integrations)",
                 "required": True,
             },
             "--url": {

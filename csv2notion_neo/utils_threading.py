@@ -2,14 +2,15 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable, Iterable, Iterator
 
-from csv2notion_neo.notion_db import NotionDB
-from csv2notion_neo.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_db_official import NotionDBOfficial
+from csv2notion_neo.notion_client_official import NotionClientOfficial
+from csv2notion_neo.notion_db_client_official import NotionClientExtendedOfficial
 from csv2notion_neo.notion_uploader import NotionRowUploader
 from icecream import ic
 
 
 class ThreadRowUploader(object):
-    def __init__(self, client: NotionClientExtended, collection_id: str) -> None:
+    def __init__(self, client: NotionClientOfficial, collection_id: str) -> None:
         self.thread_data = threading.local()
 
         self.client = client
@@ -19,8 +20,8 @@ class ThreadRowUploader(object):
         try:
             notion_uploader = self.thread_data.uploader
         except AttributeError:
-            client = NotionClientExtended(old_client=self.client)
-            notion_db = NotionDB(client, self.collection_id)
+            client = NotionClientExtendedOfficial(old_client=self.client)
+            notion_db = NotionDBOfficial(client, self.collection_id)
 
             notion_uploader = NotionRowUploader(notion_db)
             self.thread_data.uploader = notion_uploader

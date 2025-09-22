@@ -1,13 +1,9 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests
-from csv2notion_neo.notion.user import User
-from csv2notion_neo.notion.utils import InvalidNotionIdentifier
-
 from csv2notion_neo.local_data import LocalData
-from csv2notion_neo.notion_db_client import NotionClientExtended
-from csv2notion_neo.notion_db_collection import CollectionExtended
-from csv2notion_neo.notion_row import CollectionRowBlockExtended
+from csv2notion_neo.notion_client_official import NotionClientOfficial
+from csv2notion_neo.notion_db_official import NotionDBOfficial
 from csv2notion_neo.utils_db import make_status_column
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_rand_id import rand_id_list
@@ -15,14 +11,14 @@ from icecream import ic
 
 
 class NotionDB(object):  # noqa: WPS214
-    def __init__(self, client: NotionClientExtended, collection_id: str):
+    def __init__(self, client: NotionClientOfficial, collection_id: str):
         self.client = client
-        self.collection = CollectionExtended(self.client, collection_id)
+        self.collection = NotionDBOfficial(self.client, collection_id)
 
         self._cache_columns: Dict[str, Dict[str, str]] = {}
         self._cache_relations: Dict[str, NotionDB] = {}
-        self._cache_rows: Dict[str, CollectionRowBlockExtended] = {}
-        self._cache_users: Dict[str, User] = {}
+        self._cache_rows: Dict[str, Dict[str, Any]] = {}
+        self._cache_users: Dict[str, Dict[str, Any]] = {}
 
     @property
     def name(self) -> str:
@@ -43,7 +39,7 @@ class NotionDB(object):  # noqa: WPS214
         return next(c["name"] for c in column_values if c["type"] == "title")
 
     @property
-    def rows(self) -> Dict[str, CollectionRowBlockExtended]:
+    def rows(self) -> Dict[str, Dict[str, Any]]:
         if not self._cache_rows:
             self._cache_rows = self.collection.get_unique_rows()
 
@@ -101,7 +97,7 @@ class NotionDB(object):  # noqa: WPS214
         self,
         properties: Optional[Dict[str, Any]] = None,
         columns: Optional[Dict[str, Any]] = None,
-    ) -> CollectionRowBlockExtended:
+    ) -> Dict[str, Any]:
         new_row = self.collection.add_row_block(properties=properties, columns=columns)
         key = columns.get(self.key_column) if columns else None
         if key:
@@ -109,30 +105,27 @@ class NotionDB(object):  # noqa: WPS214
 
         return new_row
 
-    def add_row_key(self, key: str) -> CollectionRowBlockExtended:
+    def add_row_key(self, key: str) -> Dict[str, Any]:
         return self.add_row(columns={self.key_column: key})
 
 
-def get_collection_id(client: NotionClientExtended, notion_url: str) -> str:
+def get_collection_id(client: NotionClientOfficial, notion_url: str) -> str:
     try:
         block = client.get_block(notion_url, force_refresh=True)
-    except InvalidNotionIdentifier as e:
+    except Exception as e:
         raise NotionError("Invalid URL.") from e
 
     if not block:
         raise NotionError(f"Cannot access {notion_url}.")
 
-    if block.type not in ["collection_view_page", "collection_view"]:
+    if block.get("object") != "database":
         raise NotionError("Provided URL does not point to a Notion database.")
 
-    if block.collection.role not in {"editor", "content_only_editor", "read_and_write"}:
-        raise NotionError("You must have editing permissions for Notion database.")
-
-    return str(block.collection.id)
+    return str(block["id"])
 
 
 def notion_db_from_csv(
-    client: NotionClientExtended,
+    client: NotionClientOfficial,
     page_name: str,
     csv_data: LocalData,
     skip_columns: Optional[List[str]] = None,
@@ -201,10 +194,10 @@ def _schema_from_csv(
 
 def get_notion_client(
     token: str, workspace: str, **options: Dict[str, Any]
-) -> NotionClientExtended:
+) -> NotionClientOfficial:
     try:
-        client = NotionClientExtended(token_v2=token, workspace=workspace)
-    except requests.exceptions.HTTPError as e:
+        client = NotionClientOfficial(integration_token=token, workspace=workspace)
+    except Exception as e:
         raise NotionError("Invalid Notion token") from e
 
     client.options = options

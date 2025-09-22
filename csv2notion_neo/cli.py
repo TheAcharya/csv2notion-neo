@@ -14,7 +14,7 @@ from csv2notion_neo.cli_steps import (
     upload_rows,
 )
 from csv2notion_neo.local_data import LocalData
-from csv2notion_neo.notion_db import get_collection_id, get_notion_client
+from csv2notion_neo.notion_db_official import get_collection_id_official, get_notion_client_official
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
 
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ def cli(*argv: str) -> None:
         if not csv_data:
             raise CriticalError(f"{path} file is empty")
 
-        client = get_notion_client(
+        client = get_notion_client_official(
             args.token,
             workspace=args.workspace,
             is_randomize_select_colors=args.randomize_select_colors,
@@ -56,7 +56,7 @@ def cli(*argv: str) -> None:
         if not args.url:
             args.url = new_database(args, client, csv_data)
 
-        collection_id = get_collection_id(client, args.url)
+        collection_id = get_collection_id_official(client, args.url)
 
         notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
 

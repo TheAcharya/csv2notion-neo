@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import requests
-from csv2notion_neo.notion.block import Block
+from csv2notion_neo.notion_client_official import NotionClientOfficial
 
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_file import get_file_sha256
@@ -15,7 +15,7 @@ from icecream import ic
 Meta = Dict[str, str]
 
 
-def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
+def upload_filetype(parent: NotionClientOfficial, filetype: FileType) -> Tuple[str, Meta]:
 
     if isinstance(filetype, Path):
         url, meta = upload_file(parent, filetype)
@@ -26,7 +26,7 @@ def upload_filetype(parent: Block, filetype: FileType) -> Tuple[str, Meta]:
     return url, meta
 
 
-def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
+def upload_file(block: NotionClientOfficial, file_path: Path) -> Tuple[str, Meta]:
 
     file_url = _upload_file(block, file_path)
 
@@ -43,30 +43,14 @@ def upload_file(block: Block, file_path: Path) -> Tuple[str, Meta]:
     # }
 
 
-def _upload_file(block: Block, file_path: Path) -> str:
-    file_mime = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
-
-    post_data = {
-        "bucket": "secure",
-        "name": file_path.name,
-        "contentType": file_mime,
-        "record": {
-            "table": "block",
-            "id": block.id,
-            "spaceId": block.space_info["spaceId"],
-        },
-    }
-
-    upload_data = block._client.post("getUploadFileUrl", post_data).json()
-
-    with open(file_path, "rb") as f:
-        requests.put(
-            upload_data["signedPutUrl"],
-            data=f,
-            headers={"Content-type": file_mime},
-        ).raise_for_status()
-
-    return str(upload_data.get("url", ""))
+def _upload_file(block: NotionClientOfficial, file_path: Path) -> str:
+    """Upload file using official Notion API."""
+    try:
+        # Use the official client's upload method
+        file_url, metadata = block.upload_file(file_path, "")
+        return file_url
+    except Exception as e:
+        raise NotionError(f"Failed to upload file {file_path}: {e}") from e
 
 
 def get_file_id(image_url: str) -> Optional[str]:

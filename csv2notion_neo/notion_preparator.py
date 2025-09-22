@@ -2,7 +2,7 @@ import logging
 from typing import Callable, Dict, Iterable, List, Set, Tuple
 
 from csv2notion_neo.local_data import LocalData
-from csv2notion_neo.notion_db import NotionDB
+from csv2notion_neo.notion_db_official import NotionDBOfficial
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_static import UNSETTABLE_TYPES, ConversionRules
 from icecream import ic
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class NotionPreparator(object):  # noqa: WPS214
     def __init__(
-        self, db: NotionDB, csv: LocalData, conversion_rules: ConversionRules
+        self, db: NotionDBOfficial, csv: LocalData, conversion_rules: ConversionRules
     ) -> None:
         self.db = db
         self.csv = csv
@@ -215,7 +215,7 @@ class NotionPreparator(object):  # noqa: WPS214
     def _present_columns(self) -> List[str]:
         return [k for k in self.csv.columns if k in self.db.columns]
 
-    def _present_relations(self) -> Dict[str, NotionDB]:
+    def _present_relations(self) -> Dict[str, NotionDBOfficial]:
         relations = self.db.relations.items()
         return {k: v for k, v in relations if k in self.csv.columns}
 
