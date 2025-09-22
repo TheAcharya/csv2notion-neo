@@ -4,31 +4,69 @@
 
 CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. It serves as a successor to the original csv2notion project, providing enhanced compatibility with Notion's evolving API and additional features like AI-powered image captioning.
 
+## Version 2.0.0+ Migration
+
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library. This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+
+### Migration Details
+
+#### Authentication Changes
+- Previous: Used `token_v2` session cookies from Notion web interface
+- Current: Uses official Notion integration tokens (starts with 'secret_' or 'ntn_')
+- Benefits: Enhanced security, better token management, official authentication method
+
+#### API Implementation Changes
+- Previous: Custom implementation using unofficial private Notion APIs
+- Current: Official [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library integration
+- Benefits: Official API support, better error handling, future-proof compatibility
+
+#### Database URL Requirements
+- Previous: Optional database URL with automatic database creation
+- Current: Mandatory database URL for all operations
+- Benefits: Clearer workflow, explicit database targeting, better error handling
+
+#### File Upload Implementation
+- Previous: Custom file upload logic with signed URLs
+- Current: Official Notion file_uploads API endpoints
+- Benefits: Standardised upload process, better error handling, official support
+
+#### Error Handling Improvements
+- Previous: Custom error handling for unofficial API responses
+- Current: Official API error codes and structured error responses
+- Benefits: Better error messages, standardised error handling, official documentation
+
+#### Codebase Structure Changes
+- Removed: `csv2notion_neo/notion/` directory (unofficial API implementation)
+- Added: `csv2notion_neo/notion_client_official.py` (official API client wrapper)
+- Added: `csv2notion_neo/notion_db_official.py` (official database operations)
+- Added: `csv2notion_neo/notion_row_upload_file_official.py` (official file uploads)
+- Added: `csv2notion_neo/notion_db_client_official.py` (compatibility layer)
+
 ## Core Architecture
 
 ### Main Components
 
-1. **CLI Interface** (`csv2notion_neo/cli.py`)
+1. CLI Interface (`csv2notion_neo/cli.py`)
    - Entry point for the application
    - Handles argument parsing and logging setup
    - Orchestrates the main workflow
 
-2. **Data Processing** (`csv2notion_neo/local_data.py`)
+2. Data Processing (`csv2notion_neo/local_data.py`)
    - Reads and validates CSV/JSON files
    - Manages column types and data structure
    - Handles AI feature integration
 
-3. **Notion Integration** (`csv2notion_neo/notion/`)
-   - Custom Notion client implementation
-   - Database and collection management
-   - File upload and block operations
+3. Notion Integration (`csv2notion_neo/notion_client_official.py`, `csv2notion_neo/notion_db_official.py`)
+   - Official Notion API client implementation using notion-sdk-py
+   - Database and collection management with official API
+   - File upload and block operations through official endpoints
 
-4. **Conversion Engine** (`csv2notion_neo/notion_convert.py`)
+4. Conversion Engine (`csv2notion_neo/notion_convert.py`)
    - Converts CSV/JSON data to Notion format
    - Handles different column types
    - Manages image and icon processing
 
-5. **Upload System** (`csv2notion_neo/notion_uploader.py`)
+5. Upload System (`csv2notion_neo/notion_uploader.py`)
    - Manages row uploads to Notion
    - Handles merge operations
    - Integrates AI captioning features
@@ -90,16 +128,17 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 ### Dependencies
 - Python 3.9+ required
 - Poetry for dependency management
-- Key dependencies: requests, tqdm, emoji, python-dateutil, icecream
+- Key dependencies: notion-client (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
 
 ## API Integration
 
 ### Notion API
-- Custom client implementation for Notion's unofficial private API
-- Support for CRDT operations and atomic transactions
-- File upload handling with signed URLs
-- Rate limiting and error handling
-- Note: Uses unofficial private APIs that may change without notice
+- Official Notion API client implementation using notion-sdk-py library
+- Support for all official Notion API endpoints (databases, pages, blocks, users, file uploads)
+- File upload handling through official file_uploads endpoints
+- Built-in rate limiting and error handling from the official SDK
+- Integration token authentication for enhanced security
+- Full compatibility with Notion's official API specifications
 
 ### Hugging Face API
 - Integration with Hugging Face inference API
@@ -110,15 +149,15 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 ## Configuration Management
 
 ### Command Line Arguments
-- Workspace and token authentication
-- Database URL specification
+- Workspace and integration token authentication (mandatory)
+- Database URL specification (mandatory)
 - Column type mapping
 - Image and icon handling options
 - Merge and validation flags
 - AI model configuration
 
 ### Environment Variables
-- Notion authentication tokens
+- Notion integration tokens (starts with 'secret_' or 'ntn_')
 - Hugging Face API tokens
 - Test configuration for CI/CD
 
@@ -137,9 +176,10 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 ## Security Considerations
 
 ### Authentication
-- Secure token handling for Notion API
+- Secure integration token handling for official Notion API
 - Hugging Face token management
 - No hardcoded credentials in source code
+- Integration token validation and error handling
 
 ### Data Privacy
 - Local file processing
@@ -181,10 +221,10 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 - Backward compatibility considerations
 
 ### API Compatibility
-- Monitoring Notion unofficial private API changes
-- Regular dependency updates
-- Compatibility testing with different Notion versions
-- Note: Unofficial APIs may break with Notion updates, requiring prompt fixes
+- Full compatibility with official Notion API specifications
+- Regular dependency updates for notion-sdk-py
+- Compatibility testing with official Notion API versions
+- Official API stability and backward compatibility guarantees
 
 ## Contributing Guidelines
 
@@ -196,16 +236,16 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 5. Configure environment variables for testing
 
 ### Ephemeral Build System
-- **Script**: `scripts/local-test-build.sh`
-- **Environment**: Self-contained in `.build/` directory
-- **Features**:
+- Script: `scripts/local-test-build.sh`
+- Environment: Self-contained in `.build/` directory
+- Features:
   - Automatic Python virtual environment setup
   - Poetry installation and configuration
   - Dependency management with update options
   - PyInstaller binary creation
   - Testing integration
   - Clean build artifacts management
-- **Usage**:
+- Usage:
   ```bash
   # Basic build
   ./scripts/local-test-build.sh
@@ -235,12 +275,12 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 ## Troubleshooting
 
 ### Common Issues
-- Authentication token expiration
-- Rate limiting from Notion unofficial private API
-- File upload failures
+- Integration token expiration or invalid tokens
+- Rate limiting from official Notion API
+- File upload failures through official endpoints
 - AI model loading issues
 - Column type conversion errors
-- Unofficial API breaking changes from Notion updates
+- Database access permissions and sharing requirements
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

@@ -4,6 +4,44 @@
 
 This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.9+ and uses Poetry for dependency management.
 
+## Version 2.0.0+ Migration
+
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library. This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+
+### Migration Implementation Details
+
+#### New File Structure
+- `csv2notion_neo/notion_client_official.py`: Official Notion API client wrapper
+- `csv2notion_neo/notion_db_official.py`: Database operations using official API
+- `csv2notion_neo/notion_row_upload_file_official.py`: File upload operations
+- `csv2notion_neo/notion_db_client_official.py`: Compatibility layer for existing code
+
+#### Removed Components
+- `csv2notion_neo/notion/` directory: Entire unofficial API implementation
+- `csv2notion_neo/notion_row.py`: Old row handling classes
+- `csv2notion_neo/notion_db_collection.py`: Old collection management
+
+#### Key Implementation Changes
+- Authentication: Integration tokens instead of session cookies
+- Database Operations: Official databases API endpoints
+- File Uploads: Official file_uploads API endpoints
+- Error Handling: Official API error codes and responses
+- Rate Limiting: Built-in official API rate limiting
+- Property Validation: Official API property type validation
+
+#### Compatibility Layer
+- Maintains existing method signatures where possible
+- Provides seamless transition from old to new API
+- Handles data structure differences between APIs
+- Preserves all existing functionality and features
+
+## Dependencies
+
+### Core Dependencies
+- Python 3.9+ required
+- Poetry for dependency management
+- Key dependencies: notion-client (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
+
 ## Code Style and Standards
 
 ### Python Code Style
@@ -78,12 +116,14 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 ## API Integration Patterns
 
 ### Notion API
-- Use the custom Notion client in csv2notion_neo/notion/
-- Handle CRDT operations properly
-- Implement proper rate limiting
-- Use atomic transactions where possible
-- Handle file uploads with signed URLs
-- Note: Uses unofficial private APIs that may change without notice
+- Use the official Notion API client implementation in csv2notion_neo/notion_client_official.py
+- Utilise the notion-sdk-py library for all Notion API interactions
+- Handle official API responses and error codes properly
+- Implement proper rate limiting using official API guidelines
+- Use official file_uploads endpoints for file operations
+- Follow official Notion API specifications and best practices
+- Reference: [notion-sdk-py documentation](https://ramnes.github.io/notion-sdk-py/)
+- Reference: [Official Notion API documentation](https://developers.notion.com/)
 
 ### Hugging Face API
 - Implement retry logic for model loading
@@ -140,6 +180,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Provide clear help messages
 - Validate argument combinations
 - Support both required and optional arguments
+- Note: --token (integration token) and --url (database URL) are now mandatory
 
 ### Environment Variables
 - Use python-dotenv for environment configuration
@@ -257,11 +298,11 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Are authentication mechanisms secure?
 
 ### Integration
-- Do unofficial API integrations work correctly?
-- Are rate limits respected?
-- Is error handling robust?
-- Are fallback mechanisms in place?
-- Are unofficial API changes monitored and handled?
+- Do official API integrations work correctly?
+- Are rate limits respected according to official API guidelines?
+- Is error handling robust with official API error codes?
+- Are fallback mechanisms in place for API failures?
+- Are official API changes monitored and handled appropriately?
 
 ## Troubleshooting Guidelines
 
@@ -273,12 +314,12 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Use ephemeral build environment for isolated debugging
 
 ### Common Issues
-- Authentication token expiration
-- Unofficial API rate limiting
-- File upload failures
+- Integration token expiration or invalid tokens
+- Official API rate limiting
+- File upload failures through official endpoints
 - Network connectivity issues
 - Memory usage problems
-- Unofficial API breaking changes from Notion updates
+- Database access permissions and sharing requirements
 - Build environment issues (use `./scripts/local-test-build.sh --clean` to reset)
 
 ### Performance Issues

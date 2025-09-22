@@ -67,7 +67,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-15
+          - os: macos-latest
             OS_CODE: macos
           - os: ubuntu-latest
             OS_CODE: linux
@@ -78,14 +78,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get version
-        if: matrix.os == 'macos-15'
+        if: matrix.os == 'macos-latest'
         shell: bash
         run: |
           APP_VERSION=$(perl -n -e'/^__version__ = "([^"]+)"$/ && print $1' ${{ env.PACKAGE_NAME }}/version.py)
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
 
       - name: Get version
-        if: matrix.os != 'macos-15'
+        if: matrix.os != 'macos-latest'
         shell: bash
         run: |
           APP_VERSION=$(sed -n 's/^__version__ = "\([^"]\+\)"$/\1/p' ${{ env.PACKAGE_NAME }}/version.py)

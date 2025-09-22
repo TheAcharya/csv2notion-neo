@@ -23,7 +23,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
         description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV or JSON Data with Images to Notion Database",
-        usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
+        usage="%(prog)s [-h] --token TOKEN --url URL [OPTION]... FILE",
         add_help=False,
         formatter_class=lambda prog: CustomHelpFormatter(
             prog, max_help_position=HELP_ARGS_WIDTH
@@ -49,11 +49,9 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "required": True,
             },
             "--url": {
-                "help": (
-                    "Notion database URL; if none is provided,"
-                    " will create a new database"
-                ),
+                "help": "Notion database URL (required)",
                 "metavar": "URL",
+                "required": True,
             },
             "--max-threads": {
                 "type": lambda x: max(int(x), 1),

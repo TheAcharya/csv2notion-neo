@@ -6,6 +6,7 @@ maintaining compatibility with the existing CSV2Notion Neo codebase.
 """
 
 import logging
+import random
 from typing import Any, Dict, List, Optional, Tuple
 
 from csv2notion_neo.notion_client_official import NotionClientOfficial
@@ -15,6 +16,17 @@ from csv2notion_neo.utils_rand_id import rand_id_list
 from csv2notion_neo.utils_db import make_status_column
 
 logger = logging.getLogger(__name__)
+
+# Notion API supported colors for select options
+NOTION_COLORS = [
+    "blue", "brown", "default", "gray", "green",
+    "orange", "pink", "purple", "red", "yellow"
+]
+
+
+def _get_random_select_color() -> str:
+    """Get a random color for select options."""
+    return random.choice(NOTION_COLORS)
 
 
 class NotionDBOfficial:
@@ -261,6 +273,65 @@ class NotionDBOfficial:
         except Exception as e:
             raise NotionError(f"Failed to add column {column_name}: {e}") from e
     
+    def add_select_option(self, prop_name: str, option_name: str, color: Optional[str] = None) -> None:
+        """Add a new option to a select, multi_select, or status property."""
+        try:
+            if prop_name not in self.columns:
+                raise NotionError(f"Property '{prop_name}' not found in database")
+            
+            prop_info = self.columns[prop_name]
+            prop_type = prop_info["type"]
+            
+            if prop_type not in ["select", "multi_select", "status"]:
+                raise NotionError(f"Property '{prop_name}' is not a select, multi_select, or status type")
+            
+            # Get current options
+            current_options = prop_info.get("options", [])
+            
+            # Check if option already exists
+            existing_names = [opt["name"] for opt in current_options]
+            if option_name in existing_names:
+                logger.debug(f"Option '{option_name}' already exists in property '{prop_name}'")
+                return
+            
+            # Determine color
+            if color is None:
+                # Check if we should randomize colors
+                if hasattr(self.client, 'options') and self.client.options.get("is_randomize_select_colors"):
+                    color = _get_random_select_color()
+                else:
+                    color = "default"
+            
+            # Create new option
+            new_option = {
+                "name": option_name,
+                "color": color
+            }
+            
+            # Add to existing options
+            updated_options = current_options + [new_option]
+            
+            # Update the database property
+            self.client.client.databases.update(
+                database_id=self.collection_id,
+                properties={
+                    prop_name: {
+                        prop_type: {
+                            "options": updated_options
+                        }
+                    }
+                }
+            )
+            
+            # Clear cache to refresh schema
+            self._cache_columns = None
+            self._database_info = self._get_database_info()
+            
+            logger.debug(f"Added option '{option_name}' with color '{color}' to property '{prop_name}'")
+            
+        except Exception as e:
+            raise NotionError(f"Failed to add select option '{option_name}' to property '{prop_name}': {e}") from e
+    
     def add_row(
         self,
         properties: Optional[Dict[str, Any]] = None,
@@ -403,8 +474,15 @@ class NotionDBOfficial:
                 option_names = [opt["name"] for opt in available_options]
                 
                 if str(value) not in option_names:
-                    logger.warning(f"Select option '{value}' not found in database schema for property '{prop_name}'. Available options: {option_names}. Skipping property.")
-                    return None
+                    # Automatically add the new select option
+                    logger.info(f"Adding new select option '{value}' to property '{prop_name}'")
+                    try:
+                        self.add_select_option(prop_name, str(value))
+                        # Refresh the columns cache to get the updated schema
+                        self._cache_columns = None
+                    except Exception as e:
+                        logger.warning(f"Failed to add select option '{value}' to property '{prop_name}': {e}. Skipping property.")
+                        return None
             
             return {"select": {"name": str(value)}}
         elif prop_type == "multi_select":
@@ -417,15 +495,41 @@ class NotionDBOfficial:
                 option_names = [opt["name"] for opt in available_options]
                 
                 if isinstance(value, list):
-                    valid_values = [str(v) for v in value if v and str(v) in option_names]
-                    invalid_values = [str(v) for v in value if v and str(v) not in option_names]
+                    valid_values = []
+                    invalid_values = []
+                    
+                    for v in value:
+                        if v and str(v) in option_names:
+                            valid_values.append(str(v))
+                        elif v:
+                            invalid_values.append(str(v))
+                    
+                    # Automatically add new options for invalid values
                     if invalid_values:
-                        logger.warning(f"Multi-select options {invalid_values} not found in database schema for property '{prop_name}'. Available options: {option_names}. Skipping invalid options.")
+                        logger.info(f"Adding new multi-select options {invalid_values} to property '{prop_name}'")
+                        for invalid_value in invalid_values:
+                            try:
+                                self.add_select_option(prop_name, invalid_value)
+                                valid_values.append(invalid_value)
+                            except Exception as e:
+                                logger.warning(f"Failed to add multi-select option '{invalid_value}' to property '{prop_name}': {e}")
+                        
+                        # Refresh the columns cache to get the updated schema
+                        if invalid_values:
+                            self._cache_columns = None
+                    
                     return {"multi_select": [{"name": v} for v in valid_values]}
                 else:
                     if str(value) not in option_names:
-                        logger.warning(f"Multi-select option '{value}' not found in database schema for property '{prop_name}'. Available options: {option_names}. Skipping property.")
-                        return {"multi_select": []}
+                        # Automatically add the new multi-select option
+                        logger.info(f"Adding new multi-select option '{value}' to property '{prop_name}'")
+                        try:
+                            self.add_select_option(prop_name, str(value))
+                            # Refresh the columns cache to get the updated schema
+                            self._cache_columns = None
+                        except Exception as e:
+                            logger.warning(f"Failed to add multi-select option '{value}' to property '{prop_name}': {e}. Skipping property.")
+                            return {"multi_select": []}
                     return {"multi_select": [{"name": str(value)}]}
             
             # Fallback if we don't have schema info
@@ -495,8 +599,15 @@ class NotionDBOfficial:
                 option_names = [opt["name"] for opt in available_options]
                 
                 if str(value) not in option_names:
-                    logger.warning(f"Status option '{value}' not found in database schema for property '{prop_name}'. Available options: {option_names}. Skipping property.")
-                    return None
+                    # Automatically add the new status option
+                    logger.info(f"Adding new status option '{value}' to property '{prop_name}'")
+                    try:
+                        self.add_select_option(prop_name, str(value))
+                        # Refresh the columns cache to get the updated schema
+                        self._cache_columns = None
+                    except Exception as e:
+                        logger.warning(f"Failed to add status option '{value}' to property '{prop_name}': {e}. Skipping property.")
+                        return None
             
             return {"status": {"name": str(value)}}
         else:

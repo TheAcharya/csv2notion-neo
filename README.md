@@ -57,7 +57,11 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 
 Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to address the lack of advanced importing support for `*.csv` files in [Notion](https://notion.so). We took inspiration from [Airtable](https://www.airtable.com)’s [CSV import extension](https://support.airtable.com/docs/csv-import-extension).
 
-**CSV2Notion Neo** was developed as a successor to the original project, which has since been abandoned, to ensure continued compatibility with Notion’s evolving backend API. As Notion periodically updates its architecture, we are committed to maintaining, enhancing, and expanding the tool with timely fixes and new features. Any projects or tools previously reliant on [csv2notion](https://github.com/vzhd1701/csv2notion) can seamlessly transition to **CSV2Notion Neo**, requiring only minimal adjustments.
+**CSV2Notion Neo** was developed as a successor to the original project, which has since been abandoned, to ensure continued compatibility with Notion's evolving backend API. As Notion periodically updates its architecture, we are committed to maintaining, enhancing, and expanding the tool with timely fixes and new features. 
+
+**Version 2.0.0+ Migration**: CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/). This provides better reliability, security, and future compatibility. Users now need to use Notion integration tokens instead of session cookies.
+
+Any projects or tools previously reliant on [csv2notion](https://github.com/vzhd1701/csv2notion) can seamlessly transition to **CSV2Notion Neo**, requiring only minimal adjustments.
 
 ## System Requirements
 
@@ -110,11 +114,28 @@ $ poetry install --no-dev
 $ poetry run csv2notion_neo
 ```
 
+## Migration Guide (v2.0.0+)
+
+**Important**: CSV2Notion Neo v2.0.0+ uses the official Notion API and requires integration tokens instead of session cookies.
+
+### What Changed:
+- Token Type: Now uses Notion integration tokens (starts with `ntn` or `secret_`) instead of `token_v2` session cookies
+- Database URL: Now requires `--url` parameter (database URL is mandatory)
+- Authentication: More secure and reliable authentication method
+- API: Uses official Notion API for better compatibility and performance
+
+### Migration Steps:
+1. Create Integration: Go to [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations) and create a new integration
+2. Get Token: Copy the "Internal Integration Token" from your integration settings
+3. Share Database: Share your database with the integration by clicking "Share" → "Add people, emails, groups, or integrations" → Select your integration
+4. Update Commands: Replace `--token YOUR_OLD_TOKEN` with `--token secret_YOUR_INTEGRATION_TOKEN`
+
+
 ## Guide
 
 ```plain
 $ csv2notion_neo --help
-usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
+usage: csv2notion_neo [-h] --token TOKEN --url URL [OPTION]... FILE
 
 https://github.com/TheAcharya/csv2notion-neo
 
@@ -125,8 +146,8 @@ positional arguments:
 
 general options:
   --workspace                        active Notion workspace name
-  --token                            Notion token, stored in token_v2 cookie for notion.so
-  --url URL                          Notion database URL; if none is provided, will create a new database
+  --token                            Notion integration token (create at https://www.notion.so/my-integrations)
+  --url URL                          Notion database URL (required)
   --max-threads                      upload threads (default: 5)
   --log FILE                         file to store program log
   --verbose                          output debug information
@@ -220,7 +241,7 @@ sudo rm /usr/local/bin/csv2notion_neo
 
 You must pass a single `*.csv` file for upload. The CSV file must contain at least 2 rows. The first row will be used as a header.
 
-Optionally you can provide a URL to an existing Notion database with the `--url` option; if not provided, the tool will create a new database named after the CSV file. The URL must link to a database view, not a page.
+You must provide a URL to an existing Notion database with the `--url` option. The URL must link to a database view, not a page.
 
 <details><summary>Obtaining Database URL</summary>
 <p>
@@ -242,37 +263,39 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 </details>
 
 
-The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option.
+The tool also requires you to provide a Notion integration token through the `--token` option.
 
-1. Login to your [Notion](https://www.notion.so/login) account via a web browser.
-2. Find and copy the entire `token_v2` value including `v02%3Auser_token_or_cookies%` from your Notion session.
+1. Go to [Notion Integrations](https://www.notion.so/my-integrations) and create a new integration.
+2. Copy the "Internal Integration Token" from your integration settings.
+3. Share your database with the integration by clicking "Share" on your database and adding your integration.
 
-<details><summary>Obtaining Notion Session Token (Safari)</summary>
+<details><summary>Creating Notion Integration</summary>
 <p>
 
-Enable Web Inspector
+1. **Create Integration:**
+   - Go to [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations)
+   - Click "New integration"
+   - Give it a name (e.g., "Project Database")
+   - Select the workspace where your databases are located
+   - Click "Submit"
 
-- If you don’t see the Develop menu in the menu bar, choose Safari, Settings, click Advanced, then select “Show features for web developers”.
-- Press `⌥ + ⌘ + i` to show Web Inspector
+2. **Copy Integration Token:**
+   - After creating the integration, you'll see the "Internal Integration Token"
+   - Copy this token (starts with `ntn` or `secret_`)
+
+3. **Share Database with Integration:**
+   - Pick (or create) a Notion page
+   - Click on the `...` More menu in the top-right corner of the page
+   - Scroll down to `+` Add Connections
+   - Search for your integration and select it
+   - Confirm the integration can access the page and all of its child pages
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_safari.gif?raw=true"> </p>
 
 </p>
 </details>
 
-<details><summary>Obtaining Notion Session Token (Brave, Chrome or Edge)</summary>
-<p>
-
-- Press ⌥ + ⌘ + i (Mac) or  Shift + Crtl + i (Win) to show Developer Tools.
-- Go to Application tab.
-- Copy and obtain your token_v2 value.
-
-<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_brave.png?raw=true"> </p>
-
-</p>
-</details>
-
-**Important notice**. `token_v2` cookie provides complete access to your Notion account. Handle it with caution.
+**Important notice**. Integration tokens provide access to databases you explicitly share with them. Handle them with caution and only share databases you want the integration to access.
 
 ### Upload Speed
 
@@ -438,7 +461,7 @@ Steps to Obtain a Hugging Face Token with Write Mode
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE test.csv
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRATION_TOKEN_HERE test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_01.png?raw=true"> </p>
 
@@ -449,7 +472,7 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE test
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --column-types "number,multi_select" test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_02.png?raw=true"> </p>
@@ -461,7 +484,7 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_03.gif?raw=true"> </p>

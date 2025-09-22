@@ -1,11 +1,21 @@
 # Changelog
 
-### 1.3.7
+### 2.0.0
 
 **🎉 Released:**
 - TBD
 
 **🔨 Improvements:**
+- Migrated from unofficial Notion private API to official [Notion API](https://developers.notion.com/)
+- Integrated [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library for official API support
+- Changed authentication from `token_v2` session cookies to Notion integration tokens
+- Made `--url` parameter mandatory for all operations (database URL required)
+- Automatic database creation is no longer supported
+- Better error handling with official API error codes and responses
+- Improved file upload reliability using official file_uploads endpoints
+- Standardised API interactions following official Notion specifications
+- Better rate limiting using official API guidelines
+- Enhanced property validation with official API standards
 - Upgraded from Python 3.8 to Python 3.9
 - Updated to latest security patches across most dependencies
 - Improved build reproducibility across environments
