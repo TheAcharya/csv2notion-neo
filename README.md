@@ -10,8 +10,6 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 
 ## Core Features
 
-### Advantages over native import
-
 - Merge CSV or JSON with the existing database, using the first column as a key to combine existing rows
 - Choose column types manually instead of letting Notion detecting them automatically
 - Link or create new entries in relation columns based on their values automatically
@@ -20,12 +18,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 - Set a cover or embed an image for each row to enhance visual representation
 - Upload image files for covers or icons
 - Apply validation options for input data to ensure accuracy
-- Automatically analyse and generate captions for images using Hugging Face's open-source AI/ML models (Experimental)
-
-### Disadvantages over native import
- 
-- Importing each row separately might lead to slower speed
-  - To address this, utilise multithreaded upload
+- Analyse and generate captions for images using Hugging Face's open-source AI/ML models (Experimental)
 
 ## Table of contents
 
@@ -62,7 +55,7 @@ Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to
 
 **CSV2Notion Neo** was developed as a successor to the original project, which has since been abandoned, to ensure continued compatibility with Notion's evolving backend API. As Notion periodically updates its architecture, we are committed to maintaining, enhancing, and expanding the tool with timely fixes and new features. 
 
-**Version 2.0.0+ Migration**: CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/). This provides better reliability, security, and future compatibility. Users now need to use Notion integration tokens instead of session cookies.
+Starting with **CSV2Notion Neo** 2.0.0, application has been fully migrated to use the official [Notion API](https://developers.notion.com/). This provides better reliability, security, and future compatibility. Users now need to use Notion integration tokens instead of session cookies.
 
 Any projects or tools previously reliant on [csv2notion](https://github.com/vzhd1701/csv2notion) can seamlessly transition to **CSV2Notion Neo**, requiring only minimal adjustments.
 
@@ -130,7 +123,7 @@ $ poetry run csv2notion_neo
 ### Migration Steps:
 1. Create Integration: Go to [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations) and create a new integration
 2. Get Token: Copy the "Internal Integration Token" from your integration settings
-3. Share Database: Share your database with the integration by clicking "Share" → "Add people, emails, groups, or integrations" → Select your integration
+3. Database or Page Connections: User can search for and select pages or databases to share with the integration from the page picker
 4. Update Commands: Replace `--token YOUR_OLD_TOKEN` with `--token secret_YOUR_INTEGRATION_TOKEN`
 
 
