@@ -97,7 +97,7 @@ $ brew uninstall --cask csv2notion-neo
 $ pip install --user csv2notion_neo
 ```
 
-**Python 3.7 or later required.**
+**Python 3.9 or later required.**
 
 ### From source
 
