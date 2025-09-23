@@ -99,6 +99,11 @@ def cli(*argv: str) -> None:
             
             logger.info(f"Database created within page. Database URL: {database_url}")
             collection_id = database_id
+            
+            # Add a small delay to ensure the database is fully ready
+            import time
+            time.sleep(2.0)
+            logger.info("Database initialization complete, proceeding with upload...")
 
         notion_rows = convert_csv_to_notion_rows(csv_data, client, collection_id, args)
 

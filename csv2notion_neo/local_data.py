@@ -39,10 +39,10 @@ def data_read(
 
 
 def _csv_read_rows(
-    csv_file: Iterable[str], fail_on_duplicate_columns: bool, delemiter: str = ","
+    csv_file: Iterable[str], fail_on_duplicate_columns: bool, delimiter: str = ","
 ) -> List[CSVRowType]:
 
-    reader = csv.DictReader(csv_file, delimiter=delemiter, restval="")
+    reader = csv.DictReader(csv_file, delimiter=delimiter, restval="")
 
     if not reader.fieldnames:
         raise CriticalError("CSV file has no columns.")

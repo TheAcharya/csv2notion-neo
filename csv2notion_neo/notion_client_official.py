@@ -323,7 +323,10 @@ class NotionClientOfficial:
             )
             return response
         except APIResponseError as e:
-            raise NotionError(f"Failed to create page: {e}") from e
+            if e.code == "conflict_error":
+                raise NotionError(f"Conflict occurred while saving. Please try again.") from e
+            else:
+                raise NotionError(f"Failed to create page: {e}") from e
     
     def update_page(self, page_id: str, properties: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         """

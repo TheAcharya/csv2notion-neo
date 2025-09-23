@@ -352,7 +352,7 @@ The table below describes available codes for `--column-types` and what values a
 | Phone                   | `phone_number`          | string           | ❌                                     |
 | **Advanced**            |                         |                  |                                        |
 | Formula                 | `formula`               | `---`            | `---`                                  |
-| Relation                | `---`                   | key, Notion URL  | ✅                                     |
+| Relation                | `relation`              | key, Notion URL  | ✅                                     |
 | Rollup                  | `rollup`                | `---`            | `---`                                  |
 | Created time            | `created_time`          | any date format  | ❌                                     |
 | Created by              | `created_by`            | `---`            | `---`                                  |

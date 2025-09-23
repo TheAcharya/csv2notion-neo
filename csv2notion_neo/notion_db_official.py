@@ -406,53 +406,69 @@ class NotionDBOfficial:
         columns: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Add a row to the database."""
-        try:
-            # Convert columns to properties format
-            notion_properties = {}
-            
-            if columns:
-                for col_name, value in columns.items():
-                    if col_name in self.columns:
-                        col_type = self.columns[col_name]["type"]
-                        converted_property = self._convert_value_to_notion_property(
-                            value, col_type, col_name
-                        )
-                        # Only include properties that are not None or empty
-                        if converted_property and converted_property != {}:
-                            notion_properties[col_name] = converted_property
-            
-            if properties:
-                # Convert any PosixPath objects in properties to strings
-                converted_properties = self._convert_paths_to_strings(properties)
-                # Only include properties that exist in the database schema
-                for prop_name, prop_value in converted_properties.items():
-                    if prop_name in self.columns:
-                        col_type = self.columns[prop_name]["type"]
-                        converted_property = self._convert_value_to_notion_property(
-                            prop_value, col_type, prop_name
-                        )
-                        # Only include properties that are not None or empty
-                        if converted_property and converted_property != {}:
-                            notion_properties[prop_name] = converted_property
-            
-                # Debug: Log the properties we're about to send
-                # logger.debug(f"Creating page with properties: {notion_properties}")
-            
-            # Create page
-            response = self.client.create_page(
-                parent={"database_id": self.collection_id},
-                properties=notion_properties
-            )
-            
-            # Update cache
-            if columns and self.key_column in columns:
-                key_value = columns[self.key_column]
-                self._cache_rows[key_value] = response
-            
-            return response
-            
-        except Exception as e:
-            raise NotionError(f"Failed to add row: {e}") from e
+        import time
+        from notion_client.errors import APIResponseError
+        
+        max_retries = 3
+        retry_delay = 1.0  # Start with 1 second delay
+        
+        for attempt in range(max_retries):
+            try:
+                # Convert columns to properties format
+                notion_properties = {}
+                
+                if columns:
+                    for col_name, value in columns.items():
+                        if col_name in self.columns:
+                            col_type = self.columns[col_name]["type"]
+                            converted_property = self._convert_value_to_notion_property(
+                                value, col_type, col_name
+                            )
+                            # Only include properties that are not None or empty
+                            if converted_property and converted_property != {}:
+                                notion_properties[col_name] = converted_property
+                
+                if properties:
+                    # Convert any PosixPath objects in properties to strings
+                    converted_properties = self._convert_paths_to_strings(properties)
+                    # Only include properties that exist in the database schema
+                    for prop_name, prop_value in converted_properties.items():
+                        if prop_name in self.columns:
+                            col_type = self.columns[prop_name]["type"]
+                            converted_property = self._convert_value_to_notion_property(
+                                prop_value, col_type, prop_name
+                            )
+                            # Only include properties that are not None or empty
+                            if converted_property and converted_property != {}:
+                                notion_properties[prop_name] = converted_property
+                
+                    # Debug: Log the properties we're about to send
+                    # logger.debug(f"Creating page with properties: {notion_properties}")
+                
+                # Create page
+                response = self.client.create_page(
+                    parent={"database_id": self.collection_id},
+                    properties=notion_properties
+                )
+                
+                # Update cache
+                if columns and self.key_column in columns:
+                    key_value = columns[self.key_column]
+                    self._cache_rows[key_value] = response
+                
+                return response
+                
+            except APIResponseError as e:
+                if e.code == "conflict_error" and attempt < max_retries - 1:
+                    # Database might not be ready yet, wait and retry
+                    self.logger.warning(f"Database conflict on attempt {attempt + 1}, retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                    continue
+                else:
+                    raise NotionError(f"Failed to add row: {e}") from e
+            except Exception as e:
+                raise NotionError(f"Failed to add row: {e}") from e
     
     def add_row_key(self, key: str) -> Dict[str, Any]:
         """Add a row with just a key value."""
@@ -881,9 +897,15 @@ def _schema_from_csv_official(
             # Get column type for non-key columns
             try:
                 col_type = csv_data.col_type(col_key)
+                # Log that we're using pre-defined column type
+                # import logging
+                # logging.getLogger(__name__).debug(f"Using pre-defined type '{col_type}' for column '{col_key}'")
             except KeyError:
                 # If column type not found, analyze the data to determine type
                 col_type = _analyze_column_type(csv_data, col_key)
+                # Log the auto-detected type
+                # import logging
+                # logging.getLogger(__name__).debug(f"Auto-detected type '{col_type}' for column '{col_key}'")
             
             # Create property based on detected type
             if col_type == "status":
@@ -912,50 +934,144 @@ def _schema_from_csv_official(
 
 
 def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
-    """Analyze column data to determine the best property type."""
+    """Advanced column type detection with smart pattern recognition."""
+    import re
+    from datetime import datetime
+    from decimal import Decimal, InvalidOperation
+    
     try:
         values = csv_data.col_values(col_key)
         if not values:
+            return "rich_text"
+        
+        # Filter out None, empty strings, and whitespace-only values
+        clean_values = [str(v).strip() for v in values if v is not None and str(v).strip()]
+        if not clean_values:
             return "rich_text"
         
         # Check for multi_select (array values)
         if any(isinstance(v, list) for v in values):
             return "multi_select"
         
-        # Check for checkbox (boolean-like values)
-        checkbox_values = {"true", "false", "yes", "no", "1", "0", ""}
-        if all(str(v).lower() in checkbox_values for v in values if v):
+        # 1. TIME CODE DETECTION (like "00:00:08:06", "00:00:22:07")
+        timecode_pattern = r'^\d{2}:\d{2}:\d{2}:\d{2}$'
+        if any(re.match(timecode_pattern, v) for v in clean_values):
+            return "rich_text"  # Timecode should be rich text as requested
+        
+        # 2. BOOLEAN/CHECKBOX DETECTION
+        boolean_patterns = {
+            'true', 'false', 'yes', 'no', 'on', 'off', 'enabled', 'disabled',
+            'complete', 'incomplete', 'done', 'pending', 'active', 'inactive',
+            '1', '0', 'y', 'n', 't', 'f'
+        }
+        boolean_like = sum(1 for v in clean_values if v.lower() in boolean_patterns)
+        if boolean_like >= len(clean_values) * 0.8:  # 80% match boolean patterns
             return "checkbox"
         
-        # Check for select (limited unique values, not too many)
-        unique_values = set(str(v) for v in values if v and str(v).strip())
-        if len(unique_values) <= 20 and len(unique_values) > 1:
-            # Check if values look like select options (not too long, not numbers)
-            if all(len(v) <= 50 and not v.replace(".", "").replace("-", "").isdigit() for v in unique_values):
+        # 3. STATUS/SELECT DETECTION (limited unique values with semantic meaning)
+        unique_values = set(clean_values)
+        if 2 <= len(unique_values) <= 10:  # Good range for select/status
+            # Check if values look like status options
+            status_indicators = {'complete', 'incomplete', 'pending', 'done', 'todo', 'active', 'inactive'}
+            if any(v.lower() in status_indicators for v in unique_values):
+                return "select"
+            
+            # Check if values are short and meaningful (not just numbers)
+            if all(len(v) <= 30 and not v.replace(".", "").replace("-", "").isdigit() for v in unique_values):
                 return "select"
         
-        # Check for number
-        try:
-            numeric_count = sum(1 for v in values if v and str(v).replace(".", "").replace("-", "").isdigit())
-            if numeric_count > len(values) * 0.8:  # 80% are numeric
-                return "number"
-        except:
-            pass
+        # 4. NUMERIC DETECTION (integers, decimals, percentages)
+        numeric_count = 0
+        for v in clean_values:
+            try:
+                # Try to parse as number (handles integers, decimals, scientific notation)
+                float(v.replace(',', '').replace('%', ''))
+                numeric_count += 1
+            except (ValueError, InvalidOperation):
+                pass
         
-        # Check for URL
-        url_pattern = r'^https?://'
-        if any(re.match(url_pattern, str(v)) for v in values if v):
+        if numeric_count >= len(clean_values) * 0.8:  # 80% are numeric
+            return "number"
+        
+        # 5. URL DETECTION
+        url_pattern = r'^https?://[^\s]+$'
+        if any(re.match(url_pattern, v) for v in clean_values):
             return "url"
         
-        # Check for email
-        email_pattern = r'^[^@]+@[^@]+\.[^@]+$'
-        if any(re.match(email_pattern, str(v)) for v in values if v):
+        # 6. EMAIL DETECTION
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if any(re.match(email_pattern, v) for v in clean_values):
             return "email"
         
-        # Default to rich_text
+        # 7. PHONE NUMBER DETECTION
+        phone_pattern = r'^[\+]?[1-9][\d\s\-\(\)]{7,15}$'
+        if any(re.match(phone_pattern, v) for v in clean_values):
+            return "phone_number"
+        
+        # 8. DATE DETECTION (various formats)
+        date_patterns = [
+            r'^\d{4}-\d{2}-\d{2}$',  # YYYY-MM-DD
+            r'^\d{2}/\d{2}/\d{4}$',   # MM/DD/YYYY
+            r'^\d{2}-\d{2}-\d{4}$',  # MM-DD-YYYY
+            r'^\d{4}/\d{2}/\d{2}$',  # YYYY/MM/DD
+            r'^\d{1,2}/\d{1,2}/\d{4}$',  # M/D/YYYY
+        ]
+        
+        date_count = 0
+        for v in clean_values:
+            for pattern in date_patterns:
+                if re.match(pattern, v):
+                    try:
+                        # Try to parse as date to validate
+                        datetime.strptime(v, '%Y-%m-%d')
+                        date_count += 1
+                        break
+                    except ValueError:
+                        try:
+                            datetime.strptime(v, '%m/%d/%Y')
+                            date_count += 1
+                            break
+                        except ValueError:
+                            try:
+                                datetime.strptime(v, '%m-%d-%Y')
+                                date_count += 1
+                                break
+                            except ValueError:
+                                try:
+                                    datetime.strptime(v, '%Y/%m/%d')
+                                    date_count += 1
+                                    break
+                                except ValueError:
+                                    try:
+                                        datetime.strptime(v, '%m/%d/%Y')
+                                        date_count += 1
+                                        break
+                                    except ValueError:
+                                        pass
+        
+        if date_count >= len(clean_values) * 0.7:  # 70% are valid dates
+            return "date"
+        
+        # 9. MULTI-SELECT DETECTION (comma-separated values)
+        if any(',' in v for v in clean_values):
+            # Check if values look like multi-select options
+            multi_select_candidates = [v for v in clean_values if ',' in v]
+            if len(multi_select_candidates) >= len(clean_values) * 0.5:  # 50% have commas
+                return "multi_select"
+        
+        # 10. RICH TEXT DETECTION (long text, descriptions, mixed content)
+        # If values are long or contain mixed content, default to rich text
+        avg_length = sum(len(v) for v in clean_values) / len(clean_values)
+        if avg_length > 50:  # Average length > 50 characters
+            return "rich_text"
+        
+        # Default to rich_text for any unclassified content
         return "rich_text"
         
-    except Exception:
+    except Exception as e:
+        # Log the error for debugging but don't fail
+        import logging
+        logging.getLogger(__name__).warning(f"Error analyzing column type for {col_key}: {e}")
         return "rich_text"
 
 
