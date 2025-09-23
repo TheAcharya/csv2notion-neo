@@ -372,7 +372,7 @@ class NotionDBOfficial:
             
             # Now archive all pages with progress bar
             if all_pages:
-                with tqdm(total=len(all_pages), desc="Deleting database entries", unit="entries") as pbar:
+                with tqdm(total=len(all_pages), desc="Deleting database entries", unit="entries", leave=False) as pbar:
                     for page in all_pages:
                         page_id = page["id"]
                         try:

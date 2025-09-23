@@ -219,7 +219,7 @@ class NotionClientOfficial:
     
     def upload_file(self, file_path: Path, parent_block_id: str) -> Tuple[str, Dict[str, Any]]:
         """
-        Upload a file using the official API.
+        Upload a file using the official API with retry logic.
         
         Args:
             file_path: Path to file to upload
@@ -228,44 +228,81 @@ class NotionClientOfficial:
         Returns:
             Tuple of (file_url, metadata)
         """
-        try:
-            # Check file size (20MB limit for single part upload)
-            file_size = file_path.stat().st_size
-            if file_size > 20 * 1024 * 1024:  # 20MB
-                raise NotionError(f"File size {file_size} exceeds 20MB limit")
-            
-            # Create file upload
-            response = self.client.file_uploads.create(
-                mode="single_part",
-                filename=file_path.name,
-                content_type=self._get_content_type(file_path)
-            )
-            file_upload_id = response["id"]
-            
-            # Upload file
-            with open(file_path, "rb") as f:
-                upload_response = self.client.file_uploads.send(
-                    file_upload_id=file_upload_id,
-                    file=f
+        import time
+        import random
+        from requests.exceptions import Timeout, ConnectionError
+        from notion_client.errors import APIResponseError
+        
+        max_retries = 5
+        base_delay = 2.0
+        
+        for attempt in range(max_retries + 1):
+            try:
+                # Check file size (20MB limit for single part upload)
+                file_size = file_path.stat().st_size
+                if file_size > 20 * 1024 * 1024:  # 20MB
+                    raise NotionError(f"File size {file_size} exceeds 20MB limit")
+                
+                # Create file upload
+                response = self.client.file_uploads.create(
+                    mode="single_part",
+                    filename=file_path.name,
+                    content_type=self._get_content_type(file_path)
                 )
-            
-            if upload_response.get("status") != "uploaded":
-                raise NotionError(f"File upload failed with status: {upload_response.get('status')}")
-            
-            # Return file URL and metadata
-            file_url = f"attachment:{file_upload_id}:{file_path.name}"
-            metadata = {
-                "source": [[file_url]],
-                "type": "file",
-                "file_id": file_upload_id
-            }
-            
-            return file_url, metadata
-            
-        except APIResponseError as e:
-            raise NotionError(f"Failed to upload file {file_path}") from e
-        except Exception as e:
-            raise NotionError(f"Error uploading file {file_path}: {e}") from e
+                file_upload_id = response["id"]
+                
+                # Upload file
+                with open(file_path, "rb") as f:
+                    upload_response = self.client.file_uploads.send(
+                        file_upload_id=file_upload_id,
+                        file=f
+                    )
+                
+                if upload_response.get("status") != "uploaded":
+                    raise NotionError(f"File upload failed with status: {upload_response.get('status')}")
+                
+                # Return file URL and metadata
+                file_url = f"attachment:{file_upload_id}:{file_path.name}"
+                metadata = {
+                    "source": [[file_url]],
+                    "type": "file",
+                    "file_id": file_upload_id
+                }
+                
+                return file_url, metadata
+                
+            except (APIResponseError, Timeout, ConnectionError) as e:
+                # Check if this is a retryable error
+                if attempt < max_retries:
+                    # Calculate exponential backoff with jitter
+                    delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                    
+                    # Check for specific error codes that should be retried
+                    if hasattr(e, 'status_code'):
+                        if e.status_code in [503, 504, 429]:  # Service unavailable, Gateway timeout, Rate limited
+                            self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                            time.sleep(delay)
+                            continue
+                        elif e.status_code in [400, 401, 403, 404]:  # Client errors - don't retry
+                            raise NotionError(f"Failed to upload file {file_path}: {e}") from e
+                    
+                    # For timeout and connection errors, always retry
+                    if isinstance(e, (Timeout, ConnectionError)):
+                        self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                        time.sleep(delay)
+                        continue
+                    
+                    # For other API errors, retry with backoff
+                    self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Max retries exceeded
+                    raise NotionError(f"Failed to upload file {file_path} after {max_retries + 1} attempts: {e}") from e
+                    
+            except Exception as e:
+                # Non-retryable errors
+                raise NotionError(f"Error uploading file {file_path}: {e}") from e
     
     def _get_content_type(self, file_path: Path) -> str:
         """
@@ -283,7 +320,7 @@ class NotionClientOfficial:
     
     def create_database(self, parent_page_id: str, title: str, properties: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Create a database using the official API.
+        Create a database using the official API with retry logic.
         
         Args:
             parent_page_id: Parent page ID
@@ -293,19 +330,59 @@ class NotionClientOfficial:
         Returns:
             Created database data
         """
-        try:
-            response = self.client.databases.create(
-                parent={"type": "page_id", "page_id": parent_page_id},
-                title=[{"type": "text", "text": {"content": title}}],
-                properties=properties
-            )
-            return response
-        except APIResponseError as e:
-            raise NotionError(f"Failed to create database: {e}") from e
+        import time
+        import random
+        from requests.exceptions import Timeout, ConnectionError
+        from notion_client.errors import APIResponseError
+        
+        max_retries = 5
+        base_delay = 2.0
+        
+        for attempt in range(max_retries + 1):
+            try:
+                response = self.client.databases.create(
+                    parent={"type": "page_id", "page_id": parent_page_id},
+                    title=[{"type": "text", "text": {"content": title}}],
+                    properties=properties
+                )
+                return response
+                
+            except (APIResponseError, Timeout, ConnectionError) as e:
+                # Check if this is a retryable error
+                if attempt < max_retries:
+                    # Calculate exponential backoff with jitter
+                    delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                    
+                    # Check for specific error codes that should be retried
+                    if hasattr(e, 'status_code'):
+                        if e.status_code in [503, 504, 429, 409]:  # Service unavailable, Gateway timeout, Rate limited, Conflict
+                            self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                            time.sleep(delay)
+                            continue
+                        elif e.status_code in [400, 401, 403, 404]:  # Client errors - don't retry
+                            raise NotionError(f"Failed to create database: {e}") from e
+                    
+                    # For timeout and connection errors, always retry
+                    if isinstance(e, (Timeout, ConnectionError)):
+                        self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                        time.sleep(delay)
+                        continue
+                    
+                    # For other API errors, retry with backoff
+                    self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Max retries exceeded
+                    raise NotionError(f"Failed to create database after {max_retries + 1} attempts: {e}") from e
+                    
+            except Exception as e:
+                # Non-retryable errors
+                raise NotionError(f"Error creating database: {e}") from e
     
     def create_page(self, parent: Dict[str, Any], properties: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         """
-        Create a page using the official API.
+        Create a page using the official API with retry logic.
         
         Args:
             parent: Parent object (database or page)
@@ -315,18 +392,55 @@ class NotionClientOfficial:
         Returns:
             Created page data
         """
-        try:
-            response = self.client.pages.create(
-                parent=parent,
-                properties=properties,
-                **kwargs
-            )
-            return response
-        except APIResponseError as e:
-            if e.code == "conflict_error":
-                raise NotionError(f"Conflict occurred while saving. Please try again.") from e
-            else:
-                raise NotionError(f"Failed to create page: {e}") from e
+        import time
+        import random
+        from requests.exceptions import Timeout, ConnectionError
+        from notion_client.errors import APIResponseError
+        
+        max_retries = 5
+        base_delay = 2.0
+        
+        for attempt in range(max_retries + 1):
+            try:
+                response = self.client.pages.create(
+                    parent=parent,
+                    properties=properties,
+                    **kwargs
+                )
+                return response
+                
+            except (APIResponseError, Timeout, ConnectionError) as e:
+                # Check if this is a retryable error
+                if attempt < max_retries:
+                    # Calculate exponential backoff with jitter
+                    delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
+                    
+                    # Check for specific error codes that should be retried
+                    if hasattr(e, 'status_code'):
+                        if e.status_code in [503, 504, 429, 409]:  # Service unavailable, Gateway timeout, Rate limited, Conflict
+                            self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                            time.sleep(delay)
+                            continue
+                        elif e.status_code in [400, 401, 403, 404]:  # Client errors - don't retry
+                            raise NotionError(f"Failed to create page: {e}") from e
+                    
+                    # For timeout and connection errors, always retry
+                    if isinstance(e, (Timeout, ConnectionError)):
+                        self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                        time.sleep(delay)
+                        continue
+                    
+                    # For other API errors, retry with backoff
+                    self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
+                    time.sleep(delay)
+                    continue
+                else:
+                    # Max retries exceeded
+                    raise NotionError(f"Failed to create page after {max_retries + 1} attempts: {e}") from e
+                    
+            except Exception as e:
+                # Non-retryable errors
+                raise NotionError(f"Error creating page: {e}") from e
     
     def update_page(self, page_id: str, properties: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         """

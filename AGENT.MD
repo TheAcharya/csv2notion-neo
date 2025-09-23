@@ -163,7 +163,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Progress tracking with tqdm
 - Thread-safe select option management to prevent conflicts during concurrent uploads
 - Database creation within pages with proper initialization delays and retry logic
-- Exponential backoff retry mechanism for 409 Conflict errors
+- Enhanced retry mechanism with 5 max retries and exponential backoff for API errors
+- Robust error handling for 503 Service Unavailable, timeout, and 409 Conflict errors
+- Comprehensive retry logic for file uploads, page creation, and database operations
 - Enhanced error handling for concurrent operations
 
 ## Development Guidelines
@@ -349,7 +351,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Common Issues
 - Integration token expiration or invalid tokens
 - Rate limiting from official Notion API
-- File upload failures through official endpoints
+- File upload failures through official endpoints (resolved with enhanced retry logic)
 - AI model loading issues
 - Column type conversion errors
 - Database access permissions and sharing requirements
@@ -358,6 +360,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Database creation within pages timing issues (resolved with initialization delays and retry logic)
 - CSV delimiter parsing failures (resolved with delimiter parameter fix)
 - 409 Conflict errors during page creation (resolved with exponential backoff retry logic)
+- 503 Service Unavailable and timeout errors during uploads (resolved with enhanced retry mechanism)
+- Transient API errors and network connectivity issues (resolved with comprehensive retry logic)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag
