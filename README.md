@@ -726,7 +726,7 @@ csv2notion_neo \
 </p>
 </details>
 
-<details><summary>Utilising Hugging Face's AI/ML Model to Automatically Analyse and Generate Captions from Images</summary>
+<details><summary>Utilising Hugging Face's AI/ML Model to Analyse and Generate Captions from Images (Experimental)</summary>
 <p>
 
 ```shell
