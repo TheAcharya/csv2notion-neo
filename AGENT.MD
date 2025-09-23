@@ -1,5 +1,63 @@
 # CSV2Notion Neo - Agent Documentation
 
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Version 2.0.0+ Migration](#version-200-migration)
+  - [Migration Details](#migration-details)
+    - [Authentication Changes](#authentication-changes)
+    - [API Implementation Changes](#api-implementation-changes)
+    - [Database URL Requirements](#database-url-requirements)
+    - [File Upload Implementation](#file-upload-implementation)
+    - [Error Handling Improvements](#error-handling-improvements)
+    - [Codebase Structure Changes](#codebase-structure-changes)
+- [Core Architecture](#core-architecture)
+  - [Main Components](#main-components)
+- [Key Features](#key-features)
+  - [Data Import Capabilities](#data-import-capabilities)
+  - [Advanced Operations](#advanced-operations)
+  - [AI Integration](#ai-integration)
+  - [Performance Features](#performance-features)
+- [Development Guidelines](#development-guidelines)
+  - [Code Structure](#code-structure)
+  - [Local Development Workflow](#local-development-workflow)
+  - [Testing Strategy](#testing-strategy)
+  - [Code Quality](#code-quality)
+  - [Dependencies](#dependencies)
+- [API Integration](#api-integration)
+  - [Notion API](#notion-api)
+  - [Hugging Face API](#hugging-face-api)
+- [Configuration Management](#configuration-management)
+  - [Command Line Arguments](#command-line-arguments)
+  - [Environment Variables](#environment-variables)
+- [Error Handling](#error-handling)
+  - [Custom Exceptions](#custom-exceptions)
+  - [Logging Strategy](#logging-strategy)
+- [Security Considerations](#security-considerations)
+  - [Authentication](#authentication)
+  - [Data Privacy](#data-privacy)
+- [Performance Optimization](#performance-optimization)
+  - [Upload Efficiency](#upload-efficiency)
+  - [Memory Management](#memory-management)
+- [Deployment and Distribution](#deployment-and-distribution)
+  - [Packaging](#packaging)
+  - [CI/CD Pipeline](#cicd-pipeline)
+- [Maintenance and Updates](#maintenance-and-updates)
+  - [Version Management](#version-management)
+  - [API Compatibility](#api-compatibility)
+- [Contributing Guidelines](#contributing-guidelines)
+  - [Development Setup](#development-setup)
+  - [Ephemeral Build System](#ephemeral-build-system)
+  - [Code Review Process](#code-review-process)
+  - [Testing Requirements](#testing-requirements)
+- [Troubleshooting](#troubleshooting)
+  - [Common Issues](#common-issues)
+  - [Debug Mode](#debug-mode)
+- [Future Roadmap](#future-roadmap)
+  - [Planned Features](#planned-features)
+  - [Technical Debt](#technical-debt)
+- [Outdated Packages Held Back Due to Dependency Constraints](#outdated-packages-held-back-due-to-dependency-constraints)
+
 ## Project Overview
 
 CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. It serves as a successor to the original csv2notion project, providing enhanced compatibility with Notion's evolving API and additional features like AI-powered image captioning.
@@ -74,8 +132,14 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ## Key Features
 
 ### Data Import Capabilities
-- CSV and JSON file support
-- Enhanced automatic column type detection with intelligent schema analysis
+- CSV and JSON file support with comprehensive delimiter support (comma, semicolon, pipe, tab, etc.)
+- Enhanced automatic column type detection with intelligent schema analysis and smart pattern recognition
+- Timecode detection for video/film data (automatically set to Rich Text)
+- Boolean/checkbox detection with comprehensive pattern matching
+- Status/select detection for limited unique values with semantic meaning
+- Numeric detection for integers, decimals, and percentages
+- URL, email, and phone number pattern recognition
+- Date format detection supporting multiple international formats
 - Manual column type specification
 - Support for all Notion column types (text, number, select, multi_select, date, checkbox, url, email, phone_number, file, person, relation, rollup, formula, created_time, last_edited_time, created_by, last_edited_by)
 - Page URL support for creating databases within existing Notion pages
@@ -98,6 +162,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Rate limiting to respect Notion API limits
 - Progress tracking with tqdm
 - Thread-safe select option management to prevent conflicts during concurrent uploads
+- Database creation within pages with proper initialization delays and retry logic
+- Exponential backoff retry mechanism for 409 Conflict errors
+- Enhanced error handling for concurrent operations
 
 ## Development Guidelines
 
@@ -288,6 +355,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Database access permissions and sharing requirements
 - Database deletion operations requiring proper permissions and database URL validation
 - Race conditions during concurrent select option creation (resolved with thread-safe implementation)
+- Database creation within pages timing issues (resolved with initialization delays and retry logic)
+- CSV delimiter parsing failures (resolved with delimiter parameter fix)
+- 409 Conflict errors during page creation (resolved with exponential backoff retry logic)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

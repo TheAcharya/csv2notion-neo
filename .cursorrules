@@ -138,8 +138,14 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### CSV/JSON Handling
 - Validate input data thoroughly
 - Handle missing or malformed data gracefully
-- Support different delimiters and encodings
-- Implement proper column type detection
+- Support different delimiters and encodings (comma, semicolon, pipe, tab, etc.)
+- Implement proper column type detection with smart auto-detection engine
+- Timecode detection for video/film data (automatically set to Rich Text)
+- Boolean/checkbox detection with comprehensive pattern matching
+- Status/select detection for limited unique values with semantic meaning
+- Numeric detection for integers, decimals, and percentages
+- URL, email, and phone number pattern recognition
+- Date format detection supporting multiple international formats
 
 ### File Operations
 - Use pathlib for file path handling
@@ -155,6 +161,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Monitor thread usage and performance
 - Handle thread-local data appropriately
 - Prevent race conditions in select option management during concurrent uploads
+- Database creation within pages with proper initialization delays
+- Retry logic with exponential backoff for page creation conflicts
+- Enhanced error handling for 409 Conflict errors during concurrent operations
 
 ### Memory Management
 - Process large files in chunks when possible
@@ -327,6 +336,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Build environment issues (use `./scripts/local-test-build.sh --clean` to reset)
 - Database deletion operations requiring proper permissions and database URL validation
 - Race conditions during concurrent select option creation (resolved with thread-safe implementation)
+- Database creation within pages timing issues (resolved with initialization delays and retry logic)
+- CSV delimiter parsing failures (resolved with delimiter parameter fix)
+- 409 Conflict errors during page creation (resolved with exponential backoff retry logic)
 
 ### Performance Issues
 - Monitor thread usage
