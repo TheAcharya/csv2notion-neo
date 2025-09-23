@@ -497,7 +497,7 @@ csv2notion_neo \
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
   --token secret_YOUR_INTEGRATION_TOKEN_HERE \
-  --url PAGE_URL \
+  --url NOTION_URL \
   test.csv
 ```
 
@@ -508,7 +508,7 @@ csv2notion_neo \
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
   --token secret_YOUR_INTEGRATION_TOKEN_HERE \
-  --url PAGE_URL \
+  --url NOTION_URL \
   --payload-key-column "id" \
   data.json
 ```
@@ -553,7 +553,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --merge \
   test.csv
@@ -569,7 +569,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --merge \
   --merge-only-column "Column 2" \
@@ -587,7 +587,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --image-column "Image Column" \
   test.csv
@@ -603,7 +603,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --image-column "Colour Image" "Black & White Image" "Map" \
   --image-column-keep \
@@ -666,7 +666,7 @@ Example Folder Structure
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --icon-column "Icon Column" \
   test.csv
@@ -682,7 +682,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --default-icon 👍 \
   --merge \
@@ -700,7 +700,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --mandatory-column "Cat ID" \
   --payload-key-column "Cat ID" \
@@ -719,7 +719,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --mandatory-column "Cat ID" \
   --payload-key-column "Cat ID" \
@@ -739,7 +739,7 @@ csv2notion_neo \
 ```shell
 csv2notion_neo \
   --workspace YOUR_WORKSPACE_NAME_HERE \
-  --token YOUR_TOKEN_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --hugging-face-token YOUR_HUGGING_FACE_TOKEN_HERE \
   --hf-model blip-image \
@@ -768,23 +768,11 @@ csv2notion_neo \
 </p>
 </details>
 
-### [CommandPost](https://commandpost.io)
-
-<details><summary>CommandPost's Notion Toolbox</summary>
-<p>
-
-<p align="center"> <img src="https://github.com/CommandPost/CommandPost-Website/blob/main/docs/static/toolbox-notion.png?raw=true"> </p>
-
-</p>
-</details>
-
 ## Credits
 
 Original Idea and Workflow Architecture by [Vigneswaran Rajkumar](https://bsky.app/profile/vigneswaranrajkumar.com)
 
 Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
-
-Original Work by [Vladilen Zhdanov](https://github.com/vzhd1701)
 
 Icon Design by [Bor Jen Goh](https://www.artstation.com/borjengoh)
 
