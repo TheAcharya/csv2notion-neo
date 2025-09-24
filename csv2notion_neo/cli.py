@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Command Line Interface
+
+This module provides the main CLI interface for CSV2Notion Neo.
+It handles argument parsing, data processing, and orchestrates the upload process
+to Notion databases using the official Notion API.
+"""
+
 import logging
 import os
 import signal
@@ -15,7 +23,7 @@ from csv2notion_neo.cli_steps import (
     delete_all_database_entries,
 )
 from csv2notion_neo.local_data import LocalData
-from csv2notion_neo.notion_db_official import get_collection_id_official, get_notion_client_official
+from csv2notion_neo.notion_db import get_collection_id, get_notion_client
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
 
 logger = logging.getLogger(__name__)
@@ -29,7 +37,7 @@ def cli(*argv: str) -> None:
         setup_logging(is_verbose=args.verbose, log_file=args.log)
         logger.info(f"CSV2Notion Neo version {__version__}")
 
-        client = get_notion_client_official(
+        client = get_notion_client(
             args.token,
             workspace=args.workspace,
             is_randomize_select_colors=args.randomize_select_colors,
@@ -40,7 +48,7 @@ def cli(*argv: str) -> None:
             if not args.url:
                 raise CriticalError("Database URL is required for --delete-all-database-entries operation")
             
-            collection_id = get_collection_id_official(client, args.url)
+            collection_id = get_collection_id(client, args.url)
             deleted_count = delete_all_database_entries(client, collection_id)
             logger.info(f"Successfully deleted {deleted_count} entries from database")
             return
@@ -72,7 +80,7 @@ def cli(*argv: str) -> None:
         if not args.url:
             args.url = new_database(args, client, csv_data)
 
-        collection_id = get_collection_id_official(client, args.url)
+        collection_id = get_collection_id(client, args.url)
         
         # Check if we got a page ID (indicated by PAGE: prefix)
         if collection_id.startswith("PAGE:"):
@@ -88,8 +96,8 @@ def cli(*argv: str) -> None:
             if args.image_caption_column and not args.image_caption_column_keep:
                 skip_columns.append(args.image_caption_column)
             
-            from csv2notion_neo.notion_db_official import create_database_in_page_official
-            database_url, database_id = create_database_in_page_official(
+            from csv2notion_neo.notion_db import create_database_in_page
+            database_url, database_id = create_database_in_page(
                 client,
                 page_id=page_id,
                 database_name=args.csv_file.stem,  # This works for both CSV and JSON files

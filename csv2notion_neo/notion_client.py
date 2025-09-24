@@ -4,6 +4,62 @@ Official Notion SDK Client Adapter for CSV2Notion Neo
 This module provides a compatibility layer between the existing CSV2Notion Neo
 codebase and the official Notion SDK, ensuring seamless migration without
 breaking existing functionality.
+
+RETRY LOGIC ARCHITECTURE:
+========================
+This module implements a sophisticated retry system with the following characteristics:
+
+1. EXPONENTIAL BACKOFF WITH JITTER:
+   - Formula: base_delay * (2^attempt) + random(0,1) seconds
+   - Prevents thundering herd problems in high concurrency scenarios
+   - Delay progression: 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s, 4096s, 8192s, 16384s, 32768s
+
+2. SMART ERROR HANDLING:
+   - Server errors (5xx): Always retry (temporary server issues)
+   - Rate limits (429): Always retry (temporary rate limiting)
+   - Client errors (4xx): Never retry (permanent client issues)
+   - Network errors: Always retry (temporary connectivity issues)
+   - Conflict errors (409): Always retry (temporary concurrency conflicts)
+
+3. RETRY CONFIGURATION:
+   - max_retries = 14: Total of 15 attempts (0-14 inclusive)
+   - base_delay = 2.0: Base delay in seconds for exponential backoff
+   - Maximum retry time: ~18 hours (though most issues resolve much faster)
+
+4. USE CASE SCENARIOS:
+   - High concurrency: Multiple users uploading simultaneously
+   - Large file uploads: Files that take longer to process
+   - Rate limit scenarios: API rate limiting and throttling
+   - Network instability: Temporary connection issues
+   - Server errors: 503, 504, 429, 409 status codes
+
+5. IMPLEMENTED FUNCTIONS:
+   - upload_file(): File upload operations with retry logic
+   - create_database(): Database creation with retry logic
+   - create_page(): Page creation with retry logic
+
+TWO DISTINCT LOGIC PATHS:
+========================
+This module implements two distinct logic paths for different use cases:
+
+LOGIC PATH 1: CREATE NEW DATABASE IN EMPTY PAGE
+==============================================
+- When: User provides a PAGE URL (not database URL)
+- Function: create_database()
+- Purpose: Creates a new database within an existing page
+- Workflow: Page URL → Create Database → Upload Data
+- Use Case: User wants to create a new database in an existing page
+
+LOGIC PATH 2: UPLOAD TO EXISTING DATABASE
+========================================
+- When: User provides a DATABASE URL (not page URL)
+- Function: create_page()
+- Purpose: Uploads data to an existing database
+- Workflow: Database URL → Upload Data
+- Use Case: User wants to add data to an existing database
+
+This retry system ensures robust operation in production environments with
+high concurrency, large datasets, and network instability.
 """
 
 import logging
@@ -16,7 +72,7 @@ from notion_client.helpers import get_id
 from csv2notion_neo.utils_exceptions import NotionError, CriticalError
 
 
-class NotionClientOfficial:
+class NotionClient:
     """
     Official Notion SDK client adapter that maintains compatibility
     with the existing CSV2Notion Neo codebase.
@@ -217,9 +273,21 @@ class NotionClientOfficial:
             self.logger.warning(f"Failed to get workspace users: {e}")
             return []
     
+    # ============================================================================
+    # SHARED FUNCTION: FILE UPLOAD (USED BY BOTH LOGIC PATHS)
+    # ============================================================================
+    # This function is used by BOTH logic paths:
+    # - LOGIC PATH 1: When creating new databases (for file attachments)
+    # - LOGIC PATH 2: When uploading to existing databases (for file attachments)
+    # - Purpose: Handles file uploads with retry logic for both scenarios
+    # ============================================================================
+    
     def upload_file(self, file_path: Path, parent_block_id: str) -> Tuple[str, Dict[str, Any]]:
         """
         Upload a file using the official API with retry logic.
+        
+        This function is shared between both logic paths and handles file uploads
+        for both new database creation and existing database uploads.
         
         Args:
             file_path: Path to file to upload
@@ -233,9 +301,27 @@ class NotionClientOfficial:
         from requests.exceptions import Timeout, ConnectionError
         from notion_client.errors import APIResponseError
         
-        max_retries = 5
-        base_delay = 2.0
+        # ============================================================================
+        # RETRY CONFIGURATION FOR FILE UPLOAD OPERATIONS
+        # ============================================================================
+        # This section implements robust retry logic for file uploads to handle:
+        # - High concurrency scenarios (multiple users uploading simultaneously)
+        # - Large file uploads (files that take longer to process)
+        # - Rate limit scenarios (API rate limiting and throttling)
+        # - Network instability (temporary connection issues)
+        # - Server errors (503, 504, 429 status codes)
+        #
+        # Configuration:
+        # - max_retries = 14: Total of 15 attempts (0-14 inclusive)
+        # - base_delay = 2.0: Base delay in seconds for exponential backoff
+        # - Exponential backoff formula: base_delay * (2^attempt) + random(0,1)
+        # - Delay progression: 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s, 4096s, 8192s, 16384s, 32768s
+        # - Maximum retry time: ~18 hours (though most issues resolve much faster)
+        # ============================================================================
+        max_retries = 14
+        base_delay = 2.0  # Base delay in seconds for exponential backoff
         
+        # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
             try:
                 # Check file size (20MB limit for single part upload)
@@ -272,32 +358,60 @@ class NotionClientOfficial:
                 return file_url, metadata
                 
             except (APIResponseError, Timeout, ConnectionError) as e:
-                # Check if this is a retryable error
+                # ========================================================================
+                # RETRY LOGIC: SMART ERROR HANDLING WITH EXPONENTIAL BACKOFF
+                # ========================================================================
+                # This section implements intelligent retry logic that:
+                # 1. Analyzes error types to determine if retry is appropriate
+                # 2. Uses exponential backoff with jitter to prevent thundering herd
+                # 3. Handles different error scenarios with appropriate strategies
+                # 4. Provides detailed logging for debugging and monitoring
+                # ========================================================================
+                
+                # Check if we have retry attempts remaining
                 if attempt < max_retries:
-                    # Calculate exponential backoff with jitter
+                    # Calculate exponential backoff with jitter to prevent thundering herd
+                    # Formula: base_delay * (2^attempt) + random(0,1) seconds
+                    # This creates progressive delays: 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s, 4096s, 8192s, 16384s, 32768s
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
                     
-                    # Check for specific error codes that should be retried
+                    # ====================================================================
+                    # SMART RETRY LOGIC BASED ON ERROR TYPE
+                    # ====================================================================
+                    # Different error types require different retry strategies:
+                    # - Server errors (5xx): Always retry (temporary server issues)
+                    # - Rate limits (429): Always retry (temporary rate limiting)
+                    # - Client errors (4xx): Never retry (permanent client issues)
+                    # - Network errors: Always retry (temporary connectivity issues)
+                    # ====================================================================
+                    
                     if hasattr(e, 'status_code'):
-                        if e.status_code in [503, 504, 429]:  # Service unavailable, Gateway timeout, Rate limited
+                        # Retryable server errors: Service unavailable, Gateway timeout, Rate limited
+                        if e.status_code in [503, 504, 429]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
-                        elif e.status_code in [400, 401, 403, 404]:  # Client errors - don't retry
+                        # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
+                        elif e.status_code in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to upload file {file_path}: {e}") from e
                     
-                    # For timeout and connection errors, always retry
+                    # Network issues: Always retry for timeout and connection errors
                     if isinstance(e, (Timeout, ConnectionError)):
                         self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                         time.sleep(delay)
                         continue
                     
-                    # For other API errors, retry with backoff
+                    # Other API errors: Retry with exponential backoff
                     self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                     time.sleep(delay)
                     continue
                 else:
-                    # Max retries exceeded
+                    # ====================================================================
+                    # RETRY EXHAUSTION: ALL ATTEMPTS FAILED
+                    # ====================================================================
+                    # When all retry attempts are exhausted, we raise a detailed error
+                    # that includes the total number of attempts and the final error
+                    # ====================================================================
                     raise NotionError(f"Failed to upload file {file_path} after {max_retries + 1} attempts: {e}") from e
                     
             except Exception as e:
@@ -318,12 +432,26 @@ class NotionClientOfficial:
         content_type, _ = mimetypes.guess_type(str(file_path))
         return content_type or "application/octet-stream"
     
+    # ============================================================================
+    # LOGIC PATH 1: CREATE NEW DATABASE IN EMPTY PAGE
+    # ============================================================================
+    # This function is used when:
+    # - User provides a PAGE URL (not database URL)
+    # - CSV2Notion Neo needs to create a new database within an existing page
+    # - The database doesn't exist yet and needs to be created from scratch
+    # - This is part of the "create database in page" workflow
+    # ============================================================================
+    
     def create_database(self, parent_page_id: str, title: str, properties: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a database using the official API with retry logic.
         
+        This function is part of LOGIC PATH 1: Creating new databases in empty pages.
+        It handles the creation of a new database within an existing page when
+        the user provides a page URL instead of a database URL.
+        
         Args:
-            parent_page_id: Parent page ID
+            parent_page_id: Parent page ID where the database will be created
             title: Database title
             properties: Database properties schema
             
@@ -335,9 +463,27 @@ class NotionClientOfficial:
         from requests.exceptions import Timeout, ConnectionError
         from notion_client.errors import APIResponseError
         
-        max_retries = 5
-        base_delay = 2.0
+        # ============================================================================
+        # RETRY CONFIGURATION FOR DATABASE CREATION OPERATIONS
+        # ============================================================================
+        # This section implements robust retry logic for database creation to handle:
+        # - High concurrency scenarios (multiple users creating databases simultaneously)
+        # - Rate limit scenarios (API rate limiting and throttling)
+        # - Network instability (temporary connection issues)
+        # - Server errors (503, 504, 429, 409 status codes)
+        # - Conflict errors (409) when multiple operations try to create databases
+        #
+        # Configuration:
+        # - max_retries = 14: Total of 15 attempts (0-14 inclusive)
+        # - base_delay = 2.0: Base delay in seconds for exponential backoff
+        # - Exponential backoff formula: base_delay * (2^attempt) + random(0,1)
+        # - Delay progression: 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s, 4096s, 8192s, 16384s, 32768s
+        # - Maximum retry time: ~18 hours (though most issues resolve much faster)
+        # ============================================================================
+        max_retries = 14
+        base_delay = 2.0  # Base delay in seconds for exponential backoff
         
+        # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
             try:
                 response = self.client.databases.create(
@@ -348,41 +494,58 @@ class NotionClientOfficial:
                 return response
                 
             except (APIResponseError, Timeout, ConnectionError) as e:
-                # Check if this is a retryable error
+                # Retry logic: Check if we have attempts remaining
                 if attempt < max_retries:
-                    # Calculate exponential backoff with jitter
+                    # Calculate exponential backoff with jitter to prevent thundering herd
+                    # Formula: base_delay * (2^attempt) + random(0,1) seconds
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
                     
-                    # Check for specific error codes that should be retried
+                    # Smart retry logic based on error type
                     if hasattr(e, 'status_code'):
-                        if e.status_code in [503, 504, 429, 409]:  # Service unavailable, Gateway timeout, Rate limited, Conflict
+                        # Retryable server errors: Service unavailable, Gateway timeout, Rate limited, Conflict
+                        if e.status_code in [503, 504, 429, 409]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
-                        elif e.status_code in [400, 401, 403, 404]:  # Client errors - don't retry
+                        # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
+                        elif e.status_code in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to create database: {e}") from e
                     
-                    # For timeout and connection errors, always retry
+                    # Network issues: Always retry for timeout and connection errors
                     if isinstance(e, (Timeout, ConnectionError)):
                         self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                         time.sleep(delay)
                         continue
                     
-                    # For other API errors, retry with backoff
+                    # Other API errors: Retry with exponential backoff
                     self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                     time.sleep(delay)
                     continue
                 else:
-                    # Max retries exceeded
+                    # All retry attempts exhausted - fail with detailed error
                     raise NotionError(f"Failed to create database after {max_retries + 1} attempts: {e}") from e
                     
             except Exception as e:
                 # Non-retryable errors
                 raise NotionError(f"Error creating database: {e}") from e
     
+    # ============================================================================
+    # LOGIC PATH 2: UPLOAD TO EXISTING DATABASE
+    # ============================================================================
+    # This function is used when:
+    # - User provides a DATABASE URL (not page URL)
+    # - CSV2Notion Neo needs to upload data to an existing database
+    # - The database already exists and we're adding new pages/rows to it
+    # - This is part of the "upload to existing database" workflow
+    # ============================================================================
+    
     def create_page(self, parent: Dict[str, Any], properties: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         """
         Create a page using the official API with retry logic.
+        
+        This function is part of LOGIC PATH 2: Uploading to existing databases.
+        It handles the creation of new pages/rows within an existing database
+        when the user provides a database URL instead of a page URL.
         
         Args:
             parent: Parent object (database or page)
@@ -397,9 +560,28 @@ class NotionClientOfficial:
         from requests.exceptions import Timeout, ConnectionError
         from notion_client.errors import APIResponseError
         
-        max_retries = 5
-        base_delay = 2.0
+        # ============================================================================
+        # RETRY CONFIGURATION FOR PAGE CREATION OPERATIONS
+        # ============================================================================
+        # This section implements robust retry logic for page creation to handle:
+        # - High concurrency scenarios (multiple users creating pages simultaneously)
+        # - Rate limit scenarios (API rate limiting and throttling)
+        # - Network instability (temporary connection issues)
+        # - Server errors (503, 504, 429, 409 status codes)
+        # - Conflict errors (409) when multiple operations try to create pages
+        # - Database/page creation conflicts in concurrent scenarios
+        #
+        # Configuration:
+        # - max_retries = 14: Total of 15 attempts (0-14 inclusive)
+        # - base_delay = 2.0: Base delay in seconds for exponential backoff
+        # - Exponential backoff formula: base_delay * (2^attempt) + random(0,1)
+        # - Delay progression: 2s, 4s, 8s, 16s, 32s, 64s, 128s, 256s, 512s, 1024s, 2048s, 4096s, 8192s, 16384s, 32768s
+        # - Maximum retry time: ~18 hours (though most issues resolve much faster)
+        # ============================================================================
+        max_retries = 14
+        base_delay = 2.0  # Base delay in seconds for exponential backoff
         
+        # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
             try:
                 response = self.client.pages.create(
@@ -410,32 +592,35 @@ class NotionClientOfficial:
                 return response
                 
             except (APIResponseError, Timeout, ConnectionError) as e:
-                # Check if this is a retryable error
+                # Retry logic: Check if we have attempts remaining
                 if attempt < max_retries:
-                    # Calculate exponential backoff with jitter
+                    # Calculate exponential backoff with jitter to prevent thundering herd
+                    # Formula: base_delay * (2^attempt) + random(0,1) seconds
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
                     
-                    # Check for specific error codes that should be retried
+                    # Smart retry logic based on error type
                     if hasattr(e, 'status_code'):
-                        if e.status_code in [503, 504, 429, 409]:  # Service unavailable, Gateway timeout, Rate limited, Conflict
+                        # Retryable server errors: Service unavailable, Gateway timeout, Rate limited, Conflict
+                        if e.status_code in [503, 504, 429, 409]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
-                        elif e.status_code in [400, 401, 403, 404]:  # Client errors - don't retry
+                        # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
+                        elif e.status_code in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to create page: {e}") from e
                     
-                    # For timeout and connection errors, always retry
+                    # Network issues: Always retry for timeout and connection errors
                     if isinstance(e, (Timeout, ConnectionError)):
                         self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                         time.sleep(delay)
                         continue
                     
-                    # For other API errors, retry with backoff
+                    # Other API errors: Retry with exponential backoff
                     self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                     time.sleep(delay)
                     continue
                 else:
-                    # Max retries exceeded
+                    # All retry attempts exhausted - fail with detailed error
                     raise NotionError(f"Failed to create page after {max_retries + 1} attempts: {e}") from e
                     
             except Exception as e:
@@ -485,11 +670,11 @@ class NotionClientOfficial:
             raise NotionError(f"Failed to query database {database_id}: {e}") from e
 
 
-def get_notion_client_official(
+def get_notion_client(
     integration_token: str, 
     workspace: Optional[str] = None, 
     **options
-) -> NotionClientOfficial:
+) -> NotionClient:
     """
     Factory function to create official Notion client - maintains compatibility.
     
@@ -499,10 +684,10 @@ def get_notion_client_official(
         **options: Additional options
         
     Returns:
-        NotionClientOfficial instance
+        NotionClient instance
     """
     try:
-        client = NotionClientOfficial(
+        client = NotionClient(
             integration_token=integration_token,
             workspace=workspace,
             **options
@@ -510,3 +695,36 @@ def get_notion_client_official(
         return client
     except Exception as e:
         raise NotionError(f"Failed to initialize Notion client: {e}") from e
+
+
+# ============================================================================
+# LOGIC PATH SUMMARY
+# ============================================================================
+# This module implements two distinct logic paths for CSV2Notion Neo:
+#
+# LOGIC PATH 1: CREATE NEW DATABASE IN EMPTY PAGE
+# ===============================================
+# - Function: create_database()
+# - When: User provides PAGE URL
+# - Purpose: Creates new database within existing page
+# - Workflow: Page URL → Create Database → Upload Data
+# - Retry Logic: 15 attempts with exponential backoff
+#
+# LOGIC PATH 2: UPLOAD TO EXISTING DATABASE
+# =========================================
+# - Function: create_page()
+# - When: User provides DATABASE URL
+# - Purpose: Uploads data to existing database
+# - Workflow: Database URL → Upload Data
+# - Retry Logic: 15 attempts with exponential backoff
+#
+# SHARED FUNCTION: FILE UPLOAD
+# ===========================
+# - Function: upload_file()
+# - Used by: Both logic paths
+# - Purpose: Handles file attachments for both scenarios
+# - Retry Logic: 15 attempts with exponential backoff
+#
+# All functions implement the same robust retry system with exponential backoff,
+# smart error handling, and comprehensive logging for production environments.
+# ============================================================================

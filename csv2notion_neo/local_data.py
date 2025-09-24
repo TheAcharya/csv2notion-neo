@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Local Data Processing
+
+This module handles the processing and validation of local CSV and JSON data files.
+It provides intelligent column type detection, data validation, and preparation
+for upload to Notion databases.
+"""
+
 import csv
 import json
 import logging

@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - String Utilities
+
+This module provides string processing utilities for data manipulation,
+including string splitting functions used for parsing CSV data and
+handling multi-value fields in Notion databases.
+"""
+
 from typing import List
 from icecream import ic
 

@@ -1,8 +1,16 @@
+"""
+CSV2Notion Neo - Notion Uploader
+
+This module handles the uploading of processed data to Notion databases.
+It manages the upload process, including AI-powered content generation,
+image processing, and database operations using the official Notion API.
+"""
+
 import logging
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from csv2notion_neo.notion_db_official import NotionDBOfficial
+from csv2notion_neo.notion_db import NotionDB
 from icecream import ic
 from csv2notion_neo.utils_ai import AI
 
@@ -22,7 +30,7 @@ class NotionUploadRow(object):
 
 
 class NotionRowUploader(object):
-    def __init__(self, db: NotionDBOfficial):
+    def __init__(self, db: NotionDB):
         self.db = db
 
     def upload_row(self, row: NotionUploadRow, is_merge: bool) -> None:
@@ -69,7 +77,7 @@ class NotionRowUploader(object):
     def _process_image_uploads(self, db_row: Dict[str, Any], post_properties: Dict[str, Any]) -> None:
         """Process image uploads using the official Notion API."""
         from pathlib import Path
-        from csv2notion_neo.notion_row_upload_file_official import upload_filetype_official
+        from csv2notion_neo.notion_row_upload_file import upload_filetype
         
         page_id = db_row.get("id")
         if not page_id:
@@ -84,7 +92,7 @@ class NotionRowUploader(object):
                         try:
                             # Upload the image file
                             if isinstance(image, Path):
-                                image_url, metadata = upload_filetype_official(self.db.client, image)
+                                image_url, metadata = upload_filetype(self.db.client, image)
                                 # For uploaded files, use file_upload with the file upload ID
                                 if "file_id" in metadata:
                                     image_block = {
@@ -132,7 +140,7 @@ class NotionRowUploader(object):
                     cover_image = cover_images[0]
                     # Upload the cover image file
                     if isinstance(cover_image, Path):
-                        cover_url, metadata = upload_filetype_official(self.db.client, cover_image)
+                        cover_url, metadata = upload_filetype(self.db.client, cover_image)
                         # For uploaded files, use file_upload with the file upload ID
                         if "file_id" in metadata:
                             cover_data = {
@@ -170,7 +178,7 @@ class NotionRowUploader(object):
                 try:
                     # Upload the icon file
                     if isinstance(icon, Path):
-                        icon_url, metadata = upload_filetype_official(self.db.client, icon)
+                        icon_url, metadata = upload_filetype(self.db.client, icon)
                         # For uploaded files, use file_upload with the file upload ID
                         if "file_id" in metadata:
                             icon_data = {

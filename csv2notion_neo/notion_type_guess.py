@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Intelligent Type Detection
+
+This module provides intelligent column type detection for CSV data.
+It analyzes data patterns to automatically determine the most appropriate
+Notion property types for each column, including dates, numbers, URLs, emails, etc.
+"""
+
 import math
 import re
 from typing import List

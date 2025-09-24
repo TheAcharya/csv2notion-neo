@@ -1,3 +1,12 @@
+"""
+CSV2Notion Neo - Data Conversion Engine
+
+This module provides the core data conversion engine for CSV2Notion Neo.
+It handles the conversion of CSV/JSON data to Notion-compatible formats,
+including complex data transformations, relation mapping, file handling,
+AI integration, and comprehensive error handling with validation.
+"""
+
 import logging
 from functools import partial
 from pathlib import Path
@@ -14,7 +23,7 @@ from csv2notion_neo.notion_convert_map import (
     map_number,
     map_url_or_file,
 )
-from csv2notion_neo.notion_db_official import NotionDBOfficial
+from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.notion_type_guess import is_email
 from csv2notion_neo.notion_uploader import NotionUploadRow
 from csv2notion_neo.utils_exceptions import (
@@ -30,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 
 class NotionRowConverter(object):  # noqa:  WPS214
-    def __init__(self, db: NotionDBOfficial, conversion_rules: ConversionRules):
+    def __init__(self, db: NotionDB, conversion_rules: ConversionRules):
         self.db = db
         self.rules = conversion_rules
         self._current_row = 0
@@ -369,7 +378,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _extract_id(self, url: str) -> Optional[str]:
         try:
-            from csv2notion_neo.notion_db_official import _extract_database_id_from_url
+            from csv2notion_neo.notion_db import _extract_database_id_from_url
             return _extract_database_id_from_url(url)
         except Exception:
             self._error(f"'{url}' is not a valid Notion URL.")

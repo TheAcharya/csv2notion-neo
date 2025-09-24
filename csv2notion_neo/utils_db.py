@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Database Utilities
+
+This module provides database-related utility functions for creating
+Notion database schemas, including status columns with predefined
+options and groups for project management workflows.
+"""
+
 import uuid
 from typing import Any, Dict
 

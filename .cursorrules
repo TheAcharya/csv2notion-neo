@@ -11,24 +11,30 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Migration Implementation Details
 
 #### New File Structure
-- `csv2notion_neo/notion_client_official.py`: Official Notion API client wrapper
-- `csv2notion_neo/notion_db_official.py`: Database operations using official API with enhanced schema detection and thread-safe select option management
-- `csv2notion_neo/notion_row_upload_file_official.py`: File upload operations
-- `csv2notion_neo/notion_db_client_official.py`: Compatibility layer for existing code
+- `csv2notion_neo/notion_client.py`: Notion API client wrapper with comprehensive retry logic
+- `csv2notion_neo/notion_db.py`: Database operations with enhanced schema detection and thread-safe select option management
+- `csv2notion_neo/notion_row_upload_file.py`: File upload operations with retry logic
+- `csv2notion_neo/notion_db_client.py`: Extended client with additional functionality
 
 #### Removed Components
-- `csv2notion_neo/notion/` directory: Entire unofficial API implementation
+- `csv2notion_neo/notion/` directory: Legacy API implementation
 - `csv2notion_neo/notion_row.py`: Old row handling classes
 - `csv2notion_neo/notion_db_collection.py`: Old collection management
+- `csv2notion_neo/notion_client_official.py`: Renamed to `notion_client.py`
+- `csv2notion_neo/notion_db_official.py`: Renamed to `notion_db.py`
+- `csv2notion_neo/notion_row_upload_file_official.py`: Renamed to `notion_row_upload_file.py`
+- `csv2notion_neo/notion_db_client_official.py`: Renamed to `notion_db_client.py`
 
 #### Key Implementation Changes
 - Authentication: Integration tokens instead of session cookies
-- Database Operations: Official databases API endpoints with page URL support for creating databases within existing pages
-- File Uploads: Official file_uploads API endpoints
-- Error Handling: Official API error codes and responses
-- Rate Limiting: Built-in official API rate limiting
-- Property Validation: Official API property type validation with intelligent schema detection
+- Database Operations: Notion databases API endpoints with page URL support for creating databases within existing pages
+- File Uploads: Notion file_uploads API endpoints with comprehensive retry logic
+- Error Handling: Notion API error codes and responses with smart retry strategies
+- Rate Limiting: Built-in API rate limiting with exponential backoff
+- Property Validation: API property type validation with intelligent schema detection
 - Thread Safety: Thread-safe select option management to prevent race conditions during concurrent uploads
+- Retry Logic: Enhanced retry system with 15 attempts, exponential backoff, and jitter for production reliability
+- Logic Path Separation: Clear distinction between creating new databases in pages vs uploading to existing databases
 
 #### Compatibility Layer
 - Maintains existing method signatures where possible
@@ -118,14 +124,17 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ## API Integration Patterns
 
 ### Notion API
-- Use the official Notion API client implementation in csv2notion_neo/notion_client_official.py
+- Use the Notion API client implementation in csv2notion_neo/notion_client.py
 - Utilise the notion-sdk-py library for all Notion API interactions
-- Handle official API responses and error codes properly
-- Implement proper rate limiting using official API guidelines
-- Use official file_uploads endpoints for file operations
-- Follow official Notion API specifications and best practices
+- Handle API responses and error codes properly with comprehensive retry logic
+- Implement proper rate limiting using API guidelines with exponential backoff
+- Use file_uploads endpoints for file operations with retry mechanisms
+- Follow Notion API specifications and best practices
+- Implement smart retry logic with 15 attempts, exponential backoff, and jitter
+- Handle different error types with appropriate retry strategies (server errors, rate limits, network issues)
+- Support two distinct logic paths: creating new databases in pages vs uploading to existing databases
 - Reference: [notion-sdk-py documentation](https://ramnes.github.io/notion-sdk-py/)
-- Reference: [Official Notion API documentation](https://developers.notion.com/)
+- Reference: [Notion API documentation](https://developers.notion.com/)
 
 ### Hugging Face API
 - Implement retry logic for model loading
@@ -162,10 +171,12 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Handle thread-local data appropriately
 - Prevent race conditions in select option management during concurrent uploads
 - Database creation within pages with proper initialization delays
-- Enhanced retry logic with 5 max retries and exponential backoff for API errors
+- Enhanced retry logic with 15 max retries and exponential backoff for API errors
 - Comprehensive retry mechanism for file uploads, page creation, and database operations
 - Robust error handling for 503 Service Unavailable, timeout, and 409 Conflict errors
 - Enhanced error handling for 409 Conflict errors during concurrent operations
+- Smart retry logic with jitter to prevent thundering herd problems
+- Production-ready retry system handling high concurrency, large files, and rate limits
 
 ### Memory Management
 - Process large files in chunks when possible
@@ -330,8 +341,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Common Issues
 - Integration token expiration or invalid tokens
-- Official API rate limiting
-- File upload failures through official endpoints (resolved with enhanced retry logic)
+- API rate limiting (resolved with 15-attempt retry logic and exponential backoff)
+- File upload failures through API endpoints (resolved with enhanced retry logic)
 - Network connectivity issues (resolved with comprehensive retry mechanism)
 - Memory usage problems
 - Database access permissions and sharing requirements
@@ -343,6 +354,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - 409 Conflict errors during page creation (resolved with exponential backoff retry logic)
 - 503 Service Unavailable and timeout errors during uploads (resolved with enhanced retry mechanism)
 - Transient API errors and network connectivity issues (resolved with comprehensive retry logic)
+- High concurrency scenarios (resolved with smart retry logic and jitter)
+- Large file uploads (resolved with extended retry windows)
+- Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 
 ### Performance Issues
 - Monitor thread usage

@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - File Utilities
+
+This module provides file-related utility functions for file integrity
+verification, including SHA256 hash generation for uploaded files
+to ensure data integrity during the upload process.
+"""
+
 import hashlib
 from pathlib import Path
 

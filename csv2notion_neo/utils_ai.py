@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - AI Utilities
+
+This module provides AI-powered utilities for content generation and processing.
+It integrates with Hugging Face models to enhance data processing capabilities
+and provide intelligent content generation features.
+"""
+
 import shutil, os
 import logging
 from tqdm import tqdm

@@ -94,11 +94,14 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Benefits: Better error messages, standardised error handling, official documentation
 
 #### Codebase Structure Changes
-- Removed: `csv2notion_neo/notion/` directory (unofficial API implementation)
-- Added: `csv2notion_neo/notion_client_official.py` (official API client wrapper)
-- Added: `csv2notion_neo/notion_db_official.py` (official database operations with enhanced schema detection)
-- Added: `csv2notion_neo/notion_row_upload_file_official.py` (official file uploads)
-- Added: `csv2notion_neo/notion_db_client_official.py` (compatibility layer)
+- Removed: `csv2notion_neo/notion/` directory (legacy API implementation)
+- Added: `csv2notion_neo/notion_client.py` (API client wrapper with comprehensive retry logic)
+- Added: `csv2notion_neo/notion_db.py` (database operations with enhanced schema detection)
+- Added: `csv2notion_neo/notion_row_upload_file.py` (file uploads with retry logic)
+- Added: `csv2notion_neo/notion_db_client.py` (extended client with additional functionality)
+- Renamed: All "_official" suffixed files to clean names without suffixes
+- Enhanced: Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
+- Improved: Clear separation between two distinct logic paths for database operations
 
 ## Core Architecture
 
@@ -114,10 +117,13 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
    - Manages column types and data structure
    - Handles AI feature integration
 
-3. Notion Integration (`csv2notion_neo/notion_client_official.py`, `csv2notion_neo/notion_db_official.py`)
-   - Official Notion API client implementation using notion-sdk-py
-   - Database and collection management with official API
-   - File upload and block operations through official endpoints
+3. Notion Integration (`csv2notion_neo/notion_client.py`, `csv2notion_neo/notion_db.py`)
+   - Notion API client implementation using notion-sdk-py
+   - Database and collection management with API
+   - File upload and block operations through API endpoints
+   - Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
+   - Smart error handling for different error types (server errors, rate limits, network issues)
+   - Two distinct logic paths: creating new databases in pages vs uploading to existing databases
 
 4. Conversion Engine (`csv2notion_neo/notion_convert.py`)
    - Converts CSV/JSON data to Notion format
@@ -159,14 +165,17 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Performance Features
 - Multithreaded uploads for improved speed with race condition prevention
-- Rate limiting to respect Notion API limits
+- Rate limiting to respect Notion API limits with exponential backoff
 - Progress tracking with tqdm
 - Thread-safe select option management to prevent conflicts during concurrent uploads
 - Database creation within pages with proper initialization delays and retry logic
-- Enhanced retry mechanism with 5 max retries and exponential backoff for API errors
+- Enhanced retry mechanism with 15 max retries and exponential backoff for API errors
 - Robust error handling for 503 Service Unavailable, timeout, and 409 Conflict errors
 - Comprehensive retry logic for file uploads, page creation, and database operations
 - Enhanced error handling for concurrent operations
+- Smart retry logic with jitter to prevent thundering herd problems
+- Production-ready retry system handling high concurrency, large files, and rate limits
+- Two distinct logic paths with optimized retry strategies for different scenarios
 
 ## Development Guidelines
 
@@ -205,12 +214,15 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ## API Integration
 
 ### Notion API
-- Official Notion API client implementation using notion-sdk-py library
-- Support for all official Notion API endpoints (databases, pages, blocks, users, file uploads)
-- File upload handling through official file_uploads endpoints
-- Built-in rate limiting and error handling from the official SDK
+- Notion API client implementation using notion-sdk-py library
+- Support for all Notion API endpoints (databases, pages, blocks, users, file uploads)
+- File upload handling through file_uploads endpoints with comprehensive retry logic
+- Built-in rate limiting and error handling from the SDK with exponential backoff
 - Integration token authentication for enhanced security
-- Full compatibility with Notion's official API specifications
+- Full compatibility with Notion's API specifications
+- Smart retry logic with 15 attempts, exponential backoff, and jitter for production reliability
+- Two distinct logic paths: creating new databases in pages vs uploading to existing databases
+- Enhanced error handling for different error types (server errors, rate limits, network issues)
 
 ### Hugging Face API
 - Integration with Hugging Face inference API
@@ -350,8 +362,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Common Issues
 - Integration token expiration or invalid tokens
-- Rate limiting from official Notion API
-- File upload failures through official endpoints (resolved with enhanced retry logic)
+- Rate limiting from Notion API (resolved with 15-attempt retry logic and exponential backoff)
+- File upload failures through API endpoints (resolved with enhanced retry logic)
 - AI model loading issues
 - Column type conversion errors
 - Database access permissions and sharing requirements
@@ -362,6 +374,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - 409 Conflict errors during page creation (resolved with exponential backoff retry logic)
 - 503 Service Unavailable and timeout errors during uploads (resolved with enhanced retry mechanism)
 - Transient API errors and network connectivity issues (resolved with comprehensive retry logic)
+- High concurrency scenarios (resolved with smart retry logic and jitter)
+- Large file uploads (resolved with extended retry windows)
+- Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

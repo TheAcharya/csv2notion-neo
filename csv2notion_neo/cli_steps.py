@@ -8,8 +8,8 @@ from tqdm import tqdm
 
 from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_convert import NotionRowConverter
-from csv2notion_neo.notion_db_official import NotionDBOfficial, notion_db_from_csv_official
-from csv2notion_neo.notion_client_official import NotionClientOfficial
+from csv2notion_neo.notion_db import NotionDB, notion_db_from_csv
+from csv2notion_neo.notion_client import NotionClient
 from csv2notion_neo.notion_preparator import NotionPreparator
 from csv2notion_neo.notion_uploader import NotionUploadRow
 from csv2notion_neo.utils_static import ConversionRules
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 def delete_all_database_entries(
-    client: NotionClientOfficial, collection_id: str
+    client: NotionClient, collection_id: str
 ) -> int:
     """
     Delete all entries from a Notion database.
@@ -33,14 +33,14 @@ def delete_all_database_entries(
     """
     logger.info("Starting deletion of all database entries...")
     
-    notion_db = NotionDBOfficial(client, collection_id)
+    notion_db = NotionDB(client, collection_id)
     deleted_count = notion_db.delete_all_entries()
     
     return deleted_count
 
 
 def new_database(
-    args: Namespace, client: NotionClientOfficial, csv_data: LocalData
+    args: Namespace, client: NotionClient, csv_data: LocalData
 ) -> str:
     skip_columns = []
     if args.image_column and not args.image_column_keep:
@@ -52,7 +52,7 @@ def new_database(
 
     logger.info("Creating new database")
 
-    url, collection_id = notion_db_from_csv_official(
+    url, collection_id = notion_db_from_csv(
         client,
         page_name=args.csv_file.stem,
         csv_data=csv_data,
@@ -66,11 +66,11 @@ def new_database(
 
 def convert_csv_to_notion_rows(
     csv_data: LocalData,
-    client: NotionClientOfficial,
+    client: NotionClient,
     collection_id: str,
     args: Namespace,
 ) -> List[NotionUploadRow]:
-    notion_db = NotionDBOfficial(client, collection_id)
+    notion_db = NotionDB(client, collection_id)
 
     conversion_rules = ConversionRules.from_args(args)
 
@@ -83,7 +83,7 @@ def convert_csv_to_notion_rows(
 
 def upload_rows(
     notion_rows: List[NotionUploadRow],
-    client: NotionClientOfficial,
+    client: NotionClient,
     collection_id: str,
     is_merge: bool,
     max_threads: int,

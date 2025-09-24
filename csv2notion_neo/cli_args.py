@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Command Line Argument Parser
+
+This module provides comprehensive command line argument parsing for CSV2Notion Neo.
+It handles all CLI options including file uploads, database management, column types,
+merge operations, validation settings, and AI-powered features with proper validation.
+"""
+
 import argparse
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union

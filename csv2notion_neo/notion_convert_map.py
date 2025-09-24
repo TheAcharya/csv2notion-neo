@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Data Type Conversion Mappings
+
+This module provides mapping functions for converting CSV/JSON data types
+to Notion-compatible formats. It handles checkbox, date, number, icon, and URL
+conversions with proper validation and error handling.
+"""
+
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
