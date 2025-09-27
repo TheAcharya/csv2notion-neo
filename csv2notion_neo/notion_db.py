@@ -370,27 +370,31 @@ class NotionDB:
                 has_more = response.get("has_more", False)
                 next_cursor = response.get("next_cursor")
             
+            # Check if database is empty
+            if not all_pages:
+                self.logger.info("Database is empty - no entries to delete")
+                return 0
+            
             # Now archive all pages with progress bar
-            if all_pages:
-                with tqdm(total=len(all_pages), desc="Deleting database entries", unit="entries", leave=False) as pbar:
-                    for page in all_pages:
-                        page_id = page["id"]
-                        try:
-                            # Archive the page (soft delete)
-                            self.client.client.pages.update(
-                                page_id=page_id,
-                                archived=True
-                            )
-                            deleted_count += 1
-                            
-                            # Rate limiting: wait 0.35 seconds between requests
-                            time.sleep(0.35)
-                            
-                        except Exception as e:
-                            logger.warning(f"Failed to archive page {page_id}: {e}")
-                            continue
+            with tqdm(total=len(all_pages), desc="Deleting database entries", unit="entries", leave=False) as pbar:
+                for page in all_pages:
+                    page_id = page["id"]
+                    try:
+                        # Archive the page (soft delete)
+                        self.client.client.pages.update(
+                            page_id=page_id,
+                            archived=True
+                        )
+                        deleted_count += 1
                         
-                        pbar.update(1)
+                        # Rate limiting: wait 0.35 seconds between requests
+                        time.sleep(0.35)
+                        
+                    except Exception as e:
+                        logger.warning(f"Failed to archive page {page_id}: {e}")
+                        continue
+                    
+                    pbar.update(1)
             
             # Clear cache since we've modified the database
             self._cache_rows = None

@@ -49,8 +49,20 @@ def cli(*argv: str) -> None:
                 raise CriticalError("Database URL is required for --delete-all-database-entries operation")
             
             collection_id = get_collection_id(client, args.url)
+            
+            # Check if a page URL was provided instead of a database URL
+            if collection_id.startswith("PAGE:"):
+                raise CriticalError(
+                    "Page URL provided, but --delete-all-database-entries requires a database URL. "
+                    "Please provide the URL of an existing Notion database, not a page."
+                )
+            
             deleted_count = delete_all_database_entries(client, collection_id)
-            logger.info(f"Successfully deleted {deleted_count} entries from database")
+            
+            if deleted_count == 0:
+                logger.info("Database is already empty - no entries to delete")
+            else:
+                logger.info(f"Successfully deleted {deleted_count} entries from database")
             return
 
         # Check if file is provided for normal operations
