@@ -1,6 +1,6 @@
 # CSV2Notion Neo - Test Suite
 
-This directory contains the comprehensive test suite for CSV2Notion Neo, including test data sets, integration tests, and automated testing scripts.
+This directory contains the modular test suite for CSV2Notion Neo, including test data sets, integration tests, and automated testing scripts.
 
 ## Overview
 
@@ -8,6 +8,7 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - CSV and JSON file uploads
 - Image and icon handling
 - Database merging operations
+- Database entry deletion
 - Notion API integration
 - Error handling and validation
 
@@ -15,24 +16,26 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 
 ```
 tests/
-├── __init__.py                    # Python package initialization
-├── README.md                      # This file
-├── test_upload.py                 # Main integration test suite
-├── input_command.py               # Test configuration and arguments
-├── upload-markers_json-rename-key.sh  # Automated upload script
-├── log.txt                        # Test execution logs (generated during testing)
-└── assets/                        # Test data and media files
-    ├── notion-upload-test.json    # JSON test data
-    ├── icon-marker*.png           # Icon test images
-    └── notion-upload-test_*.gif   # Animated test images
-    └── notion-upload-test_*-Palette.jpg  # Static test images
+├── __init__.py                           # Python package initialization
+├── README.md                             # This file
+├── test_upload.py                        # Upload functionality test suite
+├── test_delete_database_entries.py       # Delete database entries test suite
+├── input_command.py                      # Test configuration and arguments
+├── upload-markers_json-rename-key.sh     # Manual upload test script (not used in CI)
+├── upload-markers-delete-database-entries.sh  # Manual delete test script (not used in CI)
+├── log.txt                               # Test execution logs (generated during testing)
+└── assets/                               # Test data and media files
+    ├── notion-upload-test.json           # JSON test data
+    ├── icon-marker*.png                  # Icon test images
+    ├── notion-upload-test_*.gif          # Animated test images
+    └── notion-upload-test_*-Palette.jpg   # Static test images
 ```
 
 ## Test Components
 
-### 1. Integration Tests (test_upload.py)
+### 1. Upload Tests (test_upload.py)
 
-The main test suite that validates end-to-end functionality:
+The upload test suite that validates CSV/JSON upload functionality:
 
 - Test Setup: Uses pytest fixtures for client and data initialization
 - Upload Testing: Validates CSV/JSON upload to Notion databases
@@ -40,13 +43,25 @@ The main test suite that validates end-to-end functionality:
 - Image Handling: Validates image upload and processing
 - Error Handling: Tests various error scenarios
 
+### 2. Delete Database Entries Tests (test_delete_database_entries.py)
+
+The delete test suite that validates database entry deletion functionality:
+
+- Delete Testing: Validates deletion of all database entries
+- URL Validation: Tests proper database URL requirements
+- Error Handling: Tests various deletion error scenarios
+- API Integration: Tests Notion API delete operations
+
 #### Usage
 ```bash
 # Run all tests
 pytest tests/
 
-# Run specific test file
+# Run upload tests only
 pytest tests/test_upload.py
+
+# Run delete tests only
+pytest tests/test_delete_database_entries.py
 
 # Run with verbose output
 pytest tests/ -v
@@ -55,7 +70,7 @@ pytest tests/ -v
 pytest tests/ --cov=csv2notion_neo
 ```
 
-### 2. Test Configuration (input_command.py)
+### 3. Test Configuration (input_command.py)
 
 Contains test configuration and argument definitions:
 
@@ -80,22 +95,33 @@ ARGS_DICT = {
 }
 ```
 
-### 3. Automated Upload Script (upload-markers_json-rename-key.sh)
+### 4. Manual Test Scripts
 
-Shell script for automated testing and validation:
+Shell scripts for manual testing and validation (NOT used in GitHub CI):
 
+#### Upload Script (upload-markers_json-rename-key.sh)
 - Automated Uploads: Runs CSV2Notion Neo with predefined parameters
 - Logging: Captures detailed execution logs to tests/log.txt
 - Error Handling: Provides feedback on upload success/failure
 - Configurable: Easy to modify for different test scenarios
 
+#### Delete Script (upload-markers-delete-database-entries.sh)
+- Delete Operations: Runs CSV2Notion Neo with delete-all-database-entries flag
+- Logging: Captures detailed execution logs to tests/log.txt
+- Error Handling: Provides feedback on deletion success/failure
+- Manual Testing: Available for local development and manual testing
+
 #### Usage
 ```bash
-# Make executable
+# Make scripts executable
 chmod +x tests/upload-markers_json-rename-key.sh
+chmod +x tests/upload-markers-delete-database-entries.sh
 
-# Run automated upload test
+# Run manual upload test
 ./tests/upload-markers_json-rename-key.sh
+
+# Run manual delete test
+./tests/upload-markers-delete-database-entries.sh
 
 # Check test logs
 cat tests/log.txt
@@ -133,8 +159,9 @@ Create a .env file in the project root with:
 
 ```bash
 # Notion API Configuration
-NOTION_TOKEN_A=your_notion_token_here
-NOTION_URL_A=your_notion_database_url_here
+NOTION_TOKEN=your_notion_token_here
+NOTION_URL=your_notion_database_url_here
+NOTION_WORKSPACE=your_workspace_name
 
 # Optional: Hugging Face for AI testing
 HUGGING_FACE_TOKEN=your_hf_token_here
@@ -170,25 +197,39 @@ cat tests/log.txt
 
 ### CI/CD Testing
 
-The test suite is integrated with GitHub Actions:
+The test suite is integrated with GitHub Actions workflows:
+
+#### Upload Tests (notion_image_upload_test.yml)
+- Runs every Saturday at 8 AM Singapore time
+- Tests upload functionality with pytest
+- Command: `pytest tests/test_upload.py -v -s`
+
+#### Delete Tests (notion_delete_database_entries_test.yml)
+- Runs every Saturday at 10 AM Singapore time
+- Tests delete database entries functionality with pytest
+- Command: `pytest tests/test_delete_database_entries.py -v -s`
 
 ```yaml
 # Example GitHub Actions step
 - name: Run Tests
   run: |
     poetry install
-    poetry run pytest tests/ -v
+    poetry run pytest tests/test_upload.py -v -s
 ```
 
-### Automated Upload Testing
+### Manual Testing
 
 ```bash
 # Configure environment variables
-export NOTION_TOKEN_A="your_token"
-export NOTION_URL_A="your_database_url"
+export NOTION_TOKEN="your_token"
+export NOTION_URL="your_database_url"
+export NOTION_WORKSPACE="your_workspace"
 
-# Run automated upload test
+# Run manual upload test
 ./tests/upload-markers_json-rename-key.sh
+
+# Run manual delete test
+./tests/upload-markers-delete-database-entries.sh
 
 # Review test logs
 cat tests/log.txt
@@ -211,12 +252,17 @@ cat tests/log.txt
 - Key-based row matching
 - Partial column updates
 
-### 4. Error Handling
+### 4. Database Deletion Testing
+- Delete all database entries
+- Database URL validation
+- Error handling for invalid URLs
+
+### 5. Error Handling
 - Invalid data scenarios
 - API error responses
 - Network connectivity issues
 
-### 5. Performance Testing
+### 6. Performance Testing
 - Large dataset uploads
 - Concurrent upload operations
 - Memory usage validation
@@ -274,8 +320,9 @@ mv tests/log.txt tests/log_$(date +%Y%m%d_%H%M%S).txt
 1. Environment Variables Not Set
    ```bash
    # Check environment variables
-   echo $NOTION_TOKEN_A
-   echo $NOTION_URL_A
+   echo $NOTION_TOKEN
+   echo $NOTION_URL
+   echo $NOTION_WORKSPACE
    ```
 
 2. Test Database Access
@@ -341,9 +388,11 @@ Tests are integrated with pre-commit hooks:
 ### Continuous Integration
 
 Tests run automatically on:
-- Pull requests
-- Main branch commits
-- Release builds
+- Scheduled runs (every Saturday)
+- Manual workflow dispatch
+- Pull requests (if configured)
+- Main branch commits (if configured)
+- Release builds (if configured)
 
 ## Support
 
