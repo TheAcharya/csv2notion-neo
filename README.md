@@ -112,10 +112,10 @@ $ poetry run csv2notion_neo
 
 ## Migration Guide (v2.0.0+)
 
-**Important**: CSV2Notion Neo v2.0.0+ uses the official Notion API and requires integration tokens instead of session cookies.
+**Important**: CSV2Notion Neo v2.0.0+ uses the official Notion API and requires integration tokens instead of session cookies tokens.
 
 ### What Changed:
-- Token Type: Now uses Notion integration tokens (starts with `ntn` or `secret_`) instead of `token_v2` session cookies
+- Token Type: Now uses Notion integration tokens (starts with `ntn_`) instead of `token_v2` or `v03%` session cookies tokens
 - Database URL: Now requires `--url` parameter (database URL or page URL is mandatory)
 - Authentication: More secure and reliable authentication method
 - API: Uses official Notion API for better compatibility and performance
@@ -292,7 +292,7 @@ The tool also requires you to provide a Notion integration token through the `--
 
 2. **Copy Integration Token:**
    - After creating the integration, you'll see the "Internal Integration Token"
-   - Copy this token (starts with `ntn` or `secret_`)
+   - Copy this token (starts with `ntn_`)
 
 3. **Share Database with Integration:**
    - Pick (or create) a Notion page
