@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# CSV2Notion Neo - Upload Test Script
+# This script is NOT used in GitHub CI workflows
+# It's available for manual testing and local development
+# The CI uses pytest tests instead
+
 TOOL_PATH="poetry run csv2notion_neo"
 NOTION_WORKSPACE=""
 NOTION_TOKEN=""

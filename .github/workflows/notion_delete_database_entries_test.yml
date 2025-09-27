@@ -1,10 +1,10 @@
-name: notion_image_upload_test
+name: notion_delete_database_entries_test
 
 on:
   workflow_dispatch:
   
   schedule:
-    - cron: '0 0 * * 6' # Runs at 8 AM Singapore time (00:00 UTC) every Saturday
+    - cron: '0 2 * * 6' # Runs at 10 AM Singapore time (02:00 UTC) every Saturday
       
 env:
   BUILD_PYTHON_VERSION: 3.9
@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-
               
-      - name: Install the neccessary libraries to run csv2notion_neo
+      - name: Install the necessary libraries to run csv2notion_neo
         run: |
           poetry config virtualenvs.create false
           poetry install --no-root
@@ -55,4 +55,4 @@ jobs:
           NOTION_WORKSPACE: ${{secrets.NOTION_WORKSPACE}}
           NOTION_TOKEN: ${{secrets.NOTION_TOKEN}}
           NOTION_URL: ${{secrets.NOTION_URL}}
-        run: pytest tests/test_upload.py -v -s
+        run: pytest tests/test_delete_database_entries.py -v -s
