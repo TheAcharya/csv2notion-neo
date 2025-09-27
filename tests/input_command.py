@@ -43,4 +43,6 @@ ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'),
             'fail_on_inaccessible_relations': False, 
             'fail_on_missing_columns': False, 
             'fail_on_unsettable_columns': False, 
-            'fail_on_wrong_status_values': False}
+            'fail_on_wrong_status_values': False,
+            # Database operations
+            'delete_all_database_entries': False}

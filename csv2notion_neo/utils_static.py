@@ -58,7 +58,7 @@ class ConversionRules(object):
     randomize_select_colors: bool
 
     # Image and icon columns
-    image_column: Optional[str]
+    image_column: Optional[List[str]]
     image_column_keep: bool
     image_column_mode: str
     image_caption_column: Optional[str]
@@ -88,12 +88,12 @@ class ConversionRules(object):
     fail_on_wrong_status_values: bool
 
     # Column mapping and data processing
-    rename_notion_key_column: List[str]
+    rename_notion_key_column: Optional[List[str]]
     payload_key_column: Optional[str]
 
     # AI and advanced features
     hugging_face_token: Optional[str]
-    caption_column: List[str]
+    caption_column: Optional[List[str]]
     hf_model: Optional[str]
     
     # Database operations
