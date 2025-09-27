@@ -52,6 +52,7 @@ jobs:
       - name: Run tests
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-          NOTION_TOKEN_A: ${{secrets.NOTION_TOKEN_A}}
-          NOTION_URL_A: ${{secrets.NOTION_URL_A}}
+          NOTION_WORKSPACE: ${{secrets.NOTION_WORKSPACE}}
+          NOTION_TOKEN: ${{secrets.NOTION_TOKEN}}
+          NOTION_URL: ${{secrets.NOTION_URL}}
         run: pytest -v -s

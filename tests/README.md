@@ -70,8 +70,8 @@ Contains test configuration and argument definitions:
 ARGS_DICT = {
     'csv_file': 'tests/assets/notion-upload-test.json',
     'workspace': "Arjun's notion",
-    'token': os.getenv("NOTION_TOKEN_A"),
-    'url': os.getenv("NOTION_URL_A"),
+    'token': os.getenv("NOTION_TOKEN"),
+    'url': os.getenv("NOTION_URL"),
     'log': PosixPath('tests/log.txt'),
     'image_column': ['Image Filename'],
     'mandatory_column': ['Marker ID'],
