@@ -114,6 +114,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Use VCR for API response testing
 - Test both success and failure scenarios
 - Use ephemeral environment for local testing
+- Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials
 
 ### Git Workflow
 - Use descriptive commit messages
@@ -235,6 +236,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Mock external dependencies
 - Test both success and failure paths
 - Maintain high test coverage
+- Comprehensive test suite covering all CLI arguments and Notion SDK functionality
 
 ### Integration Tests
 - Test API integrations with real endpoints

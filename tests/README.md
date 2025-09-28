@@ -11,6 +11,8 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - Database entry deletion
 - Notion API integration
 - Error handling and validation
+- CLI argument validation
+- Notion SDK functionality without credentials
 
 ## Directory Structure
 
@@ -18,6 +20,7 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 tests/
 ├── __init__.py                           # Python package initialization
 ├── README.md                             # This file
+├── test_comprehensive.py                 # Comprehensive test suite (CLI + SDK)
 ├── test_upload.py                        # Upload functionality test suite
 ├── test_delete_database_entries.py       # Delete database entries test suite
 ├── input_command.py                      # Test configuration and arguments
@@ -33,7 +36,34 @@ tests/
 
 ## Test Components
 
-### 1. Upload Tests (test_upload.py)
+### 1. Comprehensive Tests (test_comprehensive.py)
+
+The comprehensive test suite that validates all CLI arguments and Notion SDK functionality:
+
+- CLI Argument Testing: Validates all 50+ CLI arguments and switches
+- Argument Validation: Tests argument parsing and type conversion
+- Error Handling: Tests various error scenarios and edge cases
+- Notion SDK Testing: Tests Notion SDK functionality without credentials using mocking
+- Data Processing: Tests string splitting and data conversion utilities
+- Conversion Rules: Tests ConversionRules dataclass functionality
+- Version and Help: Tests version and help functionality
+- Comprehensive Scenarios: Tests complex scenarios combining multiple features
+
+#### Test Coverage for test_comprehensive.py
+
+| Test Category | Test Class | Test Methods | Coverage | Status |
+|---------------|------------|--------------|----------|---------|
+| **CLI Argument Parsing** | `TestCLIArgumentParsing` | `test_required_arguments`, `test_general_options`, `test_machine_learning_options`, `test_column_options`, `test_merge_options`, `test_relations_options`, `test_database_management_options`, `test_page_cover_options`, `test_page_icon_options`, `test_validation_options` | All 50+ CLI arguments and switches | Covered |
+| **Argument Validation** | `TestArgumentValidation` | `test_column_types_validation`, `test_default_icon_validation`, `test_max_threads_validation` | Argument parsing and type conversion | Covered |
+| **Conversion Rules** | `TestConversionRules` | `test_conversion_rules_creation`, `test_files_search_path_property` | ConversionRules dataclass functionality | Covered |
+| **Data Processing** | `TestDataProcessing` | `test_string_splitting` | String splitting and data conversion utilities | Covered |
+| **Error Handling** | `TestErrorHandling` | `test_critical_error_handling`, `test_invalid_column_types`, `test_missing_required_arguments`, `test_invalid_file_paths` | Error scenarios and edge cases | Covered |
+| **Version and Help** | `TestVersionAndHelp` | `test_version_argument`, `test_help_argument`, `test_version_constant` | Version and help functionality | Covered |
+| **Comprehensive Scenarios** | `TestComprehensiveScenarios` | `test_full_upload_scenario`, `test_ai_captioning_scenario`, `test_database_deletion_scenario`, `test_validation_scenario` | Complex scenarios combining multiple features | Covered |
+| **Notion SDK Testing** | `TestNotionSDKWithoutCredentials` | `test_notion_client_initialization`, `test_notion_client_get_collection`, `test_notion_client_create_record`, `test_notion_client_upload_file`, `test_notion_client_extended_initialization`, `test_notion_db_initialization`, `test_notion_row_converter`, `test_notion_row_uploader` | Notion SDK functionality without credentials | Covered |
+| **Edge Cases** | `TestEdgeCases` | `test_empty_arguments`, `test_whitespace_handling`, `test_special_characters` | Edge cases and boundary conditions | Covered |
+
+### 2. Upload Tests (test_upload.py)
 
 The upload test suite that validates CSV/JSON upload functionality:
 
@@ -43,7 +73,7 @@ The upload test suite that validates CSV/JSON upload functionality:
 - Image Handling: Validates image upload and processing
 - Error Handling: Tests various error scenarios
 
-### 2. Delete Database Entries Tests (test_delete_database_entries.py)
+### 3. Delete Database Entries Tests (test_delete_database_entries.py)
 
 The delete test suite that validates database entry deletion functionality:
 
@@ -57,6 +87,9 @@ The delete test suite that validates database entry deletion functionality:
 # Run all tests
 pytest tests/
 
+# Run comprehensive tests only
+pytest tests/test_comprehensive.py
+
 # Run upload tests only
 pytest tests/test_upload.py
 
@@ -68,9 +101,12 @@ pytest tests/ -v
 
 # Run with coverage
 pytest tests/ --cov=csv2notion_neo
+
+# Run comprehensive tests with local build script
+./scripts/local-test-build.sh --comprehensive-test
 ```
 
-### 3. Test Configuration (input_command.py)
+### 4. Test Configuration (input_command.py)
 
 Contains test configuration and argument definitions:
 
@@ -95,7 +131,7 @@ ARGS_DICT = {
 }
 ```
 
-### 4. Manual Test Scripts
+### 5. Manual Test Scripts
 
 Shell scripts for manual testing and validation (NOT used in GitHub CI):
 
@@ -185,11 +221,17 @@ poetry install
 # Run all tests
 poetry run pytest tests/
 
+# Run comprehensive tests (no credentials required)
+poetry run pytest tests/test_comprehensive.py -v
+
 # Run specific test
 poetry run pytest tests/test_upload.py::test_upload_rows
 
 # Run with coverage
 poetry run pytest tests/ --cov=csv2notion_neo --cov-report=html
+
+# Run comprehensive tests with local build script
+./scripts/local-test-build.sh --comprehensive-test
 
 # Check test logs
 cat tests/log.txt
@@ -198,6 +240,11 @@ cat tests/log.txt
 ### CI/CD Testing
 
 The test suite is integrated with GitHub Actions workflows:
+
+#### Comprehensive Tests (comprehensive_test.yml)
+- Runs on manual workflow dispatch
+- Tests all CLI arguments and Notion SDK functionality without credentials
+- Command: `pytest tests/test_comprehensive.py -v -s --tb=long`
 
 #### Upload Tests (notion_image_upload_test.yml)
 - Runs every Saturday at 8 AM Singapore time
@@ -237,32 +284,46 @@ cat tests/log.txt
 
 ## Test Scenarios
 
-### 1. Basic Upload Testing
+### 1. Comprehensive CLI Testing
+- All 50+ CLI arguments and switches validation
+- Argument parsing and type conversion
+- Error handling for invalid arguments
+- Edge cases and boundary conditions
+- Version and help functionality
+
+### 2. Notion SDK Testing (Mocked)
+- Client initialization and configuration
+- Database operations without credentials
+- File upload functionality
+- Row conversion and upload operations
+- Error handling and retry logic
+
+### 3. Basic Upload Testing
 - CSV/JSON file upload to new database
 - Column type detection and mapping
 - Data validation and error handling
 
-### 2. Image Upload Testing
+### 4. Image Upload Testing
 - Single and multiple image uploads
 - Icon and cover image handling
 - Image format validation
 
-### 3. Database Merging
+### 5. Database Merging
 - Existing database updates
 - Key-based row matching
 - Partial column updates
 
-### 4. Database Deletion Testing
+### 6. Database Deletion Testing
 - Delete all database entries
 - Database URL validation
 - Error handling for invalid URLs
 
-### 5. Error Handling
+### 7. Error Handling
 - Invalid data scenarios
 - API error responses
 - Network connectivity issues
 
-### 6. Performance Testing
+### 8. Performance Testing
 - Large dataset uploads
 - Concurrent upload operations
 - Memory usage validation
@@ -346,8 +407,14 @@ mv tests/log.txt tests/log_$(date +%Y%m%d_%H%M%S).txt
 # Run tests with debug output
 poetry run pytest tests/ -v -s
 
+# Run comprehensive tests with detailed traceback
+poetry run pytest tests/test_comprehensive.py -v -s --tb=long
+
 # Run specific test with debug
 poetry run pytest tests/test_upload.py::test_upload_rows -v -s
+
+# Run comprehensive tests with local build script (includes detailed traceback)
+./scripts/local-test-build.sh --comprehensive-test
 
 # Check detailed logs
 cat tests/log.txt

@@ -12,6 +12,7 @@ The `local-test-build.sh` script provides a completely ephemeral build environme
 - Cross-Platform: Works on macOS (Apple Silicon)
 - Clean Output: Professional logging without emojis
 - Flexible Updates: Multiple dependency management options
+- Comprehensive Testing: Built-in support for comprehensive test suite
 
 ## Prerequisites
 
@@ -51,6 +52,9 @@ This will:
 
 # Build and run tests
 ./scripts/local-test-build.sh --test
+
+# Run comprehensive test suite
+./scripts/local-test-build.sh --comprehensive-test
 
 # Clean build directory and exit
 ./scripts/local-test-build.sh --clean
@@ -133,7 +137,13 @@ csv2notion-neo/
    ./scripts/local-test-build.sh --update-deps
    ```
 
-4. Clean and Rebuild
+4. Run Comprehensive Tests
+   ```bash
+   # Run comprehensive test suite (no credentials required)
+   ./scripts/local-test-build.sh --comprehensive-test
+   ```
+
+5. Clean and Rebuild
    ```bash
    # Clean everything
    ./scripts/local-test-build.sh --clean
@@ -152,6 +162,12 @@ The script is designed to work seamlessly with GitHub Actions and uses identical
   run: |
     chmod +x scripts/local-test-build.sh
     ./scripts/local-test-build.sh
+
+# Example comprehensive test step
+- name: Run Comprehensive Tests
+  run: |
+    chmod +x scripts/local-test-build.sh
+    ./scripts/local-test-build.sh --comprehensive-test
 ```
 
 Version Alignment with GitHub Actions:
@@ -159,6 +175,43 @@ Version Alignment with GitHub Actions:
 - Poetry: 2.1.3 (matches `BUILD_POETRY_VERSION: 2.1.3`)
 - Setuptools: 80.9.0 (matches `setuptools==80.9.0`)
 - PyInstaller: Latest version (matches CI workflow)
+
+## Comprehensive Testing
+
+The script includes built-in support for running the comprehensive test suite, which validates all CLI arguments and Notion SDK functionality without requiring actual Notion credentials.
+
+### Comprehensive Test Features
+
+- No Credentials Required: Tests run without actual Notion API calls
+- CLI Validation: Tests all 50+ CLI arguments and switches
+- SDK Testing: Tests Notion SDK functionality using mocking
+- Fast Execution: Complete test suite runs in under 1 second
+- Detailed Traceback: Uses `--tb=long` for better debugging
+- Automatic Setup: Creates build environment if it doesn't exist
+
+### Running Comprehensive Tests
+
+```bash
+# Run comprehensive test suite
+./scripts/local-test-build.sh --comprehensive-test
+
+# The script will:
+# 1. Check if .build/ directory exists
+# 2. Set up build environment if needed
+# 3. Run comprehensive test suite with detailed traceback
+# 4. Report success/failure status
+```
+
+### Test Coverage
+
+The comprehensive test suite covers:
+- CLI argument parsing and validation
+- Error handling and edge cases
+- Notion SDK client initialization
+- Database operations (mocked)
+- File upload functionality (mocked)
+- Row conversion and upload operations
+- Test runner functionality validation
 
 ## Environment Details
 
@@ -217,6 +270,18 @@ Version Alignment with GitHub Actions:
    ```
    This warning is normal on macOS when building locally due to different SSL library versions between the build environment and system. It doesn't affect the functionality of the built binary and can be safely ignored.
 
+6. Comprehensive test failures
+   ```bash
+   # Check if test file exists
+   ls -la tests/test_comprehensive.py
+   
+   # Run with verbose output to see detailed errors
+   ./scripts/local-test-build.sh --comprehensive-test
+   
+   # Check build environment
+   ls -la .build/
+   ```
+
 ### Debug Mode
 
 If you encounter issues, you can inspect the build environment:
@@ -236,6 +301,12 @@ ls -la .build/
 
 # Check PyInstaller installation
 .build/python/bin/poetry run pyinstaller --version
+
+# Check comprehensive test environment
+.build/python/bin/poetry run pytest tests/test_comprehensive.py -v --tb=long
+
+# Run comprehensive tests manually
+.build/python/bin/poetry run pytest tests/test_comprehensive.py::TestCLIArgumentParsing -v
 ```
 
 ## Cleanup

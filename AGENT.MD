@@ -198,6 +198,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - VCR-based testing for API responses
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
+- Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials
 
 ### Code Quality
 - Black formatting with 88 character line length
@@ -339,6 +340,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
   # Build with tests
   ./scripts/local-test-build.sh --test
   
+  # Run comprehensive test suite
+  ./scripts/local-test-build.sh --comprehensive-test
+  
   # Update dependencies
   ./scripts/local-test-build.sh --update-deps
   
@@ -357,6 +361,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Integration tests for API changes
 - Manual testing for UI/UX changes
 - Performance testing for optimization changes
+- Comprehensive test suite for CLI argument validation and Notion SDK functionality
 
 ## Troubleshooting
 
