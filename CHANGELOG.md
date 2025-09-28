@@ -9,11 +9,11 @@
 - Migrated from unofficial Notion private API to official [Notion API](https://developers.notion.com/)
 - Added `--delete-all-database-entries`: Archive all entries in a specified database with progress tracking (#48)
 - Integrated [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library for official API support
-- Changed authentication from `token_v2` session cookies to Notion integration tokens
-- Made `--url` parameter mandatory for all operations (database URL required)
+- Changed authentication from `token_v2` session cookies to official Notion integration tokens
+- Made `--url` parameter mandatory for all operations (database URL or page URL required)
 - Automatic database creation is no longer supported
 - Better error handling with official API error codes and responses
-- Improved file upload reliability using official file_uploads endpoints
+- Improved file upload reliability using official `file_uploads` endpoints
 - Standardised API interactions following official Notion specifications
 - Better rate limiting using official API guidelines
 - Upgraded from Python 3.8 to Python 3.9
