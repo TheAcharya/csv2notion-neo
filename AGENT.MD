@@ -70,8 +70,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 #### Authentication Changes
 - Previous: Used `token_v2` session cookies from Notion web interface
-- Current: Uses official Notion integration tokens (starts with 'secret_' or 'ntn_')
-- Benefits: Enhanced security, better token management, official authentication method
+- Current: Uses official Notion integration tokens with format validation (starts with 'secret_' or 'ntn_')
+- Benefits: Enhanced security, better token management, official authentication method, improved user experience with clear error messages
 
 #### API Implementation Changes
 - Previous: Custom implementation using unofficial private Notion APIs
@@ -234,7 +234,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ## Configuration Management
 
 ### Command Line Arguments
-- Workspace and integration token authentication (mandatory)
+- Workspace and integration token authentication (mandatory) with format validation
 - Database URL or page URL specification (mandatory) - supports both existing databases and page URLs for creating new databases
 - Column type mapping
 - Image and icon handling options
@@ -264,6 +264,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Authentication
 - Secure integration token handling for official Notion API
+- Token format validation with user-friendly error messages
 - Hugging Face token management
 - No hardcoded credentials in source code
 - Integration token validation and error handling
@@ -366,7 +367,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ## Troubleshooting
 
 ### Common Issues
-- Integration token expiration or invalid tokens
+- Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
+- Invalid token format (resolved with user-friendly validation and guidance)
 - Rate limiting from Notion API (resolved with 15-attempt retry logic and exponential backoff)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - AI model loading issues

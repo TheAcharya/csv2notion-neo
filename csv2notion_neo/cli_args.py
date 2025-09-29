@@ -56,6 +56,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--token": {
                 "help": "Notion integration token (create at https://www.notion.so/my-integrations)",
                 "required": True,
+                "type": _validate_notion_token,
             },
             "--url": {
                 "help": (
@@ -349,6 +350,45 @@ def _parse_default_icon(default_icon: str) -> FileType:
         if not default_icon_filetype.exists():
             raise CriticalError(f"File not found: {default_icon_filetype}")
     return default_icon_filetype
+
+
+def _validate_notion_token(token: str) -> str:
+    """
+    Validate Notion integration token format.
+    
+    Args:
+        token: The token string to validate
+        
+    Returns:
+        The validated token string
+        
+    Raises:
+        CriticalError: If token format is invalid
+    """
+    if not token:
+        raise CriticalError(
+            "Notion integration token cannot be empty. "
+            "Please provide a valid token starting with 'ntn_' or 'secret_'."
+        )
+    
+    # Check if token starts with valid prefixes
+    if not (token.startswith("ntn_") or token.startswith("secret_")):
+        raise CriticalError(
+            f"Invalid Notion integration token format: '{token}'\n"
+            "Notion integration tokens must start with 'ntn_' or 'secret_'.\n"
+            "Please create a new integration at https://www.notion.so/my-integrations\n"
+            "and copy the 'Internal Integration Token' from your integration settings."
+        )
+    
+    # Additional validation for token length (basic sanity check)
+    if len(token) < 20:
+        raise CriticalError(
+            f"Token appears to be too short: '{token}'\n"
+            "Notion integration tokens are typically longer. "
+            "Please verify you copied the complete token from your integration settings."
+        )
+    
+    return token
 
 
 def _parse_column_types(column_types: str) -> List[str]:

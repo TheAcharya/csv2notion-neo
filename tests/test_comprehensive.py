@@ -53,7 +53,7 @@ class TestCLIArgumentParsing:
             parse_args([])
         
         with pytest.raises(SystemExit):
-            parse_args(["--token", "test_token"])
+            parse_args(["--token", "ntn_test_token_12345678901234567890"])
         
         with pytest.raises(SystemExit):
             parse_args(["--url", "test_url"])
@@ -62,7 +62,7 @@ class TestCLIArgumentParsing:
         """Test general CLI options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--max-threads", "10",
             "--log", "test.log",
@@ -71,7 +71,7 @@ class TestCLIArgumentParsing:
         ])
         
         assert args.workspace == "Test Workspace"
-        assert args.token == "test_token"
+        assert args.token == "ntn_test_token_12345678901234567890"
         assert args.url == "test_url"
         assert args.max_threads == 10
         assert args.log == Path("test.log")
@@ -82,7 +82,7 @@ class TestCLIArgumentParsing:
         """Test AI/ML related options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--hugging-face-token", "hf_token",
             "--hf-model", "blip-image",
@@ -98,7 +98,7 @@ class TestCLIArgumentParsing:
         """Test column-related options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--column-types", "text,number,checkbox",
             "--delimiter", ";",
@@ -118,7 +118,7 @@ class TestCLIArgumentParsing:
         """Test merge-related options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--merge",
             "--merge-only-column", "col1",
@@ -135,7 +135,7 @@ class TestCLIArgumentParsing:
         """Test relations-related options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--add-missing-relations",
             "test.csv"
@@ -147,7 +147,7 @@ class TestCLIArgumentParsing:
         """Test database management options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--delete-all-database-entries"
         ])
@@ -158,7 +158,7 @@ class TestCLIArgumentParsing:
         """Test page cover and image options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--image-column", "img1", "img2",
             "--image-column-keep",
@@ -178,7 +178,7 @@ class TestCLIArgumentParsing:
         """Test page icon options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--icon-column", "icon_col",
             "--icon-column-keep",
@@ -194,7 +194,7 @@ class TestCLIArgumentParsing:
         """Test validation and error handling options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--mandatory-column", "col1",
             "--mandatory-column", "col2",
@@ -256,7 +256,7 @@ class TestArgumentValidation:
         """Test max threads validation."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_ntn_test_token_12345678901234567890_12345678901234567890",
             "--url", "test_url",
             "--max-threads", "0",  # Should be converted to 1
             "test.csv"
@@ -265,12 +265,68 @@ class TestArgumentValidation:
         
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "secret_ntn_test_token_12345678901234567890_12345678901234567890",
             "--url", "test_url",
             "--max-threads", "10",
             "test.csv"
         ])
         assert args.max_threads == 10
+    
+    def test_notion_token_validation(self):
+        """Test Notion token validation."""
+        # Test valid ntn_ token
+        args = parse_args([
+            "--workspace", "Test Workspace",
+            "--token", "ntn_ntn_test_token_12345678901234567890_12345678901234567890",
+            "--url", "test_url",
+            "test.csv"
+        ])
+        assert args.token == "ntn_ntn_test_token_12345678901234567890_12345678901234567890"
+        
+        # Test valid secret_ token
+        args = parse_args([
+            "--workspace", "Test Workspace",
+            "--token", "secret_ntn_test_token_12345678901234567890_12345678901234567890",
+            "--url", "test_url",
+            "test.csv"
+        ])
+        assert args.token == "secret_ntn_test_token_12345678901234567890_12345678901234567890"
+        
+        # Test invalid token (no prefix)
+        with pytest.raises(CriticalError, match="Invalid Notion integration token format"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", "invalid_token_12345678901234567890",
+                "--url", "test_url",
+                "test.csv"
+            ])
+        
+        # Test invalid token (wrong prefix)
+        with pytest.raises(CriticalError, match="Invalid Notion integration token format"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", "token_12345678901234567890",
+                "--url", "test_url",
+                "test.csv"
+            ])
+        
+        # Test empty token
+        with pytest.raises(CriticalError, match="Notion integration token cannot be empty"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", "",
+                "--url", "test_url",
+                "test.csv"
+            ])
+        
+        # Test token too short
+        with pytest.raises(CriticalError, match="Token appears to be too short"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", "ntn_short",
+                "--url", "test_url",
+                "test.csv"
+            ])
 
 
 class TestConversionRules:
@@ -280,7 +336,7 @@ class TestConversionRules:
         """Test ConversionRules creation from arguments."""
         args = Namespace(
             csv_file=Path("test.csv"),
-            token="test_token",
+            token="ntn_test_token_12345678901234567890",
             url="test_url",
             workspace="Test Workspace",
             max_threads=5,
@@ -321,7 +377,7 @@ class TestConversionRules:
         
         rules = ConversionRules.from_args(args)
         assert rules.csv_file == Path("test.csv")
-        assert rules.token == "test_token"
+        assert rules.token == "ntn_test_token_12345678901234567890"
         assert rules.url == "test_url"
         assert rules.workspace == "Test Workspace"
         assert rules.max_threads == 5
@@ -348,7 +404,7 @@ class TestConversionRules:
         """Test files_search_path property."""
         rules = ConversionRules(
             csv_file=Path("/path/to/test.csv"),
-            token="test_token",
+            token="ntn_test_token_12345678901234567890",
             url="test_url",
             workspace="Test Workspace",
             max_threads=5,
@@ -465,7 +521,7 @@ class TestComprehensiveScenarios:
         """Test full upload scenario with all options."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--max-threads", "3",
             "--log", "test.log",
@@ -492,7 +548,7 @@ class TestComprehensiveScenarios:
         
         # Verify all arguments are parsed correctly
         assert args.workspace == "Test Workspace"
-        assert args.token == "test_token"
+        assert args.token == "ntn_test_token_12345678901234567890"
         assert args.url == "test_url"
         assert args.max_threads == 3
         assert args.log == Path("test.log")
@@ -520,7 +576,7 @@ class TestComprehensiveScenarios:
         """Test AI captioning scenario."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--hugging-face-token", "hf_token",
             "--hf-model", "blip-image",
@@ -540,7 +596,7 @@ class TestComprehensiveScenarios:
         """Test database deletion scenario."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--delete-all-database-entries"
         ])
@@ -552,7 +608,7 @@ class TestComprehensiveScenarios:
         """Test comprehensive validation scenario."""
         args = parse_args([
             "--workspace", "Test Workspace",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--mandatory-column", "ID",
             "--mandatory-column", "Name",
@@ -773,20 +829,20 @@ class TestEdgeCases:
         """Test handling of empty argument values."""
         args = parse_args([
             "--workspace", "",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "test.csv"
         ])
         
         assert args.workspace == ""
-        assert args.token == "test_token"
+        assert args.token == "ntn_test_token_12345678901234567890"
         assert args.url == "test_url"
     
     def test_whitespace_handling(self):
         """Test handling of whitespace in arguments."""
         args = parse_args([
             "--workspace", "  Test Workspace  ",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--column-types", " text , number , checkbox ",
             "test.csv"
@@ -799,7 +855,7 @@ class TestEdgeCases:
         """Test handling of special characters."""
         args = parse_args([
             "--workspace", "Test Workspace with Special Chars: !@#$%^&*()",
-            "--token", "test_token",
+            "--token", "ntn_test_token_12345678901234567890",
             "--url", "test_url",
             "--default-icon", "🎉",
             "test.csv"

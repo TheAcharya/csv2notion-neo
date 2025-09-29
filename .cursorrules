@@ -26,7 +26,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - `csv2notion_neo/notion_db_client_official.py`: Renamed to `notion_db_client.py`
 
 #### Key Implementation Changes
-- Authentication: Integration tokens instead of session cookies
+- Authentication: Integration tokens with format validation instead of session cookies
 - Database Operations: Notion databases API endpoints with page URL support for creating databases within existing pages
 - File Uploads: Notion file_uploads API endpoints with comprehensive retry logic
 - Error Handling: Notion API error codes and responses with smart retry strategies
@@ -35,6 +35,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Thread Safety: Thread-safe select option management to prevent race conditions during concurrent uploads
 - Retry Logic: Enhanced retry system with 15 attempts, exponential backoff, and jitter for production reliability
 - Logic Path Separation: Clear distinction between creating new databases in pages vs uploading to existing databases
+- Token Validation: User-friendly token format validation with clear error messages
 
 #### Compatibility Layer
 - Maintains existing method signatures where possible
@@ -190,8 +191,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Authentication
 - Never hardcode credentials in source code
 - Use environment variables for sensitive data
-- Implement secure token handling
+- Implement secure token handling with format validation
 - Validate authentication before operations
+- Provide user-friendly error messages for invalid tokens
 
 ### Data Privacy
 - Handle user data securely
@@ -207,6 +209,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Validate argument combinations
 - Support both required and optional arguments
 - Note: --token (integration token) and --url (database URL or page URL) are now mandatory
+- Token format validation with user-friendly error messages
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
 
 ### Environment Variables
@@ -342,7 +345,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Use ephemeral build environment for isolated debugging
 
 ### Common Issues
-- Integration token expiration or invalid tokens
+- Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
+- Invalid token format (resolved with user-friendly validation and guidance)
 - API rate limiting (resolved with 15-attempt retry logic and exponential backoff)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - Network connectivity issues (resolved with comprehensive retry mechanism)

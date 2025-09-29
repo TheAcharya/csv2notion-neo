@@ -11,7 +11,7 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - Database entry deletion
 - Notion API integration
 - Error handling and validation
-- CLI argument validation
+- CLI argument validation with token format validation
 - Notion SDK functionality without credentials
 
 ## Directory Structure
@@ -41,7 +41,7 @@ tests/
 The comprehensive test suite that validates all CLI arguments and Notion SDK functionality:
 
 - CLI Argument Testing: Validates all 50+ CLI arguments and switches
-- Argument Validation: Tests argument parsing and type conversion
+- Argument Validation: Tests argument parsing, type conversion, and token format validation
 - Error Handling: Tests various error scenarios and edge cases
 - Notion SDK Testing: Tests Notion SDK functionality without credentials using mocking
 - Data Processing: Tests string splitting and data conversion utilities
@@ -54,7 +54,7 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | Test Category | Test Class | Test Methods | Coverage | Status |
 |---------------|------------|--------------|----------|---------|
 | **CLI Argument Parsing** | `TestCLIArgumentParsing` | `test_required_arguments`, `test_general_options`, `test_machine_learning_options`, `test_column_options`, `test_merge_options`, `test_relations_options`, `test_database_management_options`, `test_page_cover_options`, `test_page_icon_options`, `test_validation_options` | All 50+ CLI arguments and switches | Covered |
-| **Argument Validation** | `TestArgumentValidation` | `test_column_types_validation`, `test_default_icon_validation`, `test_max_threads_validation` | Argument parsing and type conversion | Covered |
+| **Argument Validation** | `TestArgumentValidation` | `test_column_types_validation`, `test_default_icon_validation`, `test_max_threads_validation`, `test_notion_token_validation` | Argument parsing, type conversion, and token format validation | Covered |
 | **Conversion Rules** | `TestConversionRules` | `test_conversion_rules_creation`, `test_files_search_path_property` | ConversionRules dataclass functionality | Covered |
 | **Data Processing** | `TestDataProcessing` | `test_string_splitting` | String splitting and data conversion utilities | Covered |
 | **Error Handling** | `TestErrorHandling` | `test_critical_error_handling`, `test_invalid_column_types`, `test_missing_required_arguments`, `test_invalid_file_paths` | Error scenarios and edge cases | Covered |
@@ -195,7 +195,7 @@ Create a .env file in the project root with:
 
 ```bash
 # Notion API Configuration
-NOTION_TOKEN=your_notion_token_here
+NOTION_TOKEN=ntn_your_notion_token_here  # Must start with 'ntn_' or 'secret_'
 NOTION_URL=your_notion_database_url_here
 NOTION_WORKSPACE=your_workspace_name
 
@@ -287,6 +287,7 @@ cat tests/log.txt
 ### 1. Comprehensive CLI Testing
 - All 50+ CLI arguments and switches validation
 - Argument parsing and type conversion
+- Token format validation (ntn_ and secret_ prefixes)
 - Error handling for invalid arguments
 - Edge cases and boundary conditions
 - Version and help functionality
@@ -320,6 +321,7 @@ cat tests/log.txt
 
 ### 7. Error Handling
 - Invalid data scenarios
+- Invalid token format scenarios
 - API error responses
 - Network connectivity issues
 
@@ -386,17 +388,23 @@ mv tests/log.txt tests/log_$(date +%Y%m%d_%H%M%S).txt
    echo $NOTION_WORKSPACE
    ```
 
-2. Test Database Access
+2. Invalid Token Format
+   ```bash
+   # Check token format (must start with 'ntn_' or 'secret_')
+   echo $NOTION_TOKEN | grep -E '^(ntn_|secret_)'
+   ```
+
+3. Test Database Access
    - Ensure database URL is correct
    - Verify write permissions
    - Check workspace access
 
-3. Image Upload Failures
+4. Image Upload Failures
    - Verify image file paths
    - Check file permissions
    - Validate image formats
 
-4. API Rate Limiting
+5. API Rate Limiting
    - Reduce max_threads parameter
    - Add delays between tests
    - Use test-specific API tokens
