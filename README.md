@@ -143,7 +143,7 @@ positional arguments:
 general options:
   --workspace                        active Notion workspace name
   --token                            Notion integration token (create at https://www.notion.so/my-integrations)
-  --url URL                          Notion database URL or page URL (required);
+  --url                              Notion database URL or page URL (required);
                                      If page URL provided, database will be created within the page
   --max-threads                      upload threads (default: 5)
   --log FILE                         file to store program log

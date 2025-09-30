@@ -16,7 +16,7 @@
 - Improved file upload reliability using official `file_uploads` endpoints
 - Better rate limiting using official API guidelines (#56)
 - Added `--delete-all-database-entries`: Archive all entries within a specified database with progress tracking (#48)
-- Enhanced URL validation with `Notion.so` domain and protocol validation
+- Enhanced `--url` validation with `Notion.so` domain and protocol validation
 - Improved `--token` format validation with user-friendly error messages
 - Added comprehensive test suite with 73 test methods across 18 test categories (#17)
 - Upgraded from Python 3.8 to Python 3.9
