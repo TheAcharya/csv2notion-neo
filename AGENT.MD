@@ -102,6 +102,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Renamed: All "_official" suffixed files to clean names without suffixes
 - Enhanced: Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
 - Improved: Clear separation between two distinct logic paths for database operations
+- Enhanced: Comprehensive test suite with 73 test methods across 18 categories
 
 ## Core Architecture
 
@@ -241,6 +242,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Merge and validation flags
 - AI model configuration
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
+- Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py
 
 ### Environment Variables
 - Notion integration tokens (starts with 'secret_' or 'ntn_')
@@ -385,6 +387,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - High concurrency scenarios (resolved with smart retry logic and jitter)
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
+- Test execution issues (resolved with comprehensive test suite covering all functionality)
+- Test coverage gaps (resolved with 73 test methods across 18 categories)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag
