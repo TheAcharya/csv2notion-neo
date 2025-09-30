@@ -65,6 +65,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 ),
                 "metavar": "URL",
                 "required": True,
+                "type": _validate_notion_url,
             },
             "--max-threads": {
                 "type": lambda x: max(int(x), 1),
@@ -389,6 +390,52 @@ def _validate_notion_token(token: str) -> str:
         )
     
     return token
+
+
+def _validate_notion_url(url: str) -> str:
+    """
+    Validate Notion URL format.
+    
+    Args:
+        url: The URL string to validate
+        
+    Returns:
+        The validated URL string
+        
+    Raises:
+        CriticalError: If URL format is invalid
+    """
+    if not url:
+        raise CriticalError(
+            "Notion URL cannot be empty. "
+            "Please provide a valid Notion database or page URL."
+        )
+    
+    # Check if URL starts with http/https
+    if not (url.startswith("http://") or url.startswith("https://")):
+        raise CriticalError(
+            f"Invalid URL format: '{url}'\n"
+            "Notion URLs must start with 'http://' or 'https://'."
+        )
+    
+    # Check if URL contains notion.so domain
+    if "notion.so" not in url:
+        raise CriticalError(
+            f"Invalid Notion URL: '{url}'\n"
+            "Only Notion.so URLs are supported. "
+            "Please provide a valid Notion database or page URL from notion.so domain."
+        )
+    
+    # Additional validation for URL structure
+    if not ("/" in url and len(url.split("/")) >= 4):
+        raise CriticalError(
+            f"Invalid Notion URL structure: '{url}'\n"
+            "Notion URLs should have the format: "
+            "https://www.notion.so/workspace/database-id or "
+            "https://www.notion.so/workspace/page-id"
+        )
+    
+    return url
 
 
 def _parse_column_types(column_types: str) -> List[str]:

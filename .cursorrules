@@ -210,6 +210,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Support both required and optional arguments
 - Note: --token (integration token) and --url (database URL or page URL) are now mandatory
 - Token format validation with user-friendly error messages
+- URL validation (Notion.so domain and protocol validation) with clear error messages
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
 
 ### Environment Variables
@@ -347,6 +348,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Common Issues
 - Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
 - Invalid token format (resolved with user-friendly validation and guidance)
+- Invalid URL format (resolved with Notion.so domain and protocol validation)
 - API rate limiting (resolved with 15-attempt retry logic and exponential backoff)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - Network connectivity issues (resolved with comprehensive retry mechanism)

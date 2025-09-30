@@ -11,7 +11,7 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - Database entry deletion
 - Notion API integration
 - Error handling and validation
-- CLI argument validation with token format validation
+- CLI argument validation with token format validation and URL validation
 - Notion SDK functionality without credentials
 
 ## Directory Structure
@@ -41,7 +41,7 @@ tests/
 The comprehensive test suite that validates all CLI arguments and Notion SDK functionality:
 
 - CLI Argument Testing: Validates all 50+ CLI arguments and switches
-- Argument Validation: Tests argument parsing, type conversion, and token format validation
+- Argument Validation: Tests argument parsing, type conversion, token format validation, and URL validation
 - Error Handling: Tests various error scenarios and edge cases
 - Notion SDK Testing: Tests Notion SDK functionality without credentials using mocking
 - Data Processing: Tests string splitting and data conversion utilities
@@ -54,7 +54,7 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | Test Category | Test Class | Test Methods | Coverage | Status |
 |---------------|------------|--------------|----------|---------|
 | **CLI Argument Parsing** | `TestCLIArgumentParsing` | `test_required_arguments`, `test_general_options`, `test_machine_learning_options`, `test_column_options`, `test_merge_options`, `test_relations_options`, `test_database_management_options`, `test_page_cover_options`, `test_page_icon_options`, `test_validation_options` | All 50+ CLI arguments and switches | Covered |
-| **Argument Validation** | `TestArgumentValidation` | `test_column_types_validation`, `test_default_icon_validation`, `test_max_threads_validation`, `test_notion_token_validation` | Argument parsing, type conversion, and token format validation | Covered |
+| **Argument Validation** | `TestArgumentValidation` | `test_column_types_validation`, `test_default_icon_validation`, `test_max_threads_validation`, `test_notion_token_validation` | Argument parsing, type conversion, token format validation, and URL validation | Covered |
 | **Conversion Rules** | `TestConversionRules` | `test_conversion_rules_creation`, `test_files_search_path_property` | ConversionRules dataclass functionality | Covered |
 | **Data Processing** | `TestDataProcessing` | `test_string_splitting` | String splitting and data conversion utilities | Covered |
 | **Error Handling** | `TestErrorHandling` | `test_critical_error_handling`, `test_invalid_column_types`, `test_missing_required_arguments`, `test_invalid_file_paths` | Error scenarios and edge cases | Covered |
@@ -78,7 +78,7 @@ The upload test suite that validates CSV/JSON upload functionality:
 The delete test suite that validates database entry deletion functionality:
 
 - Delete Testing: Validates deletion of all database entries
-- URL Validation: Tests proper database URL requirements
+- URL Validation: Tests proper database URL requirements and Notion.so domain validation
 - Error Handling: Tests various deletion error scenarios
 - API Integration: Tests Notion API delete operations
 
@@ -288,6 +288,7 @@ cat tests/log.txt
 - All 50+ CLI arguments and switches validation
 - Argument parsing and type conversion
 - Token format validation (ntn_ and secret_ prefixes)
+- URL validation (Notion.so domain and protocol validation)
 - Error handling for invalid arguments
 - Edge cases and boundary conditions
 - Version and help functionality
@@ -316,12 +317,13 @@ cat tests/log.txt
 
 ### 6. Database Deletion Testing
 - Delete all database entries
-- Database URL validation
+- Database URL validation (Notion.so domain and protocol validation)
 - Error handling for invalid URLs
 
 ### 7. Error Handling
 - Invalid data scenarios
 - Invalid token format scenarios
+- Invalid URL format scenarios (non-Notion.so domains, invalid protocols)
 - API error responses
 - Network connectivity issues
 
@@ -394,17 +396,23 @@ mv tests/log.txt tests/log_$(date +%Y%m%d_%H%M%S).txt
    echo $NOTION_TOKEN | grep -E '^(ntn_|secret_)'
    ```
 
-3. Test Database Access
+3. Invalid URL Format
+   ```bash
+   # Check URL format (must be Notion.so domain with http/https protocol)
+   echo $NOTION_URL | grep -E '^https?://.*notion\.so'
+   ```
+
+4. Test Database Access
    - Ensure database URL is correct
    - Verify write permissions
    - Check workspace access
 
-4. Image Upload Failures
+5. Image Upload Failures
    - Verify image file paths
    - Check file permissions
    - Validate image formats
 
-5. API Rate Limiting
+6. API Rate Limiting
    - Reduce max_threads parameter
    - Add delays between tests
    - Use test-specific API tokens

@@ -55,15 +55,15 @@ class TestCLIArgumentParsing:
         with pytest.raises(SystemExit):
             parse_args(["--token", "ntn_test_token_12345678901234567890"])
         
-        with pytest.raises(SystemExit):
-            parse_args(["--url", "test_url"])
+        with pytest.raises(CriticalError):
+            parse_args(["--url", "invalid-url"])
     
     def test_general_options(self):
         """Test general CLI options."""
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--max-threads", "10",
             "--log", "test.log",
             "--verbose",
@@ -72,7 +72,7 @@ class TestCLIArgumentParsing:
         
         assert args.workspace == "Test Workspace"
         assert args.token == "ntn_test_token_12345678901234567890"
-        assert args.url == "test_url"
+        assert args.url == "https://www.notion.so/test-workspace/test-database-id"
         assert args.max_threads == 10
         assert args.log == Path("test.log")
         assert args.verbose is True
@@ -83,7 +83,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--hugging-face-token", "hf_token",
             "--hf-model", "blip-image",
             "--caption-column", "image_col", "caption_col",
@@ -99,7 +99,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--column-types", "text,number,checkbox",
             "--delimiter", ";",
             "--add-missing-columns",
@@ -119,7 +119,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--merge",
             "--merge-only-column", "col1",
             "--merge-only-column", "col2",
@@ -136,7 +136,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--add-missing-relations",
             "test.csv"
         ])
@@ -148,7 +148,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--delete-all-database-entries"
         ])
         
@@ -159,7 +159,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--image-column", "img1", "img2",
             "--image-column-keep",
             "--image-column-mode", "cover",
@@ -179,7 +179,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--icon-column", "icon_col",
             "--icon-column-keep",
             "--default-icon", "👍",
@@ -195,7 +195,7 @@ class TestCLIArgumentParsing:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--mandatory-column", "col1",
             "--mandatory-column", "col2",
             "--payload-key-column", "key_col",
@@ -257,7 +257,7 @@ class TestArgumentValidation:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_ntn_test_token_12345678901234567890_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--max-threads", "0",  # Should be converted to 1
             "test.csv"
         ])
@@ -266,7 +266,7 @@ class TestArgumentValidation:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "secret_ntn_test_token_12345678901234567890_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--max-threads", "10",
             "test.csv"
         ])
@@ -278,7 +278,7 @@ class TestArgumentValidation:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_ntn_test_token_12345678901234567890_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "test.csv"
         ])
         assert args.token == "ntn_ntn_test_token_12345678901234567890_12345678901234567890"
@@ -287,7 +287,7 @@ class TestArgumentValidation:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "secret_ntn_test_token_12345678901234567890_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "test.csv"
         ])
         assert args.token == "secret_ntn_test_token_12345678901234567890_12345678901234567890"
@@ -297,7 +297,7 @@ class TestArgumentValidation:
             parse_args([
                 "--workspace", "Test Workspace",
                 "--token", "invalid_token_12345678901234567890",
-                "--url", "test_url",
+                "--url", "https://www.notion.so/test-workspace/test-database-id",
                 "test.csv"
             ])
         
@@ -306,7 +306,7 @@ class TestArgumentValidation:
             parse_args([
                 "--workspace", "Test Workspace",
                 "--token", "token_12345678901234567890",
-                "--url", "test_url",
+                "--url", "https://www.notion.so/test-workspace/test-database-id",
                 "test.csv"
             ])
         
@@ -315,7 +315,7 @@ class TestArgumentValidation:
             parse_args([
                 "--workspace", "Test Workspace",
                 "--token", "",
-                "--url", "test_url",
+                "--url", "https://www.notion.so/test-workspace/test-database-id",
                 "test.csv"
             ])
         
@@ -324,7 +324,7 @@ class TestArgumentValidation:
             parse_args([
                 "--workspace", "Test Workspace",
                 "--token", "ntn_short",
-                "--url", "test_url",
+                "--url", "https://www.notion.so/test-workspace/test-database-id",
                 "test.csv"
             ])
 
@@ -337,7 +337,7 @@ class TestConversionRules:
         args = Namespace(
             csv_file=Path("test.csv"),
             token="ntn_test_token_12345678901234567890",
-            url="test_url",
+            url="https://www.notion.so/test-workspace/test-database-id",
             workspace="Test Workspace",
             max_threads=5,
             verbose=False,
@@ -378,7 +378,7 @@ class TestConversionRules:
         rules = ConversionRules.from_args(args)
         assert rules.csv_file == Path("test.csv")
         assert rules.token == "ntn_test_token_12345678901234567890"
-        assert rules.url == "test_url"
+        assert rules.url == "https://www.notion.so/test-workspace/test-database-id"
         assert rules.workspace == "Test Workspace"
         assert rules.max_threads == 5
         assert rules.verbose is False
@@ -405,7 +405,7 @@ class TestConversionRules:
         rules = ConversionRules(
             csv_file=Path("/path/to/test.csv"),
             token="ntn_test_token_12345678901234567890",
-            url="test_url",
+            url="https://www.notion.so/test-workspace/test-database-id",
             workspace="Test Workspace",
             max_threads=5,
             verbose=False,
@@ -522,7 +522,7 @@ class TestComprehensiveScenarios:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--max-threads", "3",
             "--log", "test.log",
             "--verbose",
@@ -549,7 +549,7 @@ class TestComprehensiveScenarios:
         # Verify all arguments are parsed correctly
         assert args.workspace == "Test Workspace"
         assert args.token == "ntn_test_token_12345678901234567890"
-        assert args.url == "test_url"
+        assert args.url == "https://www.notion.so/test-workspace/test-database-id"
         assert args.max_threads == 3
         assert args.log == Path("test.log")
         assert args.verbose is True
@@ -577,7 +577,7 @@ class TestComprehensiveScenarios:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--hugging-face-token", "hf_token",
             "--hf-model", "blip-image",
             "--caption-column", "image_col", "caption_col",
@@ -597,7 +597,7 @@ class TestComprehensiveScenarios:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--delete-all-database-entries"
         ])
         
@@ -609,7 +609,7 @@ class TestComprehensiveScenarios:
         args = parse_args([
             "--workspace", "Test Workspace",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--mandatory-column", "ID",
             "--mandatory-column", "Name",
             "--fail-on-relation-duplicates",
@@ -830,20 +830,20 @@ class TestEdgeCases:
         args = parse_args([
             "--workspace", "",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "test.csv"
         ])
         
         assert args.workspace == ""
         assert args.token == "ntn_test_token_12345678901234567890"
-        assert args.url == "test_url"
+        assert args.url == "https://www.notion.so/test-workspace/test-database-id"
     
     def test_whitespace_handling(self):
         """Test handling of whitespace in arguments."""
         args = parse_args([
             "--workspace", "  Test Workspace  ",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--column-types", " text , number , checkbox ",
             "test.csv"
         ])
@@ -856,7 +856,7 @@ class TestEdgeCases:
         args = parse_args([
             "--workspace", "Test Workspace with Special Chars: !@#$%^&*()",
             "--token", "ntn_test_token_12345678901234567890",
-            "--url", "test_url",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
             "--default-icon", "🎉",
             "test.csv"
         ])

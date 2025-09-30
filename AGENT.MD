@@ -235,7 +235,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Command Line Arguments
 - Workspace and integration token authentication (mandatory) with format validation
-- Database URL or page URL specification (mandatory) - supports both existing databases and page URLs for creating new databases
+- Database URL or page URL specification (mandatory) with Notion.so domain and protocol validation - supports both existing databases and page URLs for creating new databases
 - Column type mapping
 - Image and icon handling options
 - Merge and validation flags
@@ -369,6 +369,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Common Issues
 - Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
 - Invalid token format (resolved with user-friendly validation and guidance)
+- Invalid URL format (resolved with Notion.so domain and protocol validation)
 - Rate limiting from Notion API (resolved with 15-attempt retry logic and exponential backoff)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - AI model loading issues
