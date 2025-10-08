@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Data Type Conversion Mappings
+
+This module provides mapping functions for converting CSV/JSON data types
+to Notion-compatible formats. It handles checkbox, date, number, icon, and URL
+conversions with proper validation and error handling.
+"""
+
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
@@ -5,13 +13,15 @@ from typing import Optional, Union
 from dateutil.parser import ParserError
 from dateutil.parser import parse as date_parse
 from emoji import distinct_emoji_list, emoji_count, replace_emoji
-from csv2notion_neo.notion.collection import NotionDate
+# NotionDate is now handled by the official API's date format
+# We'll use a simple dict structure for date objects
 
 from csv2notion_neo.notion_type_guess import is_url
 from csv2notion_neo.utils_exceptions import TypeConversionError
 from csv2notion_neo.utils_static import FileType
 from csv2notion_neo.utils_str import split_str
 from icecream import ic
+
 
 def map_checkbox(s: str) -> bool:
     return s == "true"
@@ -24,7 +34,7 @@ def map_date(s: str) -> datetime:
         raise TypeConversionError(e) from e
 
 
-def map_notion_date(s: str) -> NotionDate:
+def map_notion_date(s: str) -> dict:
 
     dates = split_str(s)
 
@@ -35,9 +45,9 @@ def map_notion_date(s: str) -> NotionDate:
         raise TypeConversionError("Date field doesn't support more than 2 values")
 
     if len(dates) == 2:
-        return NotionDate(start=map_date(dates[0]), end=map_date(dates[1]))
+        return {"start": map_date(dates[0]).isoformat(), "end": map_date(dates[1]).isoformat()}
 
-    return NotionDate(start=map_date(dates[0]))
+    return {"start": map_date(dates[0]).isoformat()}
 
 
 def map_number(s: str) -> Union[int, float]:

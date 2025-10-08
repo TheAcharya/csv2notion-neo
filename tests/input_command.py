@@ -4,9 +4,9 @@ load_dotenv()
 import os
 
 ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'), 
-            'workspace': "Arjun's notion", 
-            'token': os.getenv("NOTION_TOKEN_A"), 
-            'url': os.getenv("NOTION_URL_A"), 
+            'workspace': os.getenv("NOTION_WORKSPACE"),  
+            'token': os.getenv("NOTION_TOKEN"), 
+            'url': os.getenv("NOTION_URL"), 
             'max_threads': 3, 
             'log': PosixPath('tests/log.txt'), 
             'verbose': True, 
@@ -30,7 +30,7 @@ ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'),
             'image_column_mode': 'block', 
             'image_caption_column': None, 
             'image_caption_column_keep': False, 
-            'icon_column': None, 
+            'icon_column': 'Icon Image', 
             'icon_column_keep': False, 
             'default_icon': None, 
             'mandatory_column': ['Marker ID'], 
@@ -43,4 +43,6 @@ ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'),
             'fail_on_inaccessible_relations': False, 
             'fail_on_missing_columns': False, 
             'fail_on_unsettable_columns': False, 
-            'fail_on_wrong_status_values': False}
+            'fail_on_wrong_status_values': False,
+            # Database operations
+            'delete_all_database_entries': False}

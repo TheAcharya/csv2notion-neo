@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Random ID Generation Utilities
+
+This module provides random ID generation functions for creating unique
+identifiers for Notion database entries, select options, and other
+components that require unique identification.
+"""
+
 import random
 import string
 from typing import Iterable, List, Set

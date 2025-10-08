@@ -16,9 +16,9 @@ NC='\033[0m' # No Color
 # Configuration
 BUILD_DIR=".build"
 TEST_BUILD_DIR="test-build"
-PYTHON_VERSION="3.8"
-POETRY_VERSION="1.7.1"
-SETUPTOOLS_VERSION="69.0.0"
+PYTHON_VERSION="3.9"
+POETRY_VERSION="2.1.3"
+SETUPTOOLS_VERSION="80.9.0"
 PROJECT_NAME="csv2notion_neo"
 
 # Function to print colored output
@@ -95,13 +95,13 @@ setup_python() {
     local system_python_version=$(python3 --version 2>&1 | cut -d' ' -f2)
     print_status "Using system Python: $system_python_version"
     
-    # Check if Python version is compatible (3.8 or higher)
+    # Check if Python version is compatible (3.9 or higher)
     local major_version=$(echo "$system_python_version" | cut -d'.' -f1)
     local minor_version=$(echo "$system_python_version" | cut -d'.' -f2)
     
-    if [ "$major_version" -lt 3 ] || ([ "$major_version" -eq 3 ] && [ "$minor_version" -lt 8 ]); then
-        print_error "Python 3.8 or higher is required. Current version: $system_python_version"
-        print_error "Please upgrade Python to version 3.8 or higher."
+    if [ "$major_version" -lt 3 ] || ([ "$major_version" -eq 3 ] && [ "$minor_version" -lt 9 ]); then
+        print_error "Python 3.9 or higher is required. Current version: $system_python_version"
+        print_error "Please upgrade Python to version 3.9 or higher."
         exit 1
     fi
     
@@ -305,6 +305,9 @@ show_outdated() {
     setup_poetry
     configure_poetry
     
+    # Set environment variable to prevent pytest cache creation
+    export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+    
     # Install current dependencies first
     if ! $poetry_bin install; then
         print_error "Failed to install dependencies for outdated check"
@@ -313,6 +316,12 @@ show_outdated() {
     
     # Show outdated packages
     $poetry_bin show --outdated
+    
+    # Clean up any pytest cache that might have been created
+    if [ -d ".pytest_cache" ]; then
+        rm -rf .pytest_cache
+        print_status "Cleaned up pytest cache directory"
+    fi
     
     exit 0
 }
@@ -333,26 +342,33 @@ show_usage() {
     echo "Usage: $0 [OPTIONS] [PACKAGES...]"
     echo ""
     echo "Options:"
-    echo "  --clean         Clean build directory and exit"
-    echo "  --test          Run tests after building"
-    echo "  --update-lock   Update poetry.lock file before building"
-    echo "  --update-deps   Update dependencies to latest versions and rebuild lock file"
-    echo "  --update        Update specific packages (provide package names as arguments)"
-    echo "  --lock-only     Only update lock file without building"
-    echo "  --show-outdated Show outdated packages"
-    echo "  --help          Show this help message"
+    echo "  --clean                Clean build directory and exit"
+    echo "  --test                 Run tests after building"
+    echo "  --comprehensive-test   Run comprehensive test suite"
+    echo "  --update-lock          Update poetry.lock file before building"
+    echo "  --update-deps          Update dependencies to latest versions and rebuild lock file"
+    echo "  --update               Update specific packages (provide package names as arguments)"
+    echo "  --lock-only            Only update lock file without building"
+    echo "  --show-outdated        Show outdated packages"
+    echo "  --help                 Show this help message"
     echo ""
     echo "This script creates an ephemeral build environment for CSV2Notion Neo."
     echo "Everything is installed in the .build/ directory and can be safely deleted."
     echo ""
+    echo "Comprehensive Testing:"
+    echo "  The comprehensive test suite validates all CLI arguments, flags, and switches"
+    echo "  without requiring actual Notion API calls. If .build/ doesn't exist, it will"
+    echo "  automatically set up the build environment first."
+    echo ""
     echo "Examples:"
-    echo "  $0                           # Normal build"
-    echo "  $0 --update-lock             # Update lock file then build"
-    echo "  $0 --update-deps             # Update all deps to latest versions then build"
-    echo "  $0 --update requests pytest  # Update only requests and pytest packages"
+    echo "  $0                          # Normal build"
+    echo "  $0 --comprehensive-test     # Run comprehensive tests"
+    echo "  $0 --update-lock            # Update lock file then build"
+    echo "  $0 --update-deps            # Update all deps to latest versions then build"
+    echo "  $0 --update requests pytest # Update only requests and pytest packages"
     echo "  $0 --lock-only --update requests # Update requests and regenerate lock file only"
-    echo "  $0 --show-outdated           # Show which packages can be updated"
-    echo "  $0 --clean                   # Clean build directory"
+    echo "  $0 --show-outdated          # Show which packages can be updated"
+    echo "  $0 --clean                  # Clean build directory"
 }
 
 # Function to install PyInstaller if needed
@@ -370,12 +386,56 @@ install_pyinstaller() {
     print_success "PyInstaller installed successfully"
 }
 
+# Function to run comprehensive tests
+run_comprehensive_tests() {
+    local poetry_bin="$BUILD_DIR/python/bin/poetry"
+    
+    print_status "Running comprehensive test suite..."
+    
+    # Check if test file exists
+    if [ ! -f "tests/test_comprehensive.py" ]; then
+        print_error "Comprehensive test file not found: tests/test_comprehensive.py"
+        exit 1
+    fi
+    
+    # Set up PATH for our portable Python
+    export PATH="$(pwd)/$BUILD_DIR/python/bin:$PATH"
+    
+    # Run the comprehensive test
+    print_status "Running comprehensive test suite..."
+    if ! $poetry_bin run pytest tests/test_comprehensive.py -v --tb=long; then
+        print_error "Comprehensive tests failed"
+        exit 1
+    fi
+    
+    print_success "Comprehensive tests completed successfully!"
+}
+
+# Function to check if build environment exists
+check_build_environment() {
+    local poetry_bin="$BUILD_DIR/python/bin/poetry"
+    
+    if [ ! -f "$poetry_bin" ]; then
+        print_status "Build environment not found. Setting up build environment first..."
+        return 1
+    fi
+    
+    # Check if Poetry virtual environment exists
+    if [ ! -d "$BUILD_DIR/venv" ]; then
+        print_status "Poetry virtual environment not found. Setting up build environment first..."
+        return 1
+    fi
+    
+    return 0
+}
+
 # Main execution
 main() {
     local UPDATE_FLAG=""
     local TEST_FLAG=""
     local LOCK_ONLY=false
     local PACKAGES=""
+    local COMPREHENSIVE_TEST=""
     
     # Parse command line arguments
     while [[ $# -gt 0 ]]; do
@@ -385,6 +445,10 @@ main() {
                 ;;
             --test)
                 TEST_FLAG="--test"
+                shift
+                ;;
+            --comprehensive-test)
+                COMPREHENSIVE_TEST="comprehensive"
                 shift
                 ;;
             --update-lock)
@@ -426,6 +490,37 @@ main() {
                 ;;
         esac
     done
+    
+    # Handle comprehensive test options
+    if [ -n "$COMPREHENSIVE_TEST" ]; then
+        print_status "Comprehensive test mode"
+        
+        # Check if build environment exists
+        if ! check_build_environment; then
+            print_status "Setting up build environment first..."
+            
+            # Check system requirements
+            check_requirements
+            
+            # Create build directory
+            mkdir -p "$BUILD_DIR"
+            
+            # Setup build environment
+            setup_python
+            install_setuptools
+            setup_poetry
+            configure_poetry
+            
+            # Install dependencies
+            install_dependencies "$UPDATE_FLAG" "$PACKAGES"
+        else
+            print_status "Using existing build environment"
+        fi
+        
+        # Run comprehensive tests
+        run_comprehensive_tests
+        exit 0
+    fi
     
     # Validate selective update
     if [ "$UPDATE_FLAG" = "--update-selective" ] && [ -z "$PACKAGES" ]; then

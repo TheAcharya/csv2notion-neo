@@ -8,7 +8,7 @@ We love your input! We want to make contributing to this project as easy and tra
 - Becoming a maintainer
 
 ## Using Github's Tools
-We use github to host code, to track issues and feature requests, as well as accept pull requests.
+We use GitHub to host code, to track issues and feature requests, as well as accept pull requests.
 
 ## Github Flow
 Pull requests are the best way to propose changes to the codebase (we use [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow)). We actively welcome your pull requests:

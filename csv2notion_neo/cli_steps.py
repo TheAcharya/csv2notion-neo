@@ -9,7 +9,7 @@ from tqdm import tqdm
 from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_convert import NotionRowConverter
 from csv2notion_neo.notion_db import NotionDB, notion_db_from_csv
-from csv2notion_neo.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_client import NotionClient
 from csv2notion_neo.notion_preparator import NotionPreparator
 from csv2notion_neo.notion_uploader import NotionUploadRow
 from csv2notion_neo.utils_static import ConversionRules
@@ -18,8 +18,29 @@ from csv2notion_neo.utils_threading import ThreadRowUploader, process_iter
 logger = logging.getLogger(__name__)
 
 
+def delete_all_database_entries(
+    client: NotionClient, collection_id: str
+) -> int:
+    """
+    Delete all entries from a Notion database.
+    
+    Args:
+        client: Official Notion client
+        collection_id: Database ID
+        
+    Returns:
+        Number of entries deleted
+    """
+    logger.info("Starting deletion of all database entries...")
+    
+    notion_db = NotionDB(client, collection_id)
+    deleted_count = notion_db.delete_all_entries()
+    
+    return deleted_count
+
+
 def new_database(
-    args: Namespace, client: NotionClientExtended, csv_data: LocalData
+    args: Namespace, client: NotionClient, csv_data: LocalData
 ) -> str:
     skip_columns = []
     if args.image_column and not args.image_column_keep:
@@ -44,7 +65,10 @@ def new_database(
 
 
 def convert_csv_to_notion_rows(
-    csv_data: LocalData, client: NotionClientExtended, collection_id: str, args: Namespace
+    csv_data: LocalData,
+    client: NotionClient,
+    collection_id: str,
+    args: Namespace,
 ) -> List[NotionUploadRow]:
     notion_db = NotionDB(client, collection_id)
 
@@ -52,15 +76,14 @@ def convert_csv_to_notion_rows(
 
     NotionPreparator(notion_db, csv_data, conversion_rules).prepare()
 
-
     converter = NotionRowConverter(notion_db, conversion_rules)
-    
+
     return converter.convert_to_notion_rows(csv_data)
 
 
 def upload_rows(
     notion_rows: List[NotionUploadRow],
-    client: NotionClientExtended,
+    client: NotionClient,
     collection_id: str,
     is_merge: bool,
     max_threads: int,

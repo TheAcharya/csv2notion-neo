@@ -10,8 +10,6 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 
 ## Core Features
 
-### Advantages over native import
-
 - Merge CSV or JSON with the existing database, using the first column as a key to combine existing rows
 - Choose column types manually instead of letting Notion detecting them automatically
 - Link or create new entries in relation columns based on their values automatically
@@ -20,12 +18,7 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 - Set a cover or embed an image for each row to enhance visual representation
 - Upload image files for covers or icons
 - Apply validation options for input data to ensure accuracy
-- Automatically analyse and generate captions for images using Hugging Face's open-source AI/ML models
-
-### Disadvantages over native import
- 
-- Importing each row separately might lead to slower speed
-  - To address this, utilise multithreaded upload
+- Analyse and generate captions for images using Hugging Face's open-source AI/ML models (Experimental)
 
 ## Table of contents
 
@@ -33,7 +26,10 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 - [System Requirements](#system-requirements)
 - [Installation](#installation)
   - [Pre-compiled Binary (Recommended)](#pre-compiled-binary-recommended)
-  - [From Source](#from-source)
+  - [With Homebrew (Recommended for macOS)](#with-homebrew-recommended-for-macos)
+  - [With PIP](#with-pip)
+  - [From source](#from-source)
+- [Migration Guide (v2.0.0+)](#migration-guide-v200)
 - [Guide](#guide)
   - [macOS Release](#macos-release)
   - [Prerequisite](#prerequisite)
@@ -41,12 +37,12 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
   - [Duplicate CSV Columns](#duplicate-csv-columns)
   - [Missing Columns](#missing-columns)
   - [Column Types](#column-types)
-  - [Mergin](#merging)
+  - [Merging](#merging)
   - [Relation Columns](#relation-columns)
   - [Cover Image & Embedded Image](#cover-image--embedded-image)
   - [Icons](#icons)
   - [Mandatory Columns](#mandatory-columns)
-  - [AI/ML Options (Hugging Face)](#aiml-options-hugging-face)
+  - [AI/ML Options (Hugging Face) (Experimental)](#aiml-options-hugging-face-experimental)
 - [Examples](#examples)
 - [Utilised By](#utilised-by)
 - [Credits](#credits)
@@ -57,7 +53,11 @@ An advance method to upload & merge *.csv or *.json files with images to <a href
 
 Originally, we developed [csv2notion](https://github.com/vzhd1701/csv2notion) to address the lack of advanced importing support for `*.csv` files in [Notion](https://notion.so). We took inspiration from [Airtable](https://www.airtable.com)’s [CSV import extension](https://support.airtable.com/docs/csv-import-extension).
 
-**CSV2Notion Neo** was developed as a successor to the original project, which has since been abandoned, to ensure continued compatibility with Notion’s evolving backend API. As Notion periodically updates its architecture, we are committed to maintaining, enhancing, and expanding the tool with timely fixes and new features. Any projects or tools previously reliant on [csv2notion](https://github.com/vzhd1701/csv2notion) can seamlessly transition to **CSV2Notion Neo**, requiring only minimal adjustments.
+**CSV2Notion Neo** was developed as a successor to the original project, which has since been abandoned, to ensure continued compatibility with Notion's evolving backend API. As Notion periodically updates its architecture, we are committed to maintaining, enhancing, and expanding the tool with timely fixes and new features. 
+
+Starting with **CSV2Notion Neo** 2.0.0, application has been fully migrated to use the official [Notion API](https://developers.notion.com/). This provides better reliability, security, and future compatibility. Users now need to use Notion integration tokens instead of session cookies.
+
+Any projects or tools previously reliant on [csv2notion](https://github.com/vzhd1701/csv2notion) can seamlessly transition to **CSV2Notion Neo**, requiring only minimal adjustments.
 
 ## System Requirements
 
@@ -97,7 +97,7 @@ $ brew uninstall --cask csv2notion-neo
 $ pip install --user csv2notion_neo
 ```
 
-**Python 3.7 or later required.**
+**Python 3.9 or later required.**
 
 ### From source
 
@@ -110,11 +110,28 @@ $ poetry install --no-dev
 $ poetry run csv2notion_neo
 ```
 
+## Migration Guide (v2.0.0+)
+
+**Important**: CSV2Notion Neo v2.0.0+ uses the official Notion API and requires integration tokens instead of session cookies tokens.
+
+### What Changed:
+- Token Type: Now uses Notion integration tokens (starts with `ntn_`) instead of `token_v2` or `v03%` session cookies tokens
+- Database URL: Now requires `--url` parameter (database URL or page URL is mandatory)
+- Authentication: More secure and reliable authentication method
+- API: Uses official Notion API for better compatibility and performance
+
+### Migration Steps:
+1. Create Integration: Go to [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations) and create a new integration
+2. Get Token: Copy the "Internal Integration Token" from your integration settings
+3. Database or Page Connections: User can search for and select pages or databases to share with the integration from the page picker
+4. Update Commands: Replace `--token YOUR_OLD_TOKEN` with `--token secret_YOUR_INTEGRATION_TOKEN`
+
+
 ## Guide
 
 ```plain
 $ csv2notion_neo --help
-usage: csv2notion_neo [-h] --token TOKEN [--url URL] [OPTION]... FILE
+usage: csv2notion_neo [-h] --token TOKEN --url URL [OPTION]... FILE
 
 https://github.com/TheAcharya/csv2notion-neo
 
@@ -125,8 +142,9 @@ positional arguments:
 
 general options:
   --workspace                        active Notion workspace name
-  --token                            Notion token, stored in token_v2 cookie for notion.so
-  --url URL                          Notion database URL; if none is provided, will create a new database
+  --token                            Notion integration token (create at https://www.notion.so/my-integrations)
+  --url                              Notion database URL or page URL (required);
+                                     If page URL provided, database will be created within the page
   --max-threads                      upload threads (default: 5)
   --log FILE                         file to store program log
   --verbose                          output debug information
@@ -156,6 +174,10 @@ merge options:
 
 relations options:
   --add-missing-relations            add missing entries into linked Notion DB
+
+database management options:
+  --delete-all-database-entries     delete (archive) all entries in the specified database;
+                                    WARNING: This action cannot be undone!
 
 page cover options:
   --image-column COLUMN              one or more CSV or JSON column that points to URL or image file that will be embedded for that row
@@ -220,12 +242,22 @@ sudo rm /usr/local/bin/csv2notion_neo
 
 You must pass a single `*.csv` file for upload. The CSV file must contain at least 2 rows. The first row will be used as a header.
 
-Optionally you can provide a URL to an existing Notion database with the `--url` option; if not provided, the tool will create a new database named after the CSV file. The URL must link to a database view, not a page.
+You must provide a URL to an existing Notion database or page with the `--url` option. 
+- **Database URL**: Links to an existing database view for uploading data
+- **Page URL**: Links to an empty page where a new database will be created automatically
 
-<details><summary>Obtaining Database URL</summary>
+<details><summary>Obtaining Database URL or Page URL</summary>
 <p>
 
+**For Database URL:**
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/database_url.png?raw=true"> </p>
+
+**For Page URL:**
+1. Navigate to the empty page where you want to create a database
+2. Copy the URL from your browser's address bar
+3. The page URL will look like: `https://www.notion.so/your-workspace/Page-Title-1234567890abcdef1234567890abcdef`
+
+**Note**: When using a page URL, CSV2Notion Neo will automatically create a new database within that page.
 
 </p>
 </details>
@@ -242,37 +274,39 @@ Optionally you can provide a URL to an existing Notion database with the `--url`
 </details>
 
 
-The tool also requires you to provide a `token_v2` cookie for the Notion website through `--token` option.
+The tool also requires you to provide a Notion integration token through the `--token` option.
 
-1. Login to your [Notion](https://www.notion.so/login) account via a web browser.
-2. Find and copy the entire `token_v2` value including `v02%3Auser_token_or_cookies%` from your Notion session.
+1. Go to [Notion Integrations](https://www.notion.so/my-integrations) and create a new integration.
+2. Copy the "Internal Integration Token" from your integration settings.
+3. Share your database with the integration by clicking "Share" on your database and adding your integration.
 
-<details><summary>Obtaining Notion Session Token (Safari)</summary>
+<details><summary>Creating Notion Integration</summary>
 <p>
 
-Enable Web Inspector
+1. **Create Integration:**
+   - Go to [https://www.notion.so/my-integrations](https://www.notion.so/my-integrations)
+   - Click "New integration"
+   - Give it a name (e.g., "Project Database")
+   - Select the workspace where your databases are located
+   - Click "Submit"
 
-- If you don’t see the Develop menu in the menu bar, choose Safari, Settings, click Advanced, then select “Show features for web developers”.
-- Press `⌥ + ⌘ + i` to show Web Inspector
+2. **Copy Integration Token:**
+   - After creating the integration, you'll see the "Internal Integration Token"
+   - Copy this token (starts with `ntn_`)
+
+3. **Share Database with Integration:**
+   - Pick (or create) a Notion page
+   - Click on the `...` More menu in the top-right corner of the page
+   - Scroll down to `+` Add Connections
+   - Search for your integration and select it
+   - Confirm the integration can access the page and all of its child pages
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_safari.gif?raw=true"> </p>
 
 </p>
 </details>
 
-<details><summary>Obtaining Notion Session Token (Brave, Chrome or Edge)</summary>
-<p>
-
-- Press ⌥ + ⌘ + i (Mac) or  Shift + Crtl + i (Win) to show Developer Tools.
-- Go to Application tab.
-- Copy and obtain your token_v2 value.
-
-<p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/notion_token_brave.png?raw=true"> </p>
-
-</p>
-</details>
-
-**Important notice**. `token_v2` cookie provides complete access to your Notion account. Handle it with caution.
+**Important notice**. Integration tokens provide access to databases you explicitly share with them. Handle them with caution and only share databases you want the integration to access.
 
 ### Upload Speed
 
@@ -318,7 +352,7 @@ The table below describes available codes for `--column-types` and what values a
 | Phone                   | `phone_number`          | string           | ❌                                     |
 | **Advanced**            |                         |                  |                                        |
 | Formula                 | `formula`               | `---`            | `---`                                  |
-| Relation                | `---`                   | key, Notion URL  | ✅                                     |
+| Relation                | `relation`              | key, Notion URL  | ✅                                     |
 | Rollup                  | `rollup`                | `---`            | `---`                                  |
 | Created time            | `created_time`          | any date format  | ❌                                     |
 | Created by              | `created_by`            | `---`            | `---`                                  |
@@ -372,7 +406,7 @@ If you want to set the same icon for each row, use the `--default-icon` option. 
 
 If you want to ensure that specific columns always have value and are not allowed to be empty, then use the `--mandatory-column` option. The program execution will stop if validation fails.
 
-### AI/ML Options (Hugging Face)
+### AI/ML Options (Hugging Face) (Experimental)
 
 Hugging Face is a prominent AI company known for its contributions to natural language processing (NLP) through its comprehensive open-source platform. It offers an extensive library called Transformers, which provides pre-trained models for a wide range of NLP tasks, including text generation, sentiment analysis, translation, and more. These models are based on state-of-the-art architectures like BERT, GPT, and T5.
 
@@ -438,9 +472,39 @@ Steps to Obtain a Hugging Face Token with Write Mode
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_01.png?raw=true"> </p>
+
+</p>
+</details>
+
+<details><summary>Creating Database within Existing Page</summary>
+<p>
+
+```shell
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  test.csv
+```
+
+**Note**: When you provide a page URL instead of a database URL, CSV2Notion Neo will automatically create a new database within that page using the file name (without extension) as the database title. This works with both CSV and JSON files.
+
+**Example with JSON file:**
+```shell
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  --payload-key-column "id" \
+  data.json
+```
 
 </p>
 </details>
@@ -449,8 +513,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE test
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
-  --column-types "number,multi_select" test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  --column-types "number,multi_select" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_02.png?raw=true"> </p>
 
@@ -461,8 +529,11 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
-  --url NOTION_URL test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_03.gif?raw=true"> </p>
 
@@ -473,9 +544,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
-  --merge test.csv
+  --merge \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_04.gif?raw=true"> </p>
 
@@ -486,11 +560,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE \
-  --url NOTION URL \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
   --merge \
   --merge-only-column "Column 2" \
-  --merge-onLy-column "Column 3" test.csv
+  --merge-only-column "Column 3" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_05.gif?raw=true"> </p>
 
@@ -501,8 +578,12 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_ TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
---image-column "Image Column" test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  --image-column "Image Column" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_06.gif?raw=true"> </p>
 
@@ -513,9 +594,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
   --image-column "Colour Image" "Black & White Image" "Map" \
-  --image-column-keep --mandatory-column "Cat ID" test.csv
+  --image-column-keep \
+  --mandatory-column "Cat ID" \
+  test.csv
 ```
 
 Example CSV
@@ -571,8 +657,12 @@ Example Folder Structure
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE  \
-  --icon-column "Icon Column" test.csv
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  --icon-column "Icon Column" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_07.gif?raw=true"> </p>
 
@@ -583,11 +673,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE  \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --default-icon 👍 \
   --merge \
-  --merge-only-column "Key" test.csv
+  --merge-only-column "Key" \
+  test.csv
 ```
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_08.gif?raw=true"> </p>
 
@@ -598,11 +691,14 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --mandatory-column "Cat ID" \
   --payload-key-column "Cat ID" \
-  --merge JSON-Demo.json
+  --merge \
+  JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_09.gif?raw=true"> </p>
@@ -614,12 +710,15 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
   --url NOTION_URL \
   --mandatory-column "Cat ID" \
   --payload-key-column "Cat ID" \
   --rename-notion-key-column "Cat ID" "Anything ID" \
-  --merge JSON-Demo.json
+  --merge \
+  JSON-Demo.json
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_10.gif?raw=true"> </p>
@@ -627,17 +726,22 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE \
 </p>
 </details>
 
-<details><summary>Utilising Hugging Face's AI/ML Model to Automatically Analyse and Generate Captions from Images</summary>
+<details><summary>Utilising Hugging Face's AI/ML Model to Analyse and Generate Captions from Images (Experimental)</summary>
 <p>
 
 ```shell
-csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --url NOTION_URL --hugging-face-token YOUR_HUGGING_FACE_TOKEN_HERE \
+csv2notion_neo \
+  --workspace YOUR_WORKSPACE_NAME_HERE \
+  --token secret_YOUR_INTEGRATION_TOKEN_HERE \
+  --url NOTION_URL \
+  --hugging-face-token YOUR_HUGGING_FACE_TOKEN_HERE \
   --hf-model blip-image \
   --caption-column "Image Filename" "Frame Description" \
   --image-column "Image Filename" \
   --image-column-keep \
   --mandatory-column "Cat ID" \
-  --merge big_cats.csv
+  --merge \
+  big_cats.csv
 ```
 
 <p align="center"> <img src="https://github.com/TheAcharya/csv2notion-neo/blob/master/assets/example_12.gif?raw=true"> </p>
@@ -657,23 +761,11 @@ csv2notion_neo --workspace YOUR_WORKSPACE_NAME_HERE --token YOUR_TOKEN_HERE --ur
 </p>
 </details>
 
-### [CommandPost](https://commandpost.io)
-
-<details><summary>CommandPost's Notion Toolbox</summary>
-<p>
-
-<p align="center"> <img src="https://github.com/CommandPost/CommandPost-Website/blob/main/docs/static/toolbox-notion.png?raw=true"> </p>
-
-</p>
-</details>
-
 ## Credits
 
 Original Idea and Workflow Architecture by [Vigneswaran Rajkumar](https://bsky.app/profile/vigneswaranrajkumar.com)
 
 Maintained by [Arjun Prakash](https://github.com/arjunprakash027) (1.0.0 ...)
-
-Original Work by [Vladilen Zhdanov](https://github.com/vzhd1701)
 
 Icon Design by [Bor Jen Goh](https://www.artstation.com/borjengoh)
 

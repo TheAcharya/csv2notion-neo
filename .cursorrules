@@ -2,7 +2,53 @@
 
 ## Project Context
 
-This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.8+ and uses Poetry for dependency management.
+This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.9+ and uses Poetry for dependency management.
+
+## Version 2.0.0+ Migration
+
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library. This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+
+### Migration Implementation Details
+
+#### New File Structure
+- `csv2notion_neo/notion_client.py`: Notion API client wrapper with comprehensive retry logic
+- `csv2notion_neo/notion_db.py`: Database operations with enhanced schema detection and thread-safe select option management
+- `csv2notion_neo/notion_row_upload_file.py`: File upload operations with retry logic
+- `csv2notion_neo/notion_db_client.py`: Extended client with additional functionality
+
+#### Removed Components
+- `csv2notion_neo/notion/` directory: Legacy API implementation
+- `csv2notion_neo/notion_row.py`: Old row handling classes
+- `csv2notion_neo/notion_db_collection.py`: Old collection management
+- `csv2notion_neo/notion_client_official.py`: Renamed to `notion_client.py`
+- `csv2notion_neo/notion_db_official.py`: Renamed to `notion_db.py`
+- `csv2notion_neo/notion_row_upload_file_official.py`: Renamed to `notion_row_upload_file.py`
+- `csv2notion_neo/notion_db_client_official.py`: Renamed to `notion_db_client.py`
+
+#### Key Implementation Changes
+- Authentication: Integration tokens with format validation instead of session cookies
+- Database Operations: Notion databases API endpoints with page URL support for creating databases within existing pages
+- File Uploads: Notion file_uploads API endpoints with comprehensive retry logic
+- Error Handling: Notion API error codes and responses with smart retry strategies
+- Rate Limiting: Built-in API rate limiting with exponential backoff
+- Property Validation: API property type validation with intelligent schema detection
+- Thread Safety: Thread-safe select option management to prevent race conditions during concurrent uploads
+- Retry Logic: Enhanced retry system with 15 attempts, exponential backoff, and jitter for production reliability
+- Logic Path Separation: Clear distinction between creating new databases in pages vs uploading to existing databases
+- Token Validation: User-friendly token format validation with clear error messages
+
+#### Compatibility Layer
+- Maintains existing method signatures where possible
+- Provides seamless transition from old to new API
+- Handles data structure differences between APIs
+- Preserves all existing functionality and features
+
+## Dependencies
+
+### Core Dependencies
+- Python 3.9+ required
+- Poetry for dependency management
+- Key dependencies: notion-client (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
 
 ## Code Style and Standards
 
@@ -44,6 +90,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Include context in log messages
 - Support configurable log levels
 - Use file-based logging for debugging
+- Provide clean, user-friendly output with verbose debugging options available
 
 ## Development Workflow
 
@@ -68,6 +115,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Use VCR for API response testing
 - Test both success and failure scenarios
 - Use ephemeral environment for local testing
+- Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials
 
 ### Git Workflow
 - Use descriptive commit messages
@@ -78,12 +126,17 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 ## API Integration Patterns
 
 ### Notion API
-- Use the custom Notion client in csv2notion_neo/notion/
-- Handle CRDT operations properly
-- Implement proper rate limiting
-- Use atomic transactions where possible
-- Handle file uploads with signed URLs
-- Note: Uses unofficial private APIs that may change without notice
+- Use the Notion API client implementation in csv2notion_neo/notion_client.py
+- Utilise the notion-sdk-py library for all Notion API interactions
+- Handle API responses and error codes properly with comprehensive retry logic
+- Implement proper rate limiting using API guidelines with exponential backoff
+- Use file_uploads endpoints for file operations with retry mechanisms
+- Follow Notion API specifications and best practices
+- Implement smart retry logic with 15 attempts, exponential backoff, and jitter
+- Handle different error types with appropriate retry strategies (server errors, rate limits, network issues)
+- Support two distinct logic paths: creating new databases in pages vs uploading to existing databases
+- Reference: [notion-sdk-py documentation](https://ramnes.github.io/notion-sdk-py/)
+- Reference: [Notion API documentation](https://developers.notion.com/)
 
 ### Hugging Face API
 - Implement retry logic for model loading
@@ -96,8 +149,14 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 ### CSV/JSON Handling
 - Validate input data thoroughly
 - Handle missing or malformed data gracefully
-- Support different delimiters and encodings
-- Implement proper column type detection
+- Support different delimiters and encodings (comma, semicolon, pipe, tab, etc.)
+- Implement proper column type detection with smart auto-detection engine
+- Timecode detection for video/film data (automatically set to Rich Text)
+- Boolean/checkbox detection with comprehensive pattern matching
+- Status/select detection for limited unique values with semantic meaning
+- Numeric detection for integers, decimals, and percentages
+- URL, email, and phone number pattern recognition
+- Date format detection supporting multiple international formats
 
 ### File Operations
 - Use pathlib for file path handling
@@ -109,9 +168,17 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 
 ### Multithreading
 - Use ThreadPoolExecutor for concurrent operations
-- Implement proper thread safety
+- Implement proper thread safety with locks for shared resources
 - Monitor thread usage and performance
 - Handle thread-local data appropriately
+- Prevent race conditions in select option management during concurrent uploads
+- Database creation within pages with proper initialization delays
+- Enhanced retry logic with 15 max retries and exponential backoff for API errors
+- Comprehensive retry mechanism for file uploads, page creation, and database operations
+- Robust error handling for 503 Service Unavailable, timeout, and 409 Conflict errors
+- Enhanced error handling for 409 Conflict errors during concurrent operations
+- Smart retry logic with jitter to prevent thundering herd problems
+- Production-ready retry system handling high concurrency, large files, and rate limits
 
 ### Memory Management
 - Process large files in chunks when possible
@@ -124,8 +191,9 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 ### Authentication
 - Never hardcode credentials in source code
 - Use environment variables for sensitive data
-- Implement secure token handling
+- Implement secure token handling with format validation
 - Validate authentication before operations
+- Provide user-friendly error messages for invalid tokens
 
 ### Data Privacy
 - Handle user data securely
@@ -140,6 +208,11 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Provide clear help messages
 - Validate argument combinations
 - Support both required and optional arguments
+- Note: --token (integration token) and --url (database URL or page URL) are now mandatory
+- Token format validation with user-friendly error messages
+- URL validation (Notion.so domain and protocol validation) with clear error messages
+- Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
+- Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py
 
 ### Environment Variables
 - Use python-dotenv for environment configuration
@@ -168,6 +241,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Mock external dependencies
 - Test both success and failure paths
 - Maintain high test coverage
+- Comprehensive test suite covering all CLI arguments and Notion SDK functionality
 
 ### Integration Tests
 - Test API integrations with real endpoints
@@ -257,11 +331,11 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Are authentication mechanisms secure?
 
 ### Integration
-- Do unofficial API integrations work correctly?
-- Are rate limits respected?
-- Is error handling robust?
-- Are fallback mechanisms in place?
-- Are unofficial API changes monitored and handled?
+- Do official API integrations work correctly?
+- Are rate limits respected according to official API guidelines?
+- Is error handling robust with official API error codes?
+- Are fallback mechanisms in place for API failures?
+- Are official API changes monitored and handled appropriately?
 
 ## Troubleshooting Guidelines
 
@@ -273,18 +347,62 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 - Use ephemeral build environment for isolated debugging
 
 ### Common Issues
-- Authentication token expiration
-- Unofficial API rate limiting
-- File upload failures
-- Network connectivity issues
+- Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
+- Invalid token format (resolved with user-friendly validation and guidance)
+- Invalid URL format (resolved with Notion.so domain and protocol validation)
+- API rate limiting (resolved with 15-attempt retry logic and exponential backoff)
+- File upload failures through API endpoints (resolved with enhanced retry logic)
+- Network connectivity issues (resolved with comprehensive retry mechanism)
 - Memory usage problems
-- Unofficial API breaking changes from Notion updates
+- Database access permissions and sharing requirements
 - Build environment issues (use `./scripts/local-test-build.sh --clean` to reset)
+- Database deletion operations requiring proper permissions and database URL validation (page URLs not supported for deletion operations)
+- Race conditions during concurrent select option creation (resolved with thread-safe implementation)
+- Database creation within pages timing issues (resolved with initialization delays and retry logic)
+- CSV delimiter parsing failures (resolved with delimiter parameter fix)
+- 409 Conflict errors during page creation (resolved with exponential backoff retry logic)
+- 503 Service Unavailable and timeout errors during uploads (resolved with enhanced retry mechanism)
+- Transient API errors and network connectivity issues (resolved with comprehensive retry logic)
+- High concurrency scenarios (resolved with smart retry logic and jitter)
+- Large file uploads (resolved with extended retry windows)
+- Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
+- Test execution issues (resolved with comprehensive test suite covering all functionality)
+- Test coverage gaps (resolved with 73 test methods across 18 categories)
 
 ### Performance Issues
 - Monitor thread usage
 - Check for memory leaks
 - Analyze API call patterns
 - Optimize data processing
+
+## Outdated Packages Held Back Due to Dependency Constraints
+
+The following packages are currently outdated but have not been updated because doing so would break compatibility with other dependencies in the project (such as flake8 plugins, wemake-python-styleguide, etc.):
+
+| Package                  | Installed | Latest   | Reason Held Back                                 |
+|--------------------------|-----------|----------|-------------------------------------------------|
+| click                    | 8.1.8     | 8.2.1    | Transitive, constrained by parent dependencies   |
+| eradicate                | 2.3.0     | 3.0.0    | Required by flake8-eradicate/wemake-styleguide   |
+| flake8                   | 3.9.0     | 7.3.0    | Required by wemake-python-styleguide             |
+| flake8-bandit            | 3.0.0     | 4.1.1    | Plugin, version tied to flake8                   |
+| flake8-broken-line       | 0.4.0     | 1.0.0    | Plugin, version tied to flake8                   |
+| flake8-bugbear           | 22.12.6   | 24.12.12 | Plugin, version tied to flake8                   |
+| flake8-commas            | 2.1.0     | 4.0.0    | Plugin, version tied to flake8                   |
+| flake8-eradicate         | 1.4.0     | 1.5.0    | Plugin, version tied to eradicate/flak8          |
+| flake8-isort             | 4.2.0     | 6.1.2    | Plugin, version tied to flake8/isort             |
+| flake8-rst-docstrings    | 0.2.7     | 0.3.1    | Plugin, version tied to flake8                   |
+| isort                    | 5.13.2    | 6.0.1    | Required by flake8-isort                         |
+| mccabe                   | 0.6.1     | 0.7.0    | Required by flake8 <5                            |
+| pep8-naming              | 0.11.1    | 0.15.1   | Latest requires flake8 >=5                       |
+| pre-commit               | 2.21.0    | 4.2.0    | Not updated to avoid breaking hooks              |
+| pycodestyle              | 2.7.0     | 2.14.0   | Required by flake8 <5                            |
+| pyfakefs                 | 4.7.0     | 5.9.1    | Not updated to avoid breaking tests              |
+| pyflakes                 | 2.3.1     | 3.4.0    | Required by flake8 <5                            |
+| pytest                   | 7.4.4     | 8.4.1    | Not updated to avoid breaking test compatibility |
+| pytest-cov               | 3.0.0     | 6.2.1    | Not updated to avoid breaking test compatibility |
+| testfixtures             | 7.2.2     | 9.1.0    | Not updated to avoid breaking test compatibility |
+| wemake-python-styleguide | 0.16.1    | 1.3.0    | Latest requires Python >=3.10                    |
+
+> These packages will be updated when their dependencies allow, or when the project drops support for Python 3.9 or older plugin versions.
 
 This cursorrule file should be kept in sync with the AGENT.MD file to ensure consistent development practices and project understanding. 

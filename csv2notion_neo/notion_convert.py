@@ -1,10 +1,18 @@
+"""
+CSV2Notion Neo - Data Conversion Engine
+
+This module provides the core data conversion engine for CSV2Notion Neo.
+It handles the conversion of CSV/JSON data to Notion-compatible formats,
+including complex data transformations, relation mapping, file handling,
+AI integration, and comprehensive error handling with validation.
+"""
+
 import logging
 from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-from csv2notion_neo.notion.user import User
-from csv2notion_neo.notion.utils import InvalidNotionIdentifier, extract_id
+from csv2notion_neo.utils_exceptions import NotionError
 
 from csv2notion_neo.local_data import LocalData, CSVRowType
 from csv2notion_neo.notion_convert_map import (
@@ -16,10 +24,13 @@ from csv2notion_neo.notion_convert_map import (
     map_url_or_file,
 )
 from csv2notion_neo.notion_db import NotionDB
-from csv2notion_neo.notion_row import CollectionRowBlockExtended
 from csv2notion_neo.notion_type_guess import is_email
 from csv2notion_neo.notion_uploader import NotionUploadRow
-from csv2notion_neo.utils_exceptions import NotionError, TypeConversionError, CriticalError
+from csv2notion_neo.utils_exceptions import (
+    NotionError,
+    TypeConversionError,
+    CriticalError,
+)
 from csv2notion_neo.utils_static import ConversionRules, FileType
 from csv2notion_neo.utils_str import split_str
 from icecream import ic
@@ -42,8 +53,13 @@ class NotionRowConverter(object):  # noqa:  WPS214
         for row in csv_data:
 
             if self.rules.rename_notion_key_column:
-                if self.rules.rename_notion_key_column[1] == self.rules.rename_notion_key_column[0]:
-                    raise CriticalError(f"Please do not provide same column name in rename-payload-key-column")
+                if (
+                    self.rules.rename_notion_key_column[1]
+                    == self.rules.rename_notion_key_column[0]
+                ):
+                    raise CriticalError(
+                        f"Please do not provide same column name in rename-payload-key-column"
+                    )
                 new_id = self.rules.rename_notion_key_column[1]
                 old_id = self.rules.rename_notion_key_column[0]
                 row[new_id] = row[old_id]
@@ -66,7 +82,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
     def _convert_row(self, row: CSVRowType) -> NotionUploadRow:
         properties = self._map_properties(row)
         columns = self._map_columns(row)
-        
+
         return NotionUploadRow(columns=columns, properties=properties)
 
     def _map_properties(self, row: CSVRowType) -> Dict[str, Any]:
@@ -79,15 +95,18 @@ class NotionRowConverter(object):  # noqa:  WPS214
             else:
                 properties["payload_key_column"] = self.rules.payload_key_column
 
-        #ai features
+        # ai features
         if self.rules.hugging_face_token:
             if self.rules.caption_column:
-                properties['AI'] = {"caption":{
-                    "hftoken":self.rules.hugging_face_token,
-                    "image_path": self.rules.csv_file.parent / Path(row[self.rules.caption_column[0]]),
-                    "caption_column":self.rules.caption_column[1],
-                    "model_url":self.csv_data.model_url
-                }}
+                properties["AI"] = {
+                    "caption": {
+                        "hftoken": self.rules.hugging_face_token,
+                        "image_path": self.rules.csv_file.parent
+                        / Path(row[self.rules.caption_column[0]]),
+                        "caption_column": self.rules.caption_column[1],
+                        "model_url": self.csv_data.model_url,
+                    }
+                }
 
         if self.rules.image_column_mode == "block":
             properties["cover_block"] = self._map_image(row)
@@ -110,7 +129,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         for col_key, col_value in row.items():
 
             col_type = self.db.columns[col_key]["type"]
-            
+
             notion_row[col_key] = self._map_column(col_key, col_value, col_type)
 
             self._raise_if_mandatory_empty(col_key, notion_row[col_key])
@@ -186,55 +205,52 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_image(self, row: CSVRowType) -> List:
 
-            image: Optional[FileType] = None
-            images = []
+        image: Optional[FileType] = None
+        images = []
 
-            if self.rules.image_column:
-        
-                for image_column in self.rules.image_column:
-                    image = row.get(image_column, "").strip()
-                    if image:
-                        image = map_url_or_file(image)
-                        
-                        if isinstance(image, Path):
-                            image = self._relative_path(image)
+        if self.rules.image_column:
 
-                    self._raise_if_mandatory_empty(image_column, image)
+            for image_column in self.rules.image_column:
+                image = row.get(image_column, "").strip()
+                if image:
+                    image = map_url_or_file(image)
 
-                    images.append(image)
-                    if not self.rules.image_column_keep:
-                        row.pop(image_column, None)
-            
-            return images
-    
-    def _map_non_cover_images(self,row:CSVRowType) ->  List:
+                    if isinstance(image, Path):
+                        image = self._relative_path(image)
+
+                self._raise_if_mandatory_empty(image_column, image)
+
+                images.append(image)
+                if not self.rules.image_column_keep:
+                    row.pop(image_column, None)
+
+        return images
+
+    def _map_non_cover_images(self, row: CSVRowType) -> List:
 
         images = None
 
         if self.rules.image_column:
             image_columns = self._remove_cover_image(self.rules.image_caption_column)
-            
 
         if self.rules.image_column:
             pass
 
-
-
-    def _remove_cover_image(self,image_column:List) -> List:
+    def _remove_cover_image(self, image_column: List) -> List:
 
         if len(image_column) == 1:
             return None
-        
+
         img_col_copy = image_column.copy()
         img_col_copy.pop(0)
 
         return img_col_copy
-    
-    def _mention_cover_image(self,image_column:List) -> List:
-	
+
+    def _mention_cover_image(self, image_column: List) -> List:
+
         if len(image_column) == 1:
             return image_column
-        
+
         img_col_copy = image_column.copy()
         cover_image = img_col_copy.pop(0)
         img_col_copy.append(cover_image)
@@ -258,7 +274,6 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_file(self, s: str) -> List[FileType]:
 
-    
         col_value = split_str(s)
 
         resolved_uris = []
@@ -286,14 +301,14 @@ class NotionRowConverter(object):  # noqa:  WPS214
         if _is_banned_extension(ensured_path):
             self._error(
                 f"File extension '*{ensured_path.suffix}' is not allowed"
-                f" to upload on csv2notion_neo.notion."
+                f" to upload on Notion."
             )
             return None
 
         return ensured_path
 
     def _relative_path(self, path: Path) -> Optional[Path]:
-        #PATH
+        # PATH
         search_path = self.rules.files_search_path
 
         if not path.is_absolute():
@@ -307,12 +322,12 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_relation(
         self, relation_column: str, col_value: str
-    ) -> List[CollectionRowBlockExtended]:
+    ) -> List[Dict[str, Any]]:
         col_values = split_str(col_value)
 
         resolved_relations = []
         for v in col_values:
-            if v.startswith("https://www.csv2notion_neo.notion.so/"):
+            if v.startswith("https://www.notion.so/"):
                 resolved_relation = self._resolve_relation_by_url(relation_column, v)
             else:
                 resolved_relation = self._resolve_relation_by_key(relation_column, v)
@@ -324,7 +339,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _resolve_relation_by_key(
         self, relation_column: str, key: str
-    ) -> Optional[CollectionRowBlockExtended]:
+    ) -> Optional[Dict[str, Any]]:
         relation = self.db.relations[relation_column]
 
         try:
@@ -343,7 +358,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _resolve_relation_by_url(
         self, relation_column: str, url: str
-    ) -> Optional[CollectionRowBlockExtended]:
+    ) -> Optional[Dict[str, Any]]:
         block_id = self._extract_id(url)
         if block_id is None:
             return None
@@ -363,13 +378,13 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _extract_id(self, url: str) -> Optional[str]:
         try:
-            return str(extract_id(url))
-        except InvalidNotionIdentifier:
-            self._error(f"'{url}' is not a valid csv2notion_neo.notion URL.")
-
+            from csv2notion_neo.notion_db import _extract_database_id_from_url
+            return _extract_database_id_from_url(url)
+        except Exception:
+            self._error(f"'{url}' is not a valid Notion URL.")
             return None
 
-    def _map_person(self, col_value: str) -> List[User]:
+    def _map_person(self, col_value: str) -> List[Dict[str, Any]]:
         col_values = split_str(col_value)
 
         resolved_persons = []

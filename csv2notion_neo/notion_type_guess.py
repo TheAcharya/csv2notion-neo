@@ -1,13 +1,22 @@
+"""
+CSV2Notion Neo - Intelligent Type Detection
+
+This module provides intelligent column type detection for CSV data.
+It analyzes data patterns to automatically determine the most appropriate
+Notion property types for each column, including dates, numbers, URLs, emails, etc.
+"""
+
 import math
 import re
 from typing import List
 from icecream import ic
 
+
 def guess_type_by_values(values_str: List[str]) -> str:
 
     if type(values_str[0]) == list:
         unique_values = set(map(tuple, values_str))
-    else:   
+    else:
         unique_values = set(filter(None, values_str))
 
     match_map = {
@@ -16,7 +25,7 @@ def guess_type_by_values(values_str: List[str]) -> str:
         "number": is_number,
         "url": is_url,
         "email": is_email,
-        "multi_select": is_multi
+        "multi_select": is_multi,
     }
 
     matches = (
@@ -24,7 +33,7 @@ def guess_type_by_values(values_str: List[str]) -> str:
         for value_type, match_func in match_map.items()
         if all(map(match_func, unique_values))
     )
-           
+
     return next(matches, "text")
 
 
@@ -34,14 +43,16 @@ def is_number(s: str) -> bool:
     except:
         return False
 
+
 def is_multi(s) -> bool:
-    
+
     try:
         if type(s) == tuple:
             return True
     except:
         return None
-    
+
+
 def is_url(s: str) -> bool:
 
     try:
@@ -52,7 +63,9 @@ def is_url(s: str) -> bool:
 
 def is_email(s: str) -> bool:
     try:
-        return re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", s) is not None
+        return (
+            re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", s) is not None
+        )
     except:
         return None
 

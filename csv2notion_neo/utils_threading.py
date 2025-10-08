@@ -1,14 +1,24 @@
+"""
+CSV2Notion Neo - Threading Utilities
+
+This module provides threading utilities for concurrent operations in CSV2Notion Neo.
+It manages thread pools, concurrent uploads, and thread-safe operations to optimize
+performance when processing large datasets.
+"""
+
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Callable, Iterable, Iterator
 
 from csv2notion_neo.notion_db import NotionDB
+from csv2notion_neo.notion_client import NotionClient
 from csv2notion_neo.notion_db_client import NotionClientExtended
 from csv2notion_neo.notion_uploader import NotionRowUploader
 from icecream import ic
 
+
 class ThreadRowUploader(object):
-    def __init__(self, client: NotionClientExtended, collection_id: str) -> None:
+    def __init__(self, client: NotionClient, collection_id: str) -> None:
         self.thread_data = threading.local()
 
         self.client = client
@@ -18,9 +28,14 @@ class ThreadRowUploader(object):
         try:
             notion_uploader = self.thread_data.uploader
         except AttributeError:
-            client = NotionClientExtended(old_client=self.client)
+            # Create a new extended client for this thread
+            client = NotionClientExtended(
+                integration_token=self.client.integration_token,
+                workspace=self.client.workspace,
+                options=self.client.options
+            )
             notion_db = NotionDB(client, self.collection_id)
-            
+
             notion_uploader = NotionRowUploader(notion_db)
             self.thread_data.uploader = notion_uploader
 

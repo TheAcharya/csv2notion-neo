@@ -12,12 +12,13 @@ The `local-test-build.sh` script provides a completely ephemeral build environme
 - Cross-Platform: Works on macOS (Apple Silicon)
 - Clean Output: Professional logging without emojis
 - Flexible Updates: Multiple dependency management options
+- Comprehensive Testing: Built-in support for comprehensive test suite
 
 ## Prerequisites
 
 ### System Requirements
 - macOS (Apple Silicon)
-- System Python 3.8+ installed (matches GitHub Actions workflow)
+- System Python 3.9+ installed (matches GitHub Actions workflow)
 - Basic tools: `curl`, `xar`, `cpio` (usually pre-installed on macOS)
 
 ## Quick Start
@@ -30,8 +31,8 @@ The `local-test-build.sh` script provides a completely ephemeral build environme
 
 This will:
 1. Create a virtual environment in `.build/python/`
-2. Install setuptools 69.0.0 (matches GitHub Actions)
-3. Install Poetry 1.7.1 in the virtual environment
+2. Install setuptools 80.9.0 (matches GitHub Actions)
+3. Install Poetry 2.1.3 in the virtual environment
 4. Install project dependencies via Poetry
 5. Install PyInstaller for building
 6. Build the application
@@ -51,6 +52,9 @@ This will:
 
 # Build and run tests
 ./scripts/local-test-build.sh --test
+
+# Run comprehensive test suite
+./scripts/local-test-build.sh --comprehensive-test
 
 # Clean build directory and exit
 ./scripts/local-test-build.sh --clean
@@ -133,7 +137,13 @@ csv2notion-neo/
    ./scripts/local-test-build.sh --update-deps
    ```
 
-4. Clean and Rebuild
+4. Run Comprehensive Tests
+   ```bash
+   # Run comprehensive test suite (no credentials required)
+   ./scripts/local-test-build.sh --comprehensive-test
+   ```
+
+5. Clean and Rebuild
    ```bash
    # Clean everything
    ./scripts/local-test-build.sh --clean
@@ -152,21 +162,64 @@ The script is designed to work seamlessly with GitHub Actions and uses identical
   run: |
     chmod +x scripts/local-test-build.sh
     ./scripts/local-test-build.sh
+
+# Example comprehensive test step
+- name: Run Comprehensive Tests
+  run: |
+    chmod +x scripts/local-test-build.sh
+    ./scripts/local-test-build.sh --comprehensive-test
 ```
 
 Version Alignment with GitHub Actions:
-- Python: 3.8+ (matches `BUILD_PYTHON_VERSION: 3.8`)
-- Poetry: 1.7.1 (matches `BUILD_POETRY_VERSION: 1.7.1`)
-- Setuptools: 69.0.0 (matches `setuptools==69.0.0`)
+- Python: 3.9+ (matches `BUILD_PYTHON_VERSION: 3.9`)
+- Poetry: 2.1.3 (matches `BUILD_POETRY_VERSION: 2.1.3`)
+- Setuptools: 80.9.0 (matches `setuptools==80.9.0`)
 - PyInstaller: Latest version (matches CI workflow)
+
+## Comprehensive Testing
+
+The script includes built-in support for running the comprehensive test suite, which validates all CLI arguments and Notion SDK functionality without requiring actual Notion credentials.
+
+### Comprehensive Test Features
+
+- No Credentials Required: Tests run without actual Notion API calls
+- CLI Validation: Tests all 50+ CLI arguments and switches
+- SDK Testing: Tests Notion SDK functionality using mocking
+- Fast Execution: Complete test suite runs in under 1 second
+- Detailed Traceback: Uses `--tb=long` for better debugging
+- Automatic Setup: Creates build environment if it doesn't exist
+
+### Running Comprehensive Tests
+
+```bash
+# Run comprehensive test suite
+./scripts/local-test-build.sh --comprehensive-test
+
+# The script will:
+# 1. Check if .build/ directory exists
+# 2. Set up build environment if needed
+# 3. Run comprehensive test suite with detailed traceback
+# 4. Report success/failure status
+```
+
+### Test Coverage
+
+The comprehensive test suite covers:
+- CLI argument parsing and validation
+- Error handling and edge cases
+- Notion SDK client initialization
+- Database operations (mocked)
+- File upload functionality (mocked)
+- Row conversion and upload operations
+- Test runner functionality validation
 
 ## Environment Details
 
 ### Virtual Environment
 - Location: `.build/python/`
-- Python: Uses system Python 3.8+ with `python3 -m venv`
-- Setuptools: 69.0.0 (installed before Poetry)
-- Poetry: 1.7.1 (installed via pip in the virtual environment)
+- Python: Uses system Python 3.9+ with `python3 -m venv`
+- Setuptools: 80.9.0 (installed before Poetry)
+- Poetry: 2.1.3 (installed via pip in the virtual environment)
 - Dependencies: Managed by Poetry in `.build/venv/`
 
 ### Build Output
@@ -211,6 +264,24 @@ Version Alignment with GitHub Actions:
    chmod +x scripts/local-test-build.sh
    ```
 
+5. SSL Warning during build
+   ```
+   urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+   ```
+   This warning is normal on macOS when building locally due to different SSL library versions between the build environment and system. It doesn't affect the functionality of the built binary and can be safely ignored.
+
+6. Comprehensive test failures
+   ```bash
+   # Check if test file exists
+   ls -la tests/test_comprehensive.py
+   
+   # Run with verbose output to see detailed errors
+   ./scripts/local-test-build.sh --comprehensive-test
+   
+   # Check build environment
+   ls -la .build/
+   ```
+
 ### Debug Mode
 
 If you encounter issues, you can inspect the build environment:
@@ -230,6 +301,12 @@ ls -la .build/
 
 # Check PyInstaller installation
 .build/python/bin/poetry run pyinstaller --version
+
+# Check comprehensive test environment
+.build/python/bin/poetry run pytest tests/test_comprehensive.py -v --tb=long
+
+# Run comprehensive tests manually
+.build/python/bin/poetry run pytest tests/test_comprehensive.py::TestCLIArgumentParsing -v
 ```
 
 ## Cleanup

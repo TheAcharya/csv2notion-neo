@@ -1,5 +1,32 @@
 # Changelog
 
+### 2.0.0
+
+**🎉 Released:**
+- TBD
+
+**🔨 Improvements:**
+- Migrated from unofficial Notion private API to official [Notion API](https://developers.notion.com/)
+- Integrated [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library for official API support
+- Changed authentication from `token_v2` session cookies to official Notion integration tokens
+- Made `--url` parameter mandatory for all operations (database URL or page URL required)
+- Automatic database creation is no longer supported
+- Standardised API interactions following official Notion specifications (#54)
+- Better error handling with official API error codes and responses
+- Improved file upload reliability using official `file_uploads` endpoints
+- Better rate limiting using official API guidelines (#56)
+- Added `--delete-all-database-entries`: Archive all entries within a specified database with progress tracking (#48)
+- Enhanced `--url` validation with `Notion.so` domain and protocol validation
+- Improved `--token` format validation with user-friendly error messages
+- Added comprehensive test suite with 73 test methods across 18 test categories (#17)
+- Upgraded from Python 3.8 to Python 3.9
+- Updated to latest security patches across most dependencies
+- Improved build reproducibility across environments
+- Enhanced ephemeral build `local-test-build.sh` reliability
+- Improved codebase formatting
+
+---
+
 ### 1.3.6
 
 **🎉 Released:**

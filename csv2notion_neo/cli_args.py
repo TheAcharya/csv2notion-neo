@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - Command Line Argument Parser
+
+This module provides comprehensive command line argument parsing for CSV2Notion Neo.
+It handles all CLI options including file uploads, database management, column types,
+merge operations, validation settings, and AI-powered features with proper validation.
+"""
+
 import argparse
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union
@@ -13,15 +21,17 @@ ArgOption = Dict[str, Any]
 ArgSchema = Dict[str, Dict[ArgToken, ArgOption]]
 HELP_ARGS_WIDTH = 50
 
+
 class CustomHelpFormatter(argparse.RawTextHelpFormatter):
     def _format_args(self, action, default_metavar):
         return ""
-    
+
+
 def parse_args(argv: Sequence[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="csv2notion_neo",
         description="https://github.com/TheAcharya/csv2notion-neo \n\nUpload & Merge CSV or JSON Data with Images to Notion Database",
-        usage="%(prog)s [-h] --token TOKEN [--url URL] [OPTION]... FILE",
+        usage="%(prog)s [-h] --token TOKEN --url URL [OPTION]... FILE",
         add_help=False,
         formatter_class=lambda prog: CustomHelpFormatter(
             prog, max_help_position=HELP_ARGS_WIDTH
@@ -34,26 +44,28 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "type": Path,
                 "help": "CSV or JSON file to upload",
                 "metavar": "FILE",
+                "nargs": "?",  # Make optional
             }
         },
         "general options": {
-            "--workspace":{
-                "help": (
-                    "active Notion workspace name"
-                ),
-                "required":True,
+            "--workspace": {
+                "help": ("active Notion workspace name"),
+                "required": True,
                 "metavar": "workspace",
             },
             "--token": {
-                "help": "Notion token, stored in token_v2 cookie for notion.so",
+                "help": "Notion integration token (create at https://www.notion.so/my-integrations)",
                 "required": True,
+                "type": _validate_notion_token,
             },
             "--url": {
                 "help": (
-                    "Notion database URL; if none is provided,"
-                    " will create a new database"
+                    "Notion database URL or page URL (required);"
+                    "\nIf page URL provided, database will be created within the page"
                 ),
                 "metavar": "URL",
+                "required": True,
+                "type": _validate_notion_url,
             },
             "--max-threads": {
                 "type": lambda x: max(int(x), 1),
@@ -79,26 +91,24 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "help": "show this help message and exit",
             },
         },
-        "machine learning options":{
-            "--hugging-face-token":{
-                "help": (
-                    "Hugging Face token to use image captioning model online"
-                ),
+        "machine learning options": {
+            "--hugging-face-token": {
+                "help": ("Hugging Face token to use image captioning model online"),
                 "metavar": "AI",
             },
-            "--hf-model":{
+            "--hf-model": {
                 "help": (
                     "Provide the model used for generating caption <vit-gpt2 | blip-image | git-large> (defaults: vit-gpt2)"
                 ),
                 "metavar": "AI",
             },
-            "--caption-column":{
-                "help":(
+            "--caption-column": {
+                "help": (
                     "Provide both image column and column where caption would be written"
                 ),
-                "metavar":"AI",
-                "nargs":2,
-            }
+                "metavar": "AI",
+                "nargs": 2,
+            },
         },
         "column options": {
             "--column-types": {
@@ -115,7 +125,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "Delimiter that is used to seperate columns and rows in csv file"
                     "\nif none is provided, ',' is taken as default"
                 ),
-                "default": ","
+                "default": ",",
             },
             "--add-missing-columns": {
                 "action": "store_true",
@@ -124,10 +134,10 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     " add them to Notion DB"
                 ),
             },
-            "--rename-notion-key-column":{
-                "nargs":2,
-                "help":"rename the key column in the file to a different key column in Notion DB",
-                "metavar":"column",
+            "--rename-notion-key-column": {
+                "nargs": 2,
+                "help": "rename the key column in the file to a different key column in Notion DB",
+                "metavar": "column",
             },
             "--randomize-select-colors": {
                 "action": "store_true",
@@ -169,13 +179,22 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "help": "add missing entries into linked Notion DB",
             },
         },
+        "database management options": {
+            "--delete-all-database-entries": {
+                "action": "store_true",
+                "help": (
+                    "delete (archive) all entries in the specified database;"
+                    "\nWARNING: This action cannot be undone!"
+                ),
+            },
+        },
         "page cover options": {
             "--image-column": {
                 "help": (
                     "One or more CSV or JSON column that points to URL or image file"
                     " that will be embedded for that row"
                 ),
-                "nargs":"*",
+                "nargs": "*",
                 "metavar": "COLUMN",
             },
             "--image-column-keep": {
@@ -239,7 +258,7 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                     "JSON object that is the key in notion db."
                     " if json file is used, this cannot be empty!"
                 ),
-                "metavar": "key column"
+                "metavar": "key column",
             },
             "--fail-on-relation-duplicates": {
                 "action": "store_true",
@@ -318,7 +337,7 @@ def _parse_schema(  # noqa: WPS210
     for group_name, group_args in schema.items():
         if group_name == "POSITIONAL":
             group = parser
-        else: 
+        else:
             group = parser.add_argument_group(group_name)
 
         for arg, arg_params in group_args.items():
@@ -332,6 +351,91 @@ def _parse_default_icon(default_icon: str) -> FileType:
         if not default_icon_filetype.exists():
             raise CriticalError(f"File not found: {default_icon_filetype}")
     return default_icon_filetype
+
+
+def _validate_notion_token(token: str) -> str:
+    """
+    Validate Notion integration token format.
+    
+    Args:
+        token: The token string to validate
+        
+    Returns:
+        The validated token string
+        
+    Raises:
+        CriticalError: If token format is invalid
+    """
+    if not token:
+        raise CriticalError(
+            "Notion integration token cannot be empty. "
+            "Please provide a valid token starting with 'ntn_' or 'secret_'."
+        )
+    
+    # Check if token starts with valid prefixes
+    if not (token.startswith("ntn_") or token.startswith("secret_")):
+        raise CriticalError(
+            f"Invalid Notion integration token format: '{token}'\n"
+            "Notion integration tokens must start with 'ntn_' or 'secret_'.\n"
+            "Please create a new integration at https://www.notion.so/my-integrations\n"
+            "and copy the 'Internal Integration Token' from your integration settings."
+        )
+    
+    # Additional validation for token length (basic sanity check)
+    if len(token) < 20:
+        raise CriticalError(
+            f"Token appears to be too short: '{token}'\n"
+            "Notion integration tokens are typically longer. "
+            "Please verify you copied the complete token from your integration settings."
+        )
+    
+    return token
+
+
+def _validate_notion_url(url: str) -> str:
+    """
+    Validate Notion URL format.
+    
+    Args:
+        url: The URL string to validate
+        
+    Returns:
+        The validated URL string
+        
+    Raises:
+        CriticalError: If URL format is invalid
+    """
+    if not url:
+        raise CriticalError(
+            "Notion URL cannot be empty. "
+            "Please provide a valid Notion database or page URL."
+        )
+    
+    # Check if URL starts with http/https
+    if not (url.startswith("http://") or url.startswith("https://")):
+        raise CriticalError(
+            f"Invalid URL format: '{url}'\n"
+            "Notion URLs must start with 'http://' or 'https://'."
+        )
+    
+    # Check if URL contains notion.so domain
+    if "notion.so" not in url:
+        raise CriticalError(
+            f"Invalid Notion URL: '{url}'\n"
+            "Only Notion.so URLs are supported. "
+            "Please provide a valid Notion database or page URL from notion.so domain."
+        )
+    
+    # Additional validation for URL structure
+    if not ("/" in url and len(url.split("/")) >= 4):
+        raise CriticalError(
+            f"Invalid Notion URL structure: '{url}'\n"
+            "Notion URLs should have the format: "
+            "https://www.notion.so/workspace/database-id or "
+            "https://www.notion.so/workspace/page-id"
+        )
+    
+    return url
 
 
 def _parse_column_types(column_types: str) -> List[str]:
