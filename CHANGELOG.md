@@ -3,7 +3,7 @@
 ### 2.0.0
 
 **🎉 Released:**
-- TBD
+- 8th October 2025
 
 **🔨 Improvements:**
 - Migrated from unofficial Notion private API to official [Notion API](https://developers.notion.com/)
