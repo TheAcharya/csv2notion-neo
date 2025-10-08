@@ -3,8 +3,9 @@ name: unit_tests
 on:
   workflow_dispatch:
   
-  schedule:
-    - cron: '0 12 * * 6' # Runs at 8 PM Singapore time (12:00 UTC) every Saturday
+  workflow_run:
+    workflows: ["build"]
+    types: [completed]
       
 env:
   BUILD_PYTHON_VERSION: 3.9
