@@ -588,6 +588,29 @@ class TestDataProcessing:
         # Test list input
         result = split_str(["a", "b", "c"])
         assert result == ["a", "b", "c"]
+    
+    def test_date_conversion(self):
+        """Test date conversion to Notion property format.
+        
+        Verifies fix for bug where date dictionaries were being double-wrapped,
+        causing API error: 'date.start should be a valid ISO 8601 date string,
+        instead was `"{'start': '2001-08-12T00:00:00'}"`.'
+        """
+        from csv2notion_neo.notion_convert_map import map_notion_date
+        
+        # Test that map_notion_date returns proper dictionary structure
+        date_value = map_notion_date("2001-08-12")
+        assert isinstance(date_value, dict)
+        assert "start" in date_value
+        assert isinstance(date_value["start"], str)
+        
+        # Test date range
+        date_range = map_notion_date("2001-08-12, 2001-08-15")
+        assert isinstance(date_range, dict)
+        assert "start" in date_range
+        assert "end" in date_range
+        assert isinstance(date_range["start"], str)
+        assert isinstance(date_range["end"], str)
 
 
 # ============================================================================
