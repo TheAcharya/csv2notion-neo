@@ -7,7 +7,7 @@
 - 10th October 2025
 
 **🐞 Bug Fix:**
-- Fixed date field API validation error where date dictionaries were being double-wrapped (#63)
+- Fixed date field API validation error where date dictionaries were being double-wrapped (#62)
 - Added comprehensive test coverage for date conversion functionality with 74 total test methods 
 
 ---
