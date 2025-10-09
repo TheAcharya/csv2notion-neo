@@ -1,5 +1,17 @@
 # Changelog
 
+
+### 2.0.1
+
+**🎉 Released:**
+- 10th October 2025
+
+**🐞 Bug Fix:**
+- Fixed date field API validation error where date dictionaries were being double-wrapped (#63)
+- Added comprehensive test coverage for date conversion functionality with 74 total test methods 
+
+---
+
 ### 2.0.0
 
 **🎉 Released:**
