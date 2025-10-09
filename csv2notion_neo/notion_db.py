@@ -633,6 +633,7 @@ class NotionDB:
         elif prop_type == "date":
             if value is None or value == "":
                 return None
+            # Value is already a dict from map_notion_date, wrap it as-is
             return {"date": value}
         elif prop_type == "checkbox":
             if value is None or value == "":
