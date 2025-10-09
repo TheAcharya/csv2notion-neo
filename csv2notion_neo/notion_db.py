@@ -633,7 +633,8 @@ class NotionDB:
         elif prop_type == "date":
             if value is None or value == "":
                 return None
-            return {"date": {"start": str(value)}}
+            # Value is already a dict from map_notion_date, wrap it as-is
+            return {"date": value}
         elif prop_type == "checkbox":
             if value is None or value == "":
                 return {"checkbox": False}
