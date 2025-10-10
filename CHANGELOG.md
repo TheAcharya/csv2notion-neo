@@ -1,5 +1,16 @@
 # Changelog
 
+### 2.0.2
+
+**🎉 Released:**
+- 11th October 2025
+
+**🐞 Bug Fix:**
+- Fixed `NotionDB.rows` property to fetch all pages from Notion API for large datasets (#64) Thanks @timotif!
+- Added pagination test with 250 rows to validate correct page fetching and caching (#64)
+- Made cache initialization thread-safe to prevent race conditions (#64)
+
+---
 
 ### 2.0.1
 

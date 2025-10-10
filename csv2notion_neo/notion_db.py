@@ -189,7 +189,7 @@ class NotionDB:
                     has_more = response.get("has_more", False)
                     start_cursor = response.get("next_cursor")
                 
-                self.logger.debug(f"Loaded {len(self._cache_rows)} rows from {page_count} pages")
+                # self.logger.debug(f"Loaded {len(self._cache_rows)} rows from {page_count} pages")
                 
             except Exception as e:
                 self.logger.error(f"Failed to get database rows: {e}")

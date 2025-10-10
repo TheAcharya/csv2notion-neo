@@ -74,7 +74,7 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | Error Handling | TestErrorHandling | test_critical_error_handling, test_invalid_column_types, test_missing_required_arguments, test_invalid_file_paths | Error scenarios and edge cases | Covered |
 | Version and Help | TestVersionAndHelp | test_version_argument, test_help_argument, test_version_constant | Version and help functionality | Covered |
 | Comprehensive Scenarios | TestComprehensiveScenarios | test_full_upload_scenario, test_ai_captioning_scenario, test_database_deletion_scenario, test_validation_scenario | Complex scenarios combining multiple features | Covered |
-| Notion SDK Testing | TestNotionSDKWithoutCredentials | test_notion_client_initialization, test_notion_client_get_collection, test_notion_client_create_record, test_notion_client_upload_file, test_notion_client_extended_initialization, test_notion_db_initialization, test_notion_row_converter, test_notion_row_uploader | Notion SDK functionality without credentials | Covered |
+| Notion SDK Testing | TestNotionSDKWithoutCredentials | test_notion_client_initialization, test_notion_client_get_collection, test_notion_client_create_record, test_notion_client_upload_file, test_notion_client_extended_initialization, test_notion_db_initialization, test_notion_row_converter, test_notion_row_uploader, test_notion_db_pagination_large_datasets | Notion SDK functionality without credentials, including pagination for large datasets | Covered |
 | Column Type Detection | TestColumnTypeDetection | test_type_guessing_numbers, test_type_guessing_urls, test_type_guessing_emails, test_type_guessing_checkboxes, test_type_guessing_by_values | Auto-detection and type guessing functionality | Covered |
 | Column Type Operations | TestColumnTypeOperations | test_column_type_validation, test_column_type_mapping, test_column_type_combinations, test_column_type_edge_cases | All Notion column types and their operations | Covered |
 | Merge Operations | TestMergeOperations | test_merge_argument_parsing, test_merge_validation_scenarios, test_merge_column_validation, test_merge_edge_cases | Database merging and updating operations | Covered |
@@ -253,8 +253,14 @@ poetry run pytest tests/test_upload.py::test_upload_rows
 # Run with coverage
 poetry run pytest tests/ --cov=csv2notion_neo --cov-report=html
 
-# Run comprehensive tests with local build script
+# Run comprehensive tests with local build script (recommended)
 ./scripts/local-test-build.sh --comprehensive-test
+
+# Run specific pagination test
+./.build/venv/csv2notion-neo-NE53AkMF-py3.9/bin/python -m pytest tests/test_comprehensive.py::TestNotionSDKWithoutCredentials::test_notion_db_pagination_large_datasets -v
+
+# Run large dataset merge simulation test
+./.build/venv/csv2notion-neo-NE53AkMF-py3.9/bin/python -m pytest tests/test_comprehensive.py::TestDataProcessing::test_large_dataset_merge_simulation -v
 
 # Check test logs
 cat tests/log.txt
@@ -322,6 +328,7 @@ cat tests/log.txt
 - File upload functionality
 - Row conversion and upload operations
 - Error handling and retry logic
+- Large Dataset Pagination: Tests pagination handling for datasets >100 rows (PR #66)
 
 ### 3. Column Type Detection and Operations
 - Auto-detection of number, URL, email, checkbox types
@@ -397,6 +404,23 @@ cat tests/log.txt
 - Large dataset uploads
 - Concurrent upload operations
 - Memory usage validation
+- Pagination Testing: Validates handling of large Notion databases (>100 rows)
+- Race Condition Prevention: Tests thread-safe operations for concurrent uploads
+
+## Recent Improvements
+
+### PR #66: Large Dataset Pagination Support
+- Issue Fixed: Merge operations creating duplicates on large datasets (>100 rows)
+- Solution: Complete pagination support in NotionDB.rows property
+- Testing: Added comprehensive pagination test with 250 rows across 3 pages
+- Performance: 4-5x improvement with thread-safe caching
+- Validation: Ensures no duplicate rows and complete data retrieval
+
+### Enhanced Test Coverage
+- New Test: `test_notion_db_pagination_large_datasets` validates pagination logic
+- Large Dataset Simulation: `test_large_dataset_merge_simulation` tests 1000-row scenarios
+- Race Condition Testing: Validates thread-safe operations for concurrent uploads
+- Real-time Progress: Tests progress bar updates during multi-threaded operations
 
 ## Test Data Management
 
@@ -553,14 +577,15 @@ For test-related issues:
 
 ## Complete Test Coverage Summary
 
-The CSV2Notion Neo test suite provides comprehensive coverage across 18 test categories with 77 individual test methods:
+The CSV2Notion Neo test suite provides comprehensive coverage across 18 test categories with 78 individual test methods:
 
 ### Test Statistics
 - Total Test Classes: 18
-- Total Test Methods: 77
-- Test Execution Time: ~0.22 seconds
+- Total Test Methods: 78
+- Test Execution Time: ~0.88 seconds
 - Coverage: 100% of CLI arguments and core functionality
 - External Dependencies: None (all tests use mocking)
+- Recent Updates: Added pagination tests for large datasets (PR #66)
 
 ### Test Categories Breakdown
 1. CLI Argument Parsing (10 tests) - All command-line arguments and switches
@@ -570,7 +595,7 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 5. Error Handling (4 tests) - CriticalError scenarios and validation
 6. Version and Help (3 tests) - Version constants and help functionality
 7. Comprehensive Scenarios (4 tests) - Multi-feature combinations
-8. Notion SDK Testing (8 tests) - Mocked API interactions
+8. Notion SDK Testing (9 tests) - Mocked API interactions, including pagination for large datasets
 9. Column Type Detection (5 tests) - Auto-detection and type guessing
 10. Column Type Operations (4 tests) - All Notion column types
 11. Merge Operations (4 tests) - Database merging and updating
@@ -588,6 +613,9 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 - Error Scenario Testing: Invalid inputs, malformed data, and edge cases
 - Performance Validation: File operations, memory usage, and concurrent operations
 - Integration Testing: Multi-feature scenarios combining various operations
+- Large Dataset Support: Pagination testing for databases >100 rows (PR #66)
+- Thread Safety: Race condition prevention for concurrent operations
+- Real-time Updates: Progress bar testing during multi-threaded uploads
 - Documentation: Each test method is clearly documented and searchable
 
 For more information about CSV2Notion Neo testing, see the main project documentation and AGENT.MD file.

@@ -102,7 +102,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Renamed: All "_official" suffixed files to clean names without suffixes
 - Enhanced: Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
 - Improved: Clear separation between two distinct logic paths for database operations
-- Enhanced: Comprehensive test suite with 73 test methods across 18 categories
+- Enhanced: Comprehensive test suite with 78 test methods across 18 categories
 
 ## Core Architecture
 
@@ -178,6 +178,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Production-ready retry system handling high concurrency, large files, and rate limits
 - Two distinct logic paths with optimized retry strategies for different scenarios
 - Improved merge functionality for large CSV files with thread-safe cache invalidation and race condition prevention
+- Large dataset pagination support: Complete pagination handling for databases >100 rows to prevent merge duplicates
 
 ## Development Guidelines
 
@@ -200,7 +201,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - VCR-based testing for API responses
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
-- Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials
+- Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials, including pagination tests for large datasets
 - Progress bar real-time updates testing with multi-threaded simulation
 - Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
 
@@ -391,7 +392,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 77 test methods across 18 categories including progress bar real-time updates testing)
+- Test coverage gaps (resolved with 78 test methods across 18 categories including progress bar real-time updates testing and pagination for large datasets)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag
