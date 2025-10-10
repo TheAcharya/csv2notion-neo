@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "csv2notion_neo"
-version = "2.0.1"
+version = "2.0.2"
 description = "Upload & Merge CSV or JSON Data with Images to Notion Database"
 authors = ["Arjun <arjunprakash027@gmail.com>"]
 readme = "README.md"
