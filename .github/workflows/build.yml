@@ -23,7 +23,7 @@ on:
   workflow_dispatch:
     
   schedule:
-    - cron: '0 23 * * 5' # Runs at 7 AM Singapore time (23:00 UTC) on Saturday
+    - cron: '0 22 * * *' # Runs at 6 AM Singapore time (22:00 UTC) daily
 
 env:
   BUILD_PYTHON_VERSION: 3.9

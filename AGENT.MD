@@ -167,7 +167,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Performance Features
 - Multithreaded uploads for improved speed with race condition prevention
 - Rate limiting to respect Notion API limits with exponential backoff
-- Progress tracking with tqdm
+- Progress tracking with tqdm and real-time updates during multi-threaded operations
 - Thread-safe select option management to prevent conflicts during concurrent uploads
 - Database creation within pages with proper initialization delays and retry logic
 - Enhanced retry mechanism with 15 max retries and exponential backoff for API errors
@@ -177,6 +177,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Smart retry logic with jitter to prevent thundering herd problems
 - Production-ready retry system handling high concurrency, large files, and rate limits
 - Two distinct logic paths with optimized retry strategies for different scenarios
+- Improved merge functionality for large CSV files with thread-safe cache invalidation and race condition prevention
 
 ## Development Guidelines
 
@@ -200,6 +201,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
 - Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials
+- Progress bar real-time updates testing with multi-threaded simulation
+- Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
 
 ### Code Quality
 - Black formatting with 88 character line length
@@ -388,7 +391,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 73 test methods across 18 categories)
+- Test coverage gaps (resolved with 77 test methods across 18 categories including progress bar real-time updates testing)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

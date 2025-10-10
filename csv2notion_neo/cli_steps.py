@@ -88,16 +88,33 @@ def upload_rows(
     is_merge: bool,
     max_threads: int,
 ) -> None:
-    worker = partial(
-        ThreadRowUploader(client, collection_id).worker,
-        is_merge=is_merge,
-    )
-
-    tdqm_iter = tqdm(
-        iterable=process_iter(worker, notion_rows, max_workers=max_threads),
+    # Create progress bar with real-time updates but same look as before
+    with tqdm(
         total=len(notion_rows),
         leave=False,
-    )
-
-    # Consume iterator
-    list(tdqm_iter)
+        mininterval=0.1,  # Update at least every 100ms for real-time updates
+        maxinterval=1.0,   # Update at most every 1 second
+        smoothing=0.1,     # Smooth progress updates
+    ) as pbar:
+        
+        if max_threads == 1:
+            # Single-threaded: update progress bar during each operation
+            worker = partial(
+                ThreadRowUploader(client, collection_id).worker,
+                is_merge=is_merge,
+            )
+            for i, row in enumerate(notion_rows):
+                worker(row)
+                pbar.update(1)
+                pbar.refresh()  # Force immediate display update
+        else:
+            # Multi-threaded: use enhanced process_iter with progress callbacks
+            worker = partial(
+                ThreadRowUploader(client, collection_id).worker,
+                is_merge=is_merge,
+            )
+            
+            # Process with enhanced real-time updates
+            for result in process_iter(worker, notion_rows, max_workers=max_threads):
+                pbar.update(1)
+                pbar.refresh()  # Force immediate display update

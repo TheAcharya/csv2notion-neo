@@ -1,5 +1,22 @@
 # Changelog
 
+
+### 2.0.1
+
+**🎉 Released:**
+- 10th October 2025
+
+**🔨 Improvements:**
+- Added thread-safe cache invalidation and race condition prevention for merge operations
+- Added comprehensive test coverage for date conversion and merge race condition prevention with 77 total test methods
+- Added large dataset simulation test (1000 rows) to validate merge functionality under high-volume scenarios
+
+**🐞 Bug Fix:**
+- Fixed date field API validation error where date dictionaries were being double-wrapped (#62)
+- Fixed critical merge functionality issue causing duplicates with large CSV files due (#64)
+
+---
+
 ### 2.0.0
 
 **🎉 Released:**

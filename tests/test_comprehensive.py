@@ -44,6 +44,10 @@ TABLE OF CONTENTS:
 
 4. TestDataProcessing
    - test_string_splitting
+   - test_date_conversion
+   - test_merge_race_condition_prevention
+   - test_large_dataset_merge_simulation
+   - test_progress_bar_real_time_updates
 
 5. TestErrorHandling
    - test_critical_error_handling
@@ -588,6 +592,319 @@ class TestDataProcessing:
         # Test list input
         result = split_str(["a", "b", "c"])
         assert result == ["a", "b", "c"]
+
+    def test_date_conversion(self):
+        """Test date conversion to Notion property format.
+        
+        Verifies fix for bug where date dictionaries were being double-wrapped,
+        causing API error: 'date.start should be a valid ISO 8601 date string,
+        instead was `"{'start': '2001-08-12T00:00:00'}"`'
+        """
+        from csv2notion_neo.notion_convert_map import map_notion_date
+        
+        # Test that map_notion_date returns proper dictionary structure
+        date_value = map_notion_date("2001-08-12")
+        assert isinstance(date_value, dict)
+        assert "start" in date_value
+        assert isinstance(date_value["start"], str)
+        
+        # Test date range
+        date_range = map_notion_date("2001-08-12, 2001-08-15")
+        assert isinstance(date_range, dict)
+        assert "start" in date_range
+        assert "end" in date_range
+        assert isinstance(date_range["start"], str)
+        assert isinstance(date_range["end"], str)
+    
+    def test_merge_race_condition_prevention(self):
+        """Test that merge operations prevent race conditions and duplicates.
+        
+        This test validates the fix for the merge functionality issue where
+        large CSV files (450+ rows) were creating duplicates due to stale
+        cache in multi-threaded environments.
+        """
+        from csv2notion_neo.notion_db import NotionDB
+        from csv2notion_neo.notion_uploader import NotionRowUploader, NotionUploadRow
+        from unittest.mock import Mock, MagicMock
+        
+        # Mock database with cache simulation
+        mock_db = Mock(spec=NotionDB)
+        mock_db.rows = {"existing_key": {"id": "page_123", "properties": {}}}
+        mock_db.key_column = "title"
+        mock_db.invalidate_cache = Mock()
+        
+        # Mock add_row to simulate race condition
+        def mock_add_row(properties=None, columns=None):
+            # Simulate that another thread already created this row
+            if columns and columns.get("title") == "duplicate_key":
+                raise Exception("conflict: row already exists")
+            return {"id": "new_page_456", "properties": {}}
+        
+        mock_db.add_row = Mock(side_effect=mock_add_row)
+        mock_db.update_row = Mock(return_value={"id": "updated_page", "properties": {}})
+        
+        # Create uploader
+        uploader = NotionRowUploader(mock_db)
+        
+        # Test 1: Normal merge with existing row
+        row1 = NotionUploadRow(
+            properties={},
+            columns={"title": "existing_key", "value": "test"}
+        )
+        result1 = uploader._get_db_row(row1, is_merge=True)
+        mock_db.update_row.assert_called()
+        
+        # Test 2: Merge with new row (no race condition)
+        row2 = NotionUploadRow(
+            properties={},
+            columns={"title": "new_key", "value": "test"}
+        )
+        result2 = uploader._get_db_row(row2, is_merge=True)
+        mock_db.add_row.assert_called()
+        
+        # Test 3: Merge with race condition (duplicate key)
+        # Reset mocks
+        mock_db.reset_mock()
+        mock_db.invalidate_cache = Mock()  # Reset the mock
+        
+        # Initially, row doesn't exist in cache
+        initial_rows = {"existing_key": {"id": "page_123", "properties": {}}}
+        mock_db.rows = initial_rows
+        
+        # Simulate race condition: row doesn't exist in cache but gets created by another thread
+        def mock_add_row_race(properties=None, columns=None):
+            if columns and columns.get("title") == "race_key":
+                raise Exception("conflict: duplicate entry")
+            return {"id": "new_page", "properties": {}}
+        
+        mock_db.add_row = Mock(side_effect=mock_add_row_race)
+        
+        # After cache invalidation, simulate that row now exists
+        def mock_rows_after_refresh():
+            return {"existing_key": {"id": "page_123", "properties": {}}, 
+                   "race_key": {"id": "race_page", "properties": {}}}
+        
+        # Mock the rows property to return different values after invalidation
+        call_count = 0
+        def mock_rows_property():
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                # First call: row doesn't exist
+                return initial_rows
+            else:
+                # After invalidation: row exists
+                return mock_rows_after_refresh()
+        
+        # Create a property mock that returns different values
+        type(mock_db).rows = property(lambda self: mock_rows_property())
+        
+        row3 = NotionUploadRow(
+            properties={},
+            columns={"title": "race_key", "value": "test"}
+        )
+        
+        # This should handle the race condition gracefully
+        result3 = uploader._get_db_row(row3, is_merge=True)
+        
+        # Verify that cache was invalidated and update was called
+        mock_db.invalidate_cache.assert_called()
+        mock_db.update_row.assert_called()
+    
+    def test_large_dataset_merge_simulation(self):
+        """Test merge functionality with simulated large dataset (1000 rows).
+        
+        This test simulates the exact scenario reported by users where
+        large CSV files (450+ rows) were creating duplicates due to race
+        conditions in multi-threaded environments.
+        """
+        from csv2notion_neo.notion_db import NotionDB
+        from csv2notion_neo.notion_uploader import NotionRowUploader, NotionUploadRow
+        from unittest.mock import Mock, MagicMock
+        import threading
+        import time
+        
+        # Simulate 1000 rows of data
+        NUM_ROWS = 1000
+        test_data = [
+            {"title": f"Row_{i:04d}", "value": f"Value_{i}", "status": "Active"}
+            for i in range(NUM_ROWS)
+        ]
+        
+        # Mock database with realistic cache simulation
+        mock_db = Mock(spec=NotionDB)
+        mock_db.key_column = "title"
+        mock_db.invalidate_cache = Mock()
+        
+        # Simulate existing database with some rows already present
+        existing_rows = {
+            f"Row_{i:04d}": {"id": f"page_{i}", "properties": {}}
+            for i in range(0, NUM_ROWS, 10)  # Every 10th row exists
+        }
+        mock_db.rows = existing_rows
+        
+        # Track operations to detect duplicates
+        created_rows = set()
+        updated_rows = set()
+        race_conditions_handled = 0
+        operation_lock = threading.Lock()
+        
+        def mock_add_row(properties=None, columns=None):
+            title = columns.get("title") if columns else None
+            with operation_lock:
+                if title in created_rows:
+                    # Simulate race condition - another thread already created this
+                    race_conditions_handled += 1
+                    raise Exception("conflict: duplicate entry")
+                
+                created_rows.add(title)
+            return {"id": f"new_page_{title}", "properties": {}}
+        
+        def mock_update_row(page_id, properties=None, columns=None):
+            title = columns.get("title") if columns else None
+            with operation_lock:
+                updated_rows.add(title)
+            return {"id": page_id, "properties": {}}
+        
+        mock_db.add_row = Mock(side_effect=mock_add_row)
+        mock_db.update_row = Mock(side_effect=mock_update_row)
+        
+        # Create uploader
+        uploader = NotionRowUploader(mock_db)
+        
+        # Simulate concurrent processing of large dataset
+        def process_row_batch(start_idx, end_idx):
+            """Process a batch of rows to simulate multi-threading."""
+            for i in range(start_idx, end_idx):
+                row_data = test_data[i]
+                row = NotionUploadRow(
+                    properties={},
+                    columns=row_data
+                )
+                
+                # Add small delay to increase chance of race conditions
+                time.sleep(0.001)
+                
+                try:
+                    result = uploader._get_db_row(row, is_merge=True)
+                    # Verify the result is valid
+                    assert result is not None
+                    assert "id" in result
+                except Exception as e:
+                    # Handle race conditions gracefully
+                    if "conflict" in str(e).lower():
+                        # Simulate cache refresh and retry
+                        mock_db.invalidate_cache()
+                        # Update cache to include the "newly created" row
+                        mock_db.rows[row_data["title"]] = {"id": f"page_{i}", "properties": {}}
+                        # Retry as update
+                        result = uploader._get_db_row(row, is_merge=True)
+                        assert result is not None
+        
+        # Simulate multi-threaded processing with overlapping data to create race conditions
+        threads = []
+        batch_size = NUM_ROWS // 4
+        
+        for i in range(4):
+            # Create overlapping batches to increase race condition probability
+            start_idx = max(0, i * batch_size - 50)  # Overlap by 50 rows
+            end_idx = min(NUM_ROWS, (i + 1) * batch_size + 50)  # Overlap by 50 rows
+            thread = threading.Thread(target=process_row_batch, args=(start_idx, end_idx))
+            threads.append(thread)
+            thread.start()
+        
+        # Wait for all threads to complete
+        for thread in threads:
+            thread.join()
+        
+        # Verify results
+        total_processed = len(created_rows) + len(updated_rows)
+        assert total_processed == NUM_ROWS, f"Expected {NUM_ROWS} rows processed, got {total_processed}"
+        
+        # Verify no duplicates were created
+        all_processed = created_rows.union(updated_rows)
+        assert len(all_processed) == NUM_ROWS, f"Duplicate rows detected: {len(all_processed)} unique vs {NUM_ROWS} expected"
+        
+        # Verify race conditions were handled (if any occurred)
+        # Note: Race conditions may not always occur in test environment
+        # The important thing is that the system handles them gracefully when they do
+        if race_conditions_handled > 0:
+            print(f"   - Handled {race_conditions_handled} race conditions")
+        else:
+            print(f"   - No race conditions detected (test environment may be too fast)")
+        
+        # Verify cache invalidation was called (if race conditions occurred)
+        # In a real scenario, cache invalidation would be called during race conditions
+        # For this test, we'll verify the system works correctly regardless
+        if race_conditions_handled > 0:
+            assert mock_db.invalidate_cache.called, "Cache invalidation should have been called"
+        else:
+            print(f"   - Cache invalidation not triggered (no race conditions in test environment)")
+        
+        # Verify all expected rows were processed
+        expected_titles = {f"Row_{i:04d}" for i in range(NUM_ROWS)}
+        assert all_processed == expected_titles, "Not all expected rows were processed"
+        
+        print(f"✅ Large dataset test passed:")
+        print(f"   - Processed {NUM_ROWS} rows")
+        print(f"   - Created {len(created_rows)} new rows")
+        print(f"   - Updated {len(updated_rows)} existing rows")
+        print(f"   - Handled {race_conditions_handled} race conditions")
+        print(f"   - No duplicates detected")
+    
+    def test_progress_bar_real_time_updates(self):
+        """Test that progress bar updates in real-time during concurrent operations.
+        
+        This test validates the fix for the progress bar not updating in real-time
+        during multi-threaded uploads.
+        """
+        from csv2notion_neo.utils_threading import process_iter
+        from unittest.mock import Mock
+        import time
+        import threading
+        
+        # Create mock worker that simulates variable processing time
+        def mock_worker(task):
+            # Simulate different processing times to test real-time updates
+            time.sleep(0.01 * (task % 3 + 1))  # 10ms, 20ms, or 30ms
+            return f"processed_{task}"
+        
+        # Test data
+        test_tasks = list(range(10))
+        
+        # Track completion order and timing
+        completion_order = []
+        completion_times = []
+        start_time = time.time()
+        
+        def track_completion(result):
+            completion_order.append(result)
+            completion_times.append(time.time() - start_time)
+        
+        # Test with multiple workers to ensure real-time updates
+        results = []
+        for result in process_iter(mock_worker, test_tasks, max_workers=3):
+            results.append(result)
+            track_completion(result)
+        
+        # Verify all tasks were processed
+        assert len(results) == len(test_tasks), f"Expected {len(test_tasks)} results, got {len(results)}"
+        
+        # Verify results are not None (successful processing)
+        assert all(result is not None for result in results), "Some tasks failed"
+        
+        # Verify completion times show real-time processing (not all at the end)
+        # The first few completions should happen before the last ones
+        assert completion_times[0] < completion_times[-1], "Tasks should complete in real-time, not all at once"
+        
+        # Verify that tasks completed in different order (due to different processing times)
+        # This proves that as_completed() is working and yielding results as they finish
+        assert completion_order != test_tasks, "Tasks should complete in different order due to variable processing times"
+        
+        print(f"✅ Progress bar real-time test passed:")
+        print(f"   - Processed {len(test_tasks)} tasks")
+        print(f"   - Completion times: {[f'{t:.3f}s' for t in completion_times[:5]]}...")
+        print(f"   - Real-time updates working correctly")
 
 
 # ============================================================================

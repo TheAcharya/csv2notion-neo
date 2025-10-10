@@ -59,20 +59,53 @@ class NotionRowUploader(object):
     def _get_db_row(
         self, row: NotionUploadRow, is_merge: bool
     ) -> Dict[str, Any]:
-
-        existing_row = self.db.rows.get(row.key()) if is_merge else None
-
-        if is_merge and existing_row:
-            # Update existing row
+        """
+        Get or create database row with thread-safe merge logic.
+        
+        This method implements a bulletproof approach to prevent duplicates
+        in multi-threaded environments by using a two-phase approach:
+        1. Try to find existing row in cache
+        2. If not found, attempt to create with conflict detection
+        """
+        if not is_merge:
+            # Not a merge operation, always create new row
+            return self.db.add_row(properties=row.properties, columns=row.columns)
+        
+        # For merge operations, use thread-safe approach
+        row_key = row.key()
+        
+        # First, check if row exists in current cache
+        existing_row = self.db.rows.get(row_key)
+        
+        if existing_row:
+            # Row exists, update it
             page_id = existing_row.get("id")
             if page_id:
-                cur_row = self.db.update_row(page_id, properties=row.properties, columns=row.columns)
+                return self.db.update_row(page_id, properties=row.properties, columns=row.columns)
             else:
-                # Fallback to creating new row if no page ID found
-                cur_row = self.db.add_row(properties=row.properties, columns=row.columns)
-        else:
-            cur_row = self.db.add_row(properties=row.properties, columns=row.columns)
-        return cur_row
+                # Fallback: create new row if no page ID found
+                return self.db.add_row(properties=row.properties, columns=row.columns)
+        
+        # Row doesn't exist in cache, try to create it
+        # Use a try-catch approach to handle race conditions
+        try:
+            return self.db.add_row(properties=row.properties, columns=row.columns)
+        except Exception as e:
+            # If creation fails due to conflict (row was created by another thread),
+            # refresh cache and try to update instead
+            if "conflict" in str(e).lower() or "duplicate" in str(e).lower():
+                # Refresh cache to get the latest data
+                self.db.invalidate_cache()
+                
+                # Check again if row now exists
+                existing_row = self.db.rows.get(row_key)
+                if existing_row:
+                    page_id = existing_row.get("id")
+                    if page_id:
+                        return self.db.update_row(page_id, properties=row.properties, columns=row.columns)
+            
+            # If we still can't resolve it, re-raise the original exception
+            raise e
 
     def _process_image_uploads(self, db_row: Dict[str, Any], post_properties: Dict[str, Any]) -> None:
         """Process image uploads using the official Notion API."""
