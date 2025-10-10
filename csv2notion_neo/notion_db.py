@@ -133,7 +133,15 @@ class NotionDB:
     @property
     def rows(self) -> Dict[str, Dict[str, Any]]:
         """Get database rows with pagination support for large databases."""
-        if self._cache_rows is None:
+        if self._cache_rows is not None:
+            return self._cache_rows
+        
+        # Use double-checked locking to prevent multiple threads from fetching
+        with self._option_lock:
+            # Double-check after acquiring lock
+            if self._cache_rows is not None:
+                return self._cache_rows
+            
             self._cache_rows = {}
             
             try:
@@ -162,18 +170,20 @@ class NotionDB:
                                 title_prop = prop_name
                                 break
                         
-                        if title_prop:
-                            title_data = page.get("properties", {}).get(title_prop, {})
-                            title_text = ""
-                            
-                            if title_data.get("title"):
-                                title_text = "".join([
-                                    text.get("text", {}).get("content", "")
-                                    for text in title_data["title"]
-                                ])
-                            
-                            if title_text:
-                                self._cache_rows[title_text] = page
+                        if not title_prop:
+                            continue
+                        
+                        title_data = page.get("properties", {}).get(title_prop, {})
+                        if not title_data.get("title"):
+                            continue
+                        
+                        title_text = "".join([
+                            text.get("text", {}).get("content", "")
+                            for text in title_data["title"]
+                        ])
+                        
+                        if title_text:
+                            self._cache_rows[title_text] = page
                     
                     # Check if there are more pages to fetch
                     has_more = response.get("has_more", False)
