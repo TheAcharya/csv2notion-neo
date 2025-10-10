@@ -132,34 +132,54 @@ class NotionDB:
     
     @property
     def rows(self) -> Dict[str, Dict[str, Any]]:
-        """Get database rows."""
+        """Get database rows with pagination support for large databases."""
         if self._cache_rows is None:
             self._cache_rows = {}
             
             try:
-                # Query all pages in the database
-                response = self.client.query_database(self.collection_id)
+                # Query all pages in the database with pagination
+                # Notion API returns max 100 results per page
+                has_more = True
+                start_cursor = None
+                page_count = 0
                 
-                for page in response.get("results", []):
-                    # Get the title property value
-                    title_prop = None
-                    for prop_name, prop_data in self.columns.items():
-                        if prop_data["type"] == "title":
-                            title_prop = prop_name
-                            break
+                while has_more:
+                    # Build query parameters
+                    query_params = {}
+                    if start_cursor:
+                        query_params["start_cursor"] = start_cursor
                     
-                    if title_prop:
-                        title_data = page.get("properties", {}).get(title_prop, {})
-                        title_text = ""
+                    # Query this page of results
+                    response = self.client.query_database(self.collection_id, **query_params)
+                    page_count += 1
+                    
+                    # Process results from this page
+                    for page in response.get("results", []):
+                        # Get the title property value
+                        title_prop = None
+                        for prop_name, prop_data in self.columns.items():
+                            if prop_data["type"] == "title":
+                                title_prop = prop_name
+                                break
                         
-                        if title_data.get("title"):
-                            title_text = "".join([
-                                text.get("text", {}).get("content", "")
-                                for text in title_data["title"]
-                            ])
-                        
-                        if title_text:
-                            self._cache_rows[title_text] = page
+                        if title_prop:
+                            title_data = page.get("properties", {}).get(title_prop, {})
+                            title_text = ""
+                            
+                            if title_data.get("title"):
+                                title_text = "".join([
+                                    text.get("text", {}).get("content", "")
+                                    for text in title_data["title"]
+                                ])
+                            
+                            if title_text:
+                                self._cache_rows[title_text] = page
+                    
+                    # Check if there are more pages to fetch
+                    has_more = response.get("has_more", False)
+                    start_cursor = response.get("next_cursor")
+                
+                self.logger.debug(f"Loaded {len(self._cache_rows)} rows from {page_count} pages")
                 
             except Exception as e:
                 self.logger.error(f"Failed to get database rows: {e}")
