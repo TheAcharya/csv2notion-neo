@@ -75,6 +75,7 @@ TABLE OF CONTENTS:
    - test_notion_db_initialization
    - test_notion_row_converter
    - test_notion_row_uploader
+   - test_notion_db_pagination_large_datasets
 
 9. TestColumnTypeDetection
    - test_type_guessing_numbers
@@ -1271,6 +1272,143 @@ class TestNotionSDKWithoutCredentials:
         uploader = NotionRowUploader(db)
         
         assert uploader.db == db
+    
+    def test_notion_db_pagination_large_datasets(self):
+        """Test NotionDB.rows property handles pagination correctly for large datasets.
+        
+        This test validates the fix for the bug where merge operations would create
+        duplicates on large datasets (>100 rows) because the Notion API pagination
+        was not being handled correctly. The rows property must fetch ALL pages,
+        not just the first 100 results.
+        """
+        from csv2notion_neo.notion_db import NotionDB
+        from csv2notion_neo.notion_client import NotionClient
+        from unittest.mock import Mock
+        
+        # Create mock responses simulating 3 pages of results (250 rows total)
+        page_1_results = [
+            {
+                "id": f"page_{i:04d}",
+                "properties": {
+                    "Name": {
+                        "type": "title",
+                        "title": [{"text": {"content": f"Row_{i:04d}"}}]
+                    }
+                }
+            }
+            for i in range(100)  # First 100 rows
+        ]
+        
+        page_2_results = [
+            {
+                "id": f"page_{i:04d}",
+                "properties": {
+                    "Name": {
+                        "type": "title",
+                        "title": [{"text": {"content": f"Row_{i:04d}"}}]
+                    }
+                }
+            }
+            for i in range(100, 200)  # Next 100 rows
+        ]
+        
+        page_3_results = [
+            {
+                "id": f"page_{i:04d}",
+                "properties": {
+                    "Name": {
+                        "type": "title",
+                        "title": [{"text": {"content": f"Row_{i:04d}"}}]
+                    }
+                }
+            }
+            for i in range(200, 250)  # Final 50 rows
+        ]
+        
+        # Mock query_database responses
+        mock_responses = [
+            {
+                "results": page_1_results,
+                "has_more": True,
+                "next_cursor": "cursor_page_2"
+            },
+            {
+                "results": page_2_results,
+                "has_more": True,
+                "next_cursor": "cursor_page_3"
+            },
+            {
+                "results": page_3_results,
+                "has_more": False,
+                "next_cursor": None
+            }
+        ]
+        
+        # Mock NotionClient
+        mock_client = Mock(spec=NotionClient)
+        mock_client.query_database = Mock(side_effect=mock_responses)
+        mock_client.get_collection = Mock(return_value={
+            "id": "test_db_id",
+            "title": [{"text": {"content": "Test Database"}}],
+            "properties": {
+                "prop_id_name": {
+                    "name": "Name",
+                    "type": "title"
+                },
+                "prop_id_status": {
+                    "name": "Status",
+                    "type": "select",
+                    "select": {"options": []}
+                }
+            }
+        })
+        
+        # Create NotionDB instance with mocked client
+        db = NotionDB(mock_client, "test_db_id")
+        
+        # Access the rows property - this should trigger pagination
+        rows = db.rows
+        
+        # Verify query_database was called 3 times (for 3 pages)
+        assert mock_client.query_database.call_count == 3, \
+            f"Expected 3 query calls for pagination, got {mock_client.query_database.call_count}"
+        
+        # Verify first call had no cursor
+        first_call_kwargs = mock_client.query_database.call_args_list[0][1]
+        assert "start_cursor" not in first_call_kwargs or first_call_kwargs.get("start_cursor") is None, \
+            "First query should not have a start_cursor"
+        
+        # Verify second call used cursor from first response
+        second_call_kwargs = mock_client.query_database.call_args_list[1][1]
+        assert second_call_kwargs.get("start_cursor") == "cursor_page_2", \
+            f"Second query should use cursor 'cursor_page_2', got {second_call_kwargs.get('start_cursor')}"
+        
+        # Verify third call used cursor from second response
+        third_call_kwargs = mock_client.query_database.call_args_list[2][1]
+        assert third_call_kwargs.get("start_cursor") == "cursor_page_3", \
+            f"Third query should use cursor 'cursor_page_3', got {third_call_kwargs.get('start_cursor')}"
+        
+        # Verify all 250 rows are in the cache
+        assert len(rows) == 250, \
+            f"Expected 250 rows in cache after pagination, got {len(rows)}"
+        
+        # Verify rows are keyed correctly by title
+        for i in range(250):
+            expected_key = f"Row_{i:04d}"
+            assert expected_key in rows, \
+                f"Expected row with key '{expected_key}' to be in cache"
+            assert rows[expected_key]["id"] == f"page_{i:04d}", \
+                f"Expected row '{expected_key}' to have id 'page_{i:04d}'"
+        
+        # Verify no duplicate rows (all unique)
+        unique_ids = {row["id"] for row in rows.values()}
+        assert len(unique_ids) == 250, \
+            f"Expected 250 unique row IDs, got {len(unique_ids)} (duplicates detected!)"
+        
+        print(f"✅ Pagination test passed:")
+        print(f"   - Correctly fetched 3 pages of results")
+        print(f"   - All 250 rows cached without duplicates")
+        print(f"   - Pagination cursors used correctly")
 
 
 # ============================================================================
