@@ -13,7 +13,7 @@
 
 **🐞 Bug Fix:**
 - Fixed date field API validation error where date dictionaries were being double-wrapped (#62)
-- Fixed critical merge functionality issue causing duplicates with large CSV files due (#64)
+- Fixed critical merge functionality issue causing duplicates with large CSV files (#64)
 
 ---
 
