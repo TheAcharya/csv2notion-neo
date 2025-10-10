@@ -455,10 +455,11 @@ class NotionDB:
                     properties=notion_properties
                 )
                 
-                # Update cache
+                # Update cache immediately to prevent race conditions
                 if columns and self.key_column in columns:
                     key_value = columns[self.key_column]
-                    self._cache_rows[key_value] = response
+                    if self._cache_rows is not None:
+                        self._cache_rows[key_value] = response
                 
                 return response
                 
@@ -477,6 +478,14 @@ class NotionDB:
     def add_row_key(self, key: str) -> Dict[str, Any]:
         """Add a row with just a key value."""
         return self.add_row(columns={self.key_column: key})
+    
+    def invalidate_cache(self) -> None:
+        """Invalidate all cached data to force fresh data retrieval."""
+        self._cache_columns = None
+        self._cache_relations = None
+        self._cache_rows = None
+        self._cache_users = None
+        self._database_info = self._get_database_info()
     
     def update_row(self, page_id: str, properties: Optional[Dict[str, Any]] = None, columns: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Update an existing row/page."""
@@ -514,6 +523,12 @@ class NotionDB:
                 page_id=page_id,
                 properties=notion_properties
             )
+            
+            # Update cache to reflect the changes
+            if columns and self.key_column in columns:
+                key_value = columns[self.key_column]
+                if self._cache_rows is not None:
+                    self._cache_rows[key_value] = response
             
             return response
             
