@@ -31,6 +31,7 @@ ALLOWED_TYPES = frozenset(
         "formula",
         "file",
         "person",
+        "relation"
     )
 )
 
