@@ -64,7 +64,7 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 
 ## Version 2.0.0+ Migration
 
-CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library. This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (version 2.7.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
 
 ### Migration Details
 
@@ -75,7 +75,11 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 #### API Implementation Changes
 - Previous: Custom implementation using unofficial private Notion APIs
-- Current: Official [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library integration
+- Current: Official [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library integration (v2.7.0)
+- API Version: Notion API 2025-09-03 with data_sources structure
+- Data Sources: Database properties retrieved from data_sources endpoint instead of database object
+- Schema Updates: Database schema modifications use data_sources.update endpoint
+- Database Creation: Uses initial_data_source for new database property definitions
 - Benefits: Official API support, better error handling, future-proof compatibility
 
 #### Database URL Requirements
@@ -215,13 +219,15 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Dependencies
 - Python 3.9+ required
 - Poetry for dependency management
-- Key dependencies: notion-client (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
+- Key dependencies: notion-client 2.7.0 (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
 
 ## API Integration
 
 ### Notion API
-- Notion API client implementation using notion-sdk-py library
-- Support for all Notion API endpoints (databases, pages, blocks, users, file uploads)
+- Notion API client implementation using notion-sdk-py library (v2.7.0)
+- API Version: 2025-09-03 with data_sources structure for database properties
+- Support for all Notion API endpoints (databases, pages, blocks, users, file uploads, data_sources)
+- Data Sources: Properties retrieved from data_sources endpoint, schema updates via data_sources.update
 - File upload handling through file_uploads endpoints with comprehensive retry logic
 - Built-in rate limiting and error handling from the SDK with exponential backoff
 - Integration token authentication for enhanced security
@@ -315,7 +321,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Backward compatibility considerations
 
 ### API Compatibility
-- Full compatibility with official Notion API specifications
+- Full compatibility with official Notion API specifications (version 2025-09-03)
+- Uses notion-sdk-py v2.7.0 with data_sources structure support
 - Regular dependency updates for notion-sdk-py
 - Compatibility testing with official Notion API versions
 - Official API stability and backward compatibility guarantees
