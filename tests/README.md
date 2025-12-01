@@ -9,10 +9,10 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - Image and icon handling
 - Database merging operations
 - Database entry deletion
-- Notion API integration
+- Notion API integration (API version 2025-09-03 with data_sources structure)
 - Error handling and validation
 - CLI argument validation with token format validation and URL validation
-- Notion SDK functionality without credentials
+- Notion SDK functionality without credentials (notion-client 2.7.0)
 - Column type detection and auto-detection
 - Data processing and conversion utilities
 - Advanced multi-feature scenarios
@@ -147,7 +147,7 @@ ARGS_DICT = {
     'token': os.getenv("NOTION_TOKEN"),
     'url': os.getenv("NOTION_URL"),
     'log': PosixPath('tests/log.txt'),
-    'image_column': ['Image Filename'],
+    'image_column': ['Image Filename', 'Palette Filename'],
     'mandatory_column': ['Marker ID'],
     'payload_key_column': 'Marker ID',
     # ... additional configuration
@@ -323,9 +323,9 @@ cat tests/log.txt
 - Version and help functionality
 
 ### 2. Notion SDK Testing (Mocked)
-- Client initialization and configuration
-- Database operations without credentials
-- File upload functionality
+- Client initialization and configuration (API version 2025-09-03)
+- Database operations without credentials using data_sources structure
+- File upload functionality via file_uploads API
 - Row conversion and upload operations
 - Error handling and retry logic
 - Large Dataset Pagination: Tests pagination handling for datasets >100 rows (PR #66)
@@ -408,6 +408,15 @@ cat tests/log.txt
 - Race Condition Prevention: Tests thread-safe operations for concurrent uploads
 
 ## Recent Improvements
+
+### Notion API 2025-09-03 Migration
+- API Version: Upgraded to Notion API version 2025-09-03
+- SDK Update: Updated notion-client to version 2.7.0
+- Data Sources: Migrated to new data_sources structure for database properties
+- Property Retrieval: Properties now fetched from data_sources endpoint instead of database object
+- Schema Updates: Database schema modifications use data_sources.update endpoint
+- Database Creation: Uses initial_data_source for new database property definitions
+- Test Updates: All mocked tests updated to reflect new API response structure
 
 ### PR #66: Large Dataset Pagination Support
 - Issue Fixed: Merge operations creating duplicates on large datasets (>100 rows)
@@ -609,6 +618,7 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 
 ### Key Testing Features
 - No External API Calls: All tests use mocking to avoid Notion API dependencies
+- Notion API 2025-09-03: Tests updated for new data_sources structure
 - Comprehensive CLI Coverage: All 50+ CLI arguments and switches tested
 - Error Scenario Testing: Invalid inputs, malformed data, and edge cases
 - Performance Validation: File operations, memory usage, and concurrent operations
@@ -619,3 +629,5 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 - Documentation: Each test method is clearly documented and searchable
 
 For more information about CSV2Notion Neo testing, see the main project documentation and AGENT.MD file.
+
+Note: This test suite is compatible with notion-client 2.7.0 and Notion API version 2025-09-03.

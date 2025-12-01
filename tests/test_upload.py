@@ -3,7 +3,7 @@
 
 from typing import Generator, Union
 import pytest
-from csv2notion_neo.notion_db_client import NotionClientExtended
+from csv2notion_neo.notion_client import NotionClient
 from csv2notion_neo.version import __version__
 from csv2notion_neo.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
 from csv2notion_neo.local_data import LocalData
@@ -16,7 +16,7 @@ from pathlib import Path
 # Use this ficture to load the client and load the data, use yield to load client more than once with different parameters
 
 @pytest.fixture(scope="session")
-def load_client_and_data() -> Generator[Union[LocalData,NotionClientExtended,Namespace],None,None]:
+def load_client_and_data() -> Generator[Union[LocalData,NotionClient,Namespace],None,None]:
     
     args = Namespace(**ARGS_DICT)
     
