@@ -111,7 +111,7 @@ class NotionPreparator(object):  # noqa: WPS214
                 logger.info(f"Adding missing columns to the DB: {missing_columns}")
                 self._add_columns(missing_columns)
             elif self.rules.fail_on_missing_columns:
-                raise NotionError(warn_text)
+                raise NotionError(f"Missing columns in Notion DB: {missing_columns}")
             else:
                 for column in missing_columns:
                     logger.warning(f"Column {column} would be skipped!")
@@ -252,7 +252,7 @@ class NotionPreparator(object):  # noqa: WPS214
     def _get_wrong_status_values(self, column: str) -> Set[str]:
         col_values = set(self.csv.col_values(column))
         db_available_values = {
-            c["value"] for c in self.db.columns[column]["options"]  # type: ignore
+            c["name"] for c in self.db.columns[column]["options"]  # type: ignore
         } | {""}
 
         return col_values - db_available_values
