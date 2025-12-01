@@ -105,12 +105,13 @@ class NotionClientExtended(NotionClient):
                     )
                     return response["id"]
             elif table == "collection":
-                # Create a database
+                # Create a database using initial_data_source (API 2025-09-03)
+                # Properties go inside initial_data_source, not at top level
                 if schema:
                     response = self.client.databases.create(
                         parent={"type": "page_id", "page_id": parent} if isinstance(parent, str) else parent,
                         title=[{"type": "text", "text": {"content": "New Database"}}],
-                        properties=schema,
+                        initial_data_source={"properties": schema},
                         **kwargs
                     )
                     return response["id"]

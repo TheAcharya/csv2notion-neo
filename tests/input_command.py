@@ -25,7 +25,7 @@ ARGS_DICT = {'csv_file': PosixPath('tests/assets/notion-upload-test.json'),
             'merge_skip_new': False, 
             'add_missing_relations': False, 
             # Image column options
-            'image_column': ['Image Filename'], 
+            'image_column': ['Image Filename', 'Palette Filename'], 
             'image_column_keep': True, 
             'image_column_mode': 'block', 
             'image_caption_column': None, 

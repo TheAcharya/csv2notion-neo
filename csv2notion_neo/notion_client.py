@@ -91,8 +91,12 @@ class NotionClient:
         self.workspace = workspace
         self.options = options
         
-        # Initialize official Notion client
-        self.client = Client(auth=integration_token)
+        # Initialize official Notion client with API version 2025-09-03
+        # This uses the new data_sources structure for database properties
+        self.client = Client(
+            auth=integration_token,
+            notion_version="2025-09-03"
+        )
         
         # Set up logging
         self.logger = logging.getLogger(__name__)
@@ -150,6 +154,115 @@ class NotionClient:
                 return None
             raise NotionError(f"Cannot access database {collection_id}") from e
     
+    def get_data_source(self, data_source_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a data source by ID using the new API (2025-09-03).
+        
+        Data sources contain the properties/schema for databases in the new API.
+        
+        Args:
+            data_source_id: Data source ID
+            
+        Returns:
+            Data source data including properties, or None if not found
+        """
+        try:
+            return self.client.data_sources.retrieve(data_source_id=data_source_id)
+        except APIResponseError as e:
+            if e.code == APIErrorCode.ObjectNotFound:
+                return None
+            raise NotionError(f"Cannot access data source {data_source_id}") from e
+    
+    def get_primary_data_source(self, database_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get the primary data source for a database.
+        
+        In the new API (2025-09-03), database properties are stored in data sources.
+        This method retrieves the first/primary data source for a database.
+        
+        Args:
+            database_id: Database ID
+            
+        Returns:
+            Primary data source data with properties, or None if not found
+        """
+        try:
+            # First get the database to find its data sources
+            db_info = self.get_collection(database_id)
+            if not db_info:
+                return None
+            
+            # Get the data sources list
+            data_sources = db_info.get("data_sources", [])
+            if not data_sources:
+                self.logger.warning(f"Database {database_id} has no data sources")
+                return None
+            
+            # Get the first/primary data source
+            primary_ds_id = data_sources[0].get("id")
+            if not primary_ds_id:
+                return None
+            
+            return self.get_data_source(primary_ds_id)
+        except Exception as e:
+            self.logger.error(f"Error getting primary data source for {database_id}: {e}")
+            raise NotionError(f"Cannot get primary data source for {database_id}") from e
+    
+    def query_data_source(self, data_source_id: str, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Query a data source for pages/rows using the new API (2025-09-03).
+        
+        This replaces the old databases.query() method which was removed in SDK v2.6.0+.
+        
+        Args:
+            data_source_id: Data source ID
+            **kwargs: Query parameters (filter, sorts, start_cursor, page_size, etc.)
+            
+        Returns:
+            Query results with pages/rows
+        """
+        try:
+            # Build query and body parameters matching the Notion API spec
+            query_params = {}
+            if "filter_properties" in kwargs:
+                query_params["filter_properties"] = kwargs.pop("filter_properties")
+            
+            body_params = {}
+            for key in ["filter", "sorts", "start_cursor", "page_size", "archived", "in_trash", "result_type"]:
+                if key in kwargs:
+                    body_params[key] = kwargs[key]
+            
+            # Use data_sources.query() endpoint
+            response = self.client.data_sources.query(
+                data_source_id=data_source_id,
+                **body_params
+            )
+            return response
+        except APIResponseError as e:
+            raise NotionError(f"Failed to query data source {data_source_id}: {e}") from e
+    
+    def update_data_source(self, data_source_id: str, **kwargs: Any) -> Dict[str, Any]:
+        """
+        Update a data source (properties/schema) using the new API (2025-09-03).
+        
+        This is used to add/modify columns in the database schema.
+        
+        Args:
+            data_source_id: Data source ID
+            **kwargs: Update parameters (properties, title, icon, etc.)
+            
+        Returns:
+            Updated data source data
+        """
+        try:
+            response = self.client.data_sources.update(
+                data_source_id=data_source_id,
+                **kwargs
+            )
+            return response
+        except APIResponseError as e:
+            raise NotionError(f"Failed to update data source {data_source_id}: {e}") from e
+    
     def create_record(self, table: str, parent: Any, **kwargs) -> str:
         """
         Create a record - maintains compatibility with existing code.
@@ -171,8 +284,13 @@ class NotionClient:
                 )
                 return response["id"]
             elif table == "collection":
-                # Create a database
-                response = self.client.databases.create(**kwargs)
+                # Create a database using initial_data_source (API 2025-09-03)
+                # Properties go inside initial_data_source, not at top level
+                db_kwargs = dict(kwargs)
+                if "properties" in db_kwargs:
+                    properties = db_kwargs.pop("properties")
+                    db_kwargs["initial_data_source"] = {"properties": properties}
+                response = self.client.databases.create(**db_kwargs)
                 return response["id"]
             else:
                 raise NotionError(f"Unsupported table type: {table}")
@@ -486,10 +604,14 @@ class NotionClient:
         # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
             try:
+                # In API 2025-09-03, database creation uses initial_data_source
+                # for properties instead of direct properties parameter
                 response = self.client.databases.create(
                     parent={"type": "page_id", "page_id": parent_page_id},
                     title=[{"type": "text", "text": {"content": title}}],
-                    properties=properties
+                    initial_data_source={
+                        "properties": properties
+                    }
                 )
                 return response
                 
@@ -649,23 +771,31 @@ class NotionClient:
         except APIResponseError as e:
             raise NotionError(f"Failed to update page {page_id}: {e}") from e
     
-    def query_database(self, database_id: str, **kwargs) -> Dict[str, Any]:
+    def query_database(self, database_id: str, data_source_id: Optional[str] = None, **kwargs: Any) -> Dict[str, Any]:
         """
-        Query a database using the official API.
+        Query a database using the official API (2025-09-03).
+        
+        In the new API, queries go through data sources. This method automatically
+        finds the primary data source if not provided.
         
         Args:
             database_id: Database ID
-            **kwargs: Query parameters
+            data_source_id: Optional data source ID (if not provided, uses primary)
+            **kwargs: Query parameters (filter, sorts, start_cursor, page_size, etc.)
             
         Returns:
             Query results
         """
         try:
-            response = self.client.databases.query(
-                database_id=database_id,
-                **kwargs
-            )
-            return response
+            # If no data source ID provided, get the primary one
+            if not data_source_id:
+                primary_ds = self.get_primary_data_source(database_id)
+                if not primary_ds:
+                    raise NotionError(f"No data source found for database {database_id}")
+                data_source_id = primary_ds.get("id")
+            
+            # Query via data source
+            return self.query_data_source(data_source_id, **kwargs)
         except APIResponseError as e:
             raise NotionError(f"Failed to query database {database_id}: {e}") from e
 
