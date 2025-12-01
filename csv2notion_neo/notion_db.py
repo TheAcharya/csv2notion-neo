@@ -56,8 +56,10 @@ class NotionDB:
         self._cache_rows: Optional[Dict[str, Dict[str, Any]]] = None
         self._cache_users: Optional[Dict[str, Dict[str, Any]]] = None
         
-        # Get database info
+        # Get database info and primary data source
         self._database_info = self._get_database_info()
+        self._data_source_info = self._get_primary_data_source()
+        self._data_source_id: Optional[str] = self._data_source_info.get("id") if self._data_source_info else None
     
     def _get_database_info(self) -> Dict[str, Any]:
         """Get database information."""
@@ -66,6 +68,19 @@ class NotionDB:
         except Exception as e:
             self.logger.error(f"Failed to get database info: {e}")
             raise NotionError(f"Cannot access database {self.collection_id}") from e
+    
+    def _get_primary_data_source(self) -> Optional[Dict[str, Any]]:
+        """
+        Get the primary data source for this database.
+        
+        In the new Notion API (2025-09-03), properties are stored in data sources.
+        """
+        try:
+            return self.client.get_primary_data_source(self.collection_id)
+        except Exception as e:
+            self.logger.error(f"Failed to get primary data source: {e}")
+            # Return None instead of raising - some databases might not have data sources yet
+            return None
     
     @property
     def name(self) -> str:
@@ -77,14 +92,28 @@ class NotionDB:
     
     @property
     def columns(self) -> Dict[str, Dict[str, str]]:
-        """Get database columns/properties."""
+        """Get database columns/properties from the data source (API 2025-09-03)."""
         if self._cache_columns is None:
-            properties = self._database_info.get("properties", {})
+            # In the new API, properties come from the data source, not the database
+            if self._data_source_info:
+                properties = self._data_source_info.get("properties", {})
+            else:
+                # Fallback to database info for backward compatibility
+                properties = self._database_info.get("properties", {})
+            
             self._cache_columns = {}
+            
+            # Debug logging for troubleshooting schema retrieval (commented out to reduce verbosity)
+            # self.logger.debug(f"Database info keys: {list(self._database_info.keys())}")
+            # self.logger.debug(f"Data source info available: {self._data_source_info is not None}")
+            # self.logger.debug(f"Properties found: {list(properties.keys())}")
             
             for prop_id, prop_data in properties.items():
                 prop_name = prop_data.get("name", "")
                 prop_type = prop_data.get("type", "")
+                
+                # Debug logging for each column (commented out to reduce verbosity)
+                # self.logger.debug(f"Column: key='{prop_id}', name='{prop_name}', type='{prop_type}'")
                 
                 self._cache_columns[prop_name] = {
                     "name": prop_name,
@@ -145,8 +174,9 @@ class NotionDB:
             self._cache_rows = {}
             
             try:
-                # Query all pages in the database with pagination
+                # Query all pages in the database with pagination (API 2025-09-03)
                 # Notion API returns max 100 results per page
+                # Uses data source query endpoint
                 has_more = True
                 start_cursor = None
                 page_count = 0
@@ -157,8 +187,12 @@ class NotionDB:
                     if start_cursor:
                         query_params["start_cursor"] = start_cursor
                     
-                    # Query this page of results
-                    response = self.client.query_database(self.collection_id, **query_params)
+                    # Query via data source (pass data_source_id for efficiency)
+                    response = self.client.query_database(
+                        self.collection_id,
+                        data_source_id=self._data_source_id,
+                        **query_params
+                    )
                     page_count += 1
                     
                     # Process results from this page
@@ -273,10 +307,13 @@ class NotionDB:
             return False
     
     def add_column(self, column_name: str, column_type: str) -> None:
-        """Add a column to the database."""
+        """Add a column to the database via data source (API 2025-09-03)."""
         try:
-            # Update database properties
-            properties = self._database_info.get("properties", {})
+            if not self._data_source_id:
+                raise NotionError("No data source available for this database")
+            
+            # Get current properties from data source
+            properties = self._data_source_info.get("properties", {}) if self._data_source_info else {}
             
             # Generate new property ID
             prop_id = rand_id_list(1, 4)[0]
@@ -293,24 +330,28 @@ class NotionDB:
             
             properties[prop_id] = prop_schema
             
-            # Update database
-            self.client.client.databases.update(
-                database_id=self.collection_id,
+            # Update via data source endpoint (API 2025-09-03)
+            self.client.update_data_source(
+                data_source_id=self._data_source_id,
                 properties=properties
             )
             
-            # Clear cache
+            # Clear cache and refresh data source info
             self._cache_columns = None
             self._database_info = self._get_database_info()
+            self._data_source_info = self._get_primary_data_source()
             
         except Exception as e:
             raise NotionError(f"Failed to add column {column_name}: {e}") from e
     
     def add_select_option(self, prop_name: str, option_name: str, color: Optional[str] = None) -> None:
-        """Add a new option to a select, multi_select, or status property."""
+        """Add a new option to a select, multi_select, or status property via data source (API 2025-09-03)."""
         # Use lock to prevent race conditions when multiple threads try to add the same option
         with self._option_lock:
             try:
+                if not self._data_source_id:
+                    raise NotionError("No data source available for this database")
+                
                 if prop_name not in self.columns:
                     raise NotionError(f"Property '{prop_name}' not found in database")
                 
@@ -346,9 +387,9 @@ class NotionDB:
                 # Add to existing options
                 updated_options = current_options + [new_option]
                 
-                # Update the database property
-                self.client.client.databases.update(
-                    database_id=self.collection_id,
+                # Update via data source endpoint (API 2025-09-03)
+                self.client.update_data_source(
+                    data_source_id=self._data_source_id,
                     properties={
                         prop_name: {
                             prop_type: {
@@ -361,6 +402,7 @@ class NotionDB:
                 # Clear cache to refresh schema
                 self._cache_columns = None
                 self._database_info = self._get_database_info()
+                self._data_source_info = self._get_primary_data_source()
                 
                 # Commented out for cleaner output - uncomment for debugging
                 # logger.debug(f"Added option '{option_name}' with color '{color}' to property '{prop_name}'")

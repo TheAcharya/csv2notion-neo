@@ -142,7 +142,7 @@ def cli(*argv: str) -> None:
     except Exception as e:
         # Check if args was successfully parsed to avoid UnboundLocalError
         if 'args' in locals() and hasattr(args, 'verbose') and args.verbose:
-            logger.error("Error at %s", "division", exc_info=e)
+            logger.error("Error during execution", exc_info=e)
         else:
             logger.error(e)
 

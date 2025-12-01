@@ -846,7 +846,7 @@ class TestDataProcessing:
         expected_titles = {f"Row_{i:04d}" for i in range(NUM_ROWS)}
         assert all_processed == expected_titles, "Not all expected rows were processed"
         
-        print(f"✅ Large dataset test passed:")
+        print(f"Large dataset test passed:")
         print(f"   - Processed {NUM_ROWS} rows")
         print(f"   - Created {len(created_rows)} new rows")
         print(f"   - Updated {len(updated_rows)} existing rows")
@@ -902,7 +902,7 @@ class TestDataProcessing:
         # This proves that as_completed() is working and yielding results as they finish
         assert completion_order != test_tasks, "Tasks should complete in different order due to variable processing times"
         
-        print(f"✅ Progress bar real-time test passed:")
+        print(f"Progress bar real-time test passed:")
         print(f"   - Processed {len(test_tasks)} tasks")
         print(f"   - Completion times: {[f'{t:.3f}s' for t in completion_times[:5]]}...")
         print(f"   - Real-time updates working correctly")
@@ -1102,7 +1102,8 @@ class TestNotionSDKWithoutCredentials:
         assert client.integration_token == "fake_token"
         assert client.workspace == "Test Workspace"
         assert client.client == mock_client
-        mock_client_class.assert_called_once_with(auth="fake_token")
+        # API 2025-09-03 is used for data_sources support
+        mock_client_class.assert_called_once_with(auth="fake_token", notion_version="2025-09-03")
     
     @patch('csv2notion_neo.notion_client.Client')
     def test_notion_client_get_collection(self, mock_client_class):
@@ -1344,12 +1345,21 @@ class TestNotionSDKWithoutCredentials:
             }
         ]
         
-        # Mock NotionClient
+        # Mock NotionClient for API 2025-09-03 structure
         mock_client = Mock(spec=NotionClient)
         mock_client.query_database = Mock(side_effect=mock_responses)
+        
+        # In API 2025-09-03, database no longer has properties directly
+        # Properties are in the data source
         mock_client.get_collection = Mock(return_value={
             "id": "test_db_id",
             "title": [{"text": {"content": "Test Database"}}],
+            "data_sources": [{"id": "test_data_source_id", "name": "Test Database"}]
+        })
+        
+        # Mock get_primary_data_source to return data source with properties
+        mock_client.get_primary_data_source = Mock(return_value={
+            "id": "test_data_source_id",
             "properties": {
                 "prop_id_name": {
                     "name": "Name",
@@ -1405,7 +1415,7 @@ class TestNotionSDKWithoutCredentials:
         assert len(unique_ids) == 250, \
             f"Expected 250 unique row IDs, got {len(unique_ids)} (duplicates detected!)"
         
-        print(f"✅ Pagination test passed:")
+        print(f"Pagination test passed:")
         print(f"   - Correctly fetched 3 pages of results")
         print(f"   - All 250 rows cached without duplicates")
         print(f"   - Pagination cursors used correctly")
