@@ -1,5 +1,20 @@
 # Changelog
 
+### 2.0.3
+
+**🎉 Released:**
+- TBD
+
+**🔨 Improvements:**
+- Updated notion-client dependency from 2.5.0 to 2.7.0
+- Migrated to Notion API version 2025-09-03 with `data_sources` structure
+- Database properties now retrieved from `data_sources` endpoint
+- Schema updates now use `data_sources.update` endpoint
+- Database creation now uses `initial_data_source` parameter
+- Increased comprehensive test coverage to 78 test methods
+
+---
+
 ### 2.0.2
 
 **🎉 Released:**
