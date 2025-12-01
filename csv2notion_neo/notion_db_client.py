@@ -41,11 +41,11 @@ class NotionClientExtended(NotionClient):
         self.options = options or {}
         super().__init__(integration_token, workspace=workspace, **kwargs)
     
-    def get_collection(
+    def get_collection_as_db(
         self, collection_id: str, force_refresh: bool = False
     ) -> Optional[NotionDB]:
         """
-        Get a collection/database - maintains compatibility.
+        Get a collection/database as a NotionDB wrapper instance.
         
         Args:
             collection_id: Collection/database ID
@@ -55,8 +55,8 @@ class NotionClientExtended(NotionClient):
             NotionDB instance or None
         """
         try:
-            # Check if we can access the database
-            db_info = self.get_collection(collection_id, force_refresh)
+            # Check if we can access the database using parent's get_collection
+            db_info = super().get_collection(collection_id, force_refresh)
             if db_info:
                 return NotionDB(self, collection_id)
             return None
