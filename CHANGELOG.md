@@ -3,7 +3,7 @@
 ### 2.0.3
 
 **🎉 Released:**
-- TBD
+- 1st December 2025
 
 **🔨 Improvements:**
 - Updated notion-client dependency from 2.5.0 to 2.7.0
