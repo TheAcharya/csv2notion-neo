@@ -53,7 +53,7 @@ jobs:
           poetry-version: ${{ env.BUILD_POETRY_VERSION }}
       
       - name: Install poetry-plugin-export
-        run: poetry self add poetry-plugin-export
+        run: poetry self add poetry-plugin-export==1.9.0
 
       - name: Export requirements
         run: poetry export --without-hashes -f requirements.txt --output requirements.txt
