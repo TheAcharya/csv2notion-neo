@@ -171,7 +171,7 @@ class NotionDB:
             if self._cache_rows is not None:
                 return self._cache_rows
             
-            self._cache_rows = {}
+            rows_temp = {}
             
             try:
                 # Query all pages in the database with pagination (API 2025-09-03)
@@ -217,12 +217,14 @@ class NotionDB:
                         ])
                         
                         if title_text:
-                            self._cache_rows[title_text] = page
+                            rows_temp[title_text] = page
                     
                     # Check if there are more pages to fetch
                     has_more = response.get("has_more", False)
                     start_cursor = response.get("next_cursor")
                 
+                # Only cache on success
+                self._cache_rows = rows_temp
                 # self.logger.debug(f"Loaded {len(self._cache_rows)} rows from {page_count} pages")
                 
             except Exception as e:
