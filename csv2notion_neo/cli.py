@@ -145,6 +145,9 @@ def cli(*argv: str) -> None:
             logger.error("Error during execution", exc_info=e)
         else:
             logger.error(e)
+        # Re-raise so callers can handle errors programmatically
+        # (main() already catches NotionError/CriticalError for CLI usage)
+        raise
 
 
 def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> None:
