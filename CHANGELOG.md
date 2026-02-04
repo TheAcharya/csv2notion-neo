@@ -1,5 +1,18 @@
 # Changelog
 
+### 2.0.4
+
+**🎉 Released:**
+- 4th January 2026
+
+**🔨 Improvements:**
+- Added comprehensive test coverage for NotionDB cache behavior and error handling with 83 total test methods
+
+**🐞 Bug Fix:**
+- NotionDB: do not set rows cache when database fetch fails (timeout, 503, etc.), preventing duplicate entries when upload continues after a failed query (#72) Thanks @timotif!
+
+---
+
 ### 2.0.3
 
 **🎉 Released:**
