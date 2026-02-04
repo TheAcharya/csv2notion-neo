@@ -3,7 +3,7 @@
 ### 2.0.4
 
 **🎉 Released:**
-- 4th January 2026
+- 4th February 2026
 
 **🔨 Improvements:**
 - Added comprehensive test coverage for NotionDB cache behavior and error handling with 83 total test methods
