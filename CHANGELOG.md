@@ -1,5 +1,19 @@
 # Changelog
 
+### 2.0.4
+
+**🎉 Released:**
+- 4th February 2026
+
+**🔨 Improvements:**
+- Added `raise_on_error` parameter to `cli()` for programmatic use; when True, exceptions propagate so callers (e.g. web apps) can catch and handle errors (#73) Thanks @timotif!
+- Added comprehensive test coverage for NotionDB cache behavior, error handling, and programmatic CLI usage with 85 total test methods
+
+**🐞 Bug Fix:**
+- NotionDB: do not set rows cache when database fetch fails (timeout, 503, etc.), preventing duplicate entries when upload continues after a failed query (#72) Thanks @timotif!
+
+---
+
 ### 2.0.3
 
 **🎉 Released:**
