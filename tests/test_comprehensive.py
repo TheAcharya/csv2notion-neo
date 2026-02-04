@@ -140,6 +140,10 @@ TABLE OF CONTENTS:
     - test_rows_cache_prevents_duplicate_fetch
     - test_invalidate_cache_allows_refetch
     - test_partial_fetch_failure_doesnt_cache
+
+20. TestCLIProgrammaticUsage
+    - test_cli_swallows_exception_by_default
+    - test_cli_raises_exception_when_raise_on_error_true
 """
 
 import pytest
@@ -150,6 +154,7 @@ from unittest.mock import Mock, patch, MagicMock
 from argparse import Namespace
 
 # Import CSV2Notion Neo modules
+from csv2notion_neo.cli import cli
 from csv2notion_neo.cli_args import parse_args, _parse_column_types, _parse_default_icon
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
 from csv2notion_neo.utils_static import ALLOWED_TYPES, ConversionRules
@@ -2295,6 +2300,40 @@ class TestNotionDBCacheBehavior:
             _ = db.rows
 
         assert db._cache_rows is None
+
+
+# ============================================================================
+# 20. TestCLIProgrammaticUsage - cli() raise_on_error for programmatic use
+# ============================================================================
+class TestCLIProgrammaticUsage:
+    """Test cli() behavior with raise_on_error for programmatic callers."""
+
+    def test_cli_swallows_exception_by_default(self):
+        """
+        With raise_on_error=False (default), exceptions are logged and swallowed.
+        CLI behavior: no exception propagates to the caller.
+        """
+        argv = [
+            "--workspace", "Test",
+            "--token", "ntn_12345678901234567890",
+            "--url", "https://www.notion.so/workspace/database-id",
+        ]
+        # No csv_file: cli() will raise CriticalError internally, then catch it
+        cli(*argv)
+        # If we get here without exception, the error was swallowed (default behavior)
+
+    def test_cli_raises_exception_when_raise_on_error_true(self):
+        """
+        With raise_on_error=True, exceptions propagate so callers can handle them.
+        Programmatic use: e.g. web apps can catch CriticalError/NotionError.
+        """
+        argv = [
+            "--workspace", "Test",
+            "--token", "ntn_12345678901234567890",
+            "--url", "https://www.notion.so/workspace/database-id",
+        ]
+        with pytest.raises(CriticalError, match="CSV or JSON file is required"):
+            cli(*argv, raise_on_error=True)
 
 
 if __name__ == "__main__":
