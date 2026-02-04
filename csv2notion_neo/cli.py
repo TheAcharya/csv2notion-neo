@@ -29,7 +29,7 @@ from csv2notion_neo.utils_exceptions import CriticalError, NotionError
 logger = logging.getLogger(__name__)
 
 
-def cli(*argv: str) -> None:
+def cli(*argv: str, raise_on_error: bool = False) -> None:
     try:
         ic.enable()
         args = parse_args(argv)
@@ -147,8 +147,10 @@ def cli(*argv: str) -> None:
             logger.error(e)
         # Re-raise so callers can handle errors programmatically
         # (main() already catches NotionError/CriticalError for CLI usage)
-        raise
-
+        if raise_on_error:
+            raise
+        # Otherwise keep CLI behavior (log + swallow)
+        return
 
 def setup_logging(is_verbose: bool = False, log_file: Optional[Path] = None) -> None:
     logging.basicConfig(format="%(levelname)s: %(message)s")
