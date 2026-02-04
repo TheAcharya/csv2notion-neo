@@ -164,6 +164,14 @@ setup_poetry() {
         exit 1
     fi
     
+    # Install poetry-plugin-export (same version as CI for identical build environment)
+    print_status "Installing poetry-plugin-export 1.9.0..."
+    if ! "$poetry_bin" self add poetry-plugin-export==1.9.0; then
+        print_error "poetry-plugin-export installation failed"
+        exit 1
+    fi
+    print_success "poetry-plugin-export installed successfully"
+    
     print_success "Poetry installed successfully"
 }
 
