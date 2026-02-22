@@ -1,9 +1,9 @@
 # Changelog
 
-### 2.1.0
+### 2.0.5
 
 **🎉 Released:**
-- TBA
+- 22nd February 2026
 
 **🔨 Improvements:**
 - Updated notion-client (notion-sdk-py) dependency from 2.7.0 to 3.0.0 ([release notes](https://github.com/ramnes/notion-sdk-py/releases/tag/3.0.0))
