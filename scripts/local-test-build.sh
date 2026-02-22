@@ -294,7 +294,7 @@ run_tests() {
     
     if [ "$1" = "--test" ]; then
         print_status "Running tests..."
-        if ! $poetry_bin run python -m pytest tests/ -v; then
+        if ! $poetry_bin run python -m pytest tests/ -v -p no:vcr; then
             print_warning "Tests failed, but continuing..."
         fi
     fi
@@ -411,7 +411,7 @@ run_comprehensive_tests() {
     
     # Run the comprehensive test
     print_status "Running comprehensive test suite..."
-    if ! $poetry_bin run pytest tests/test_comprehensive.py -v --tb=long; then
+    if ! $poetry_bin run pytest tests/test_comprehensive.py -v --tb=long -p no:vcr; then
         print_error "Comprehensive tests failed"
         exit 1
     fi

@@ -52,7 +52,8 @@ jobs:
       - name: Run tests
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-          NOTION_WORKSPACE: ${{secrets.NOTION_WORKSPACE}}
-          NOTION_TOKEN: ${{secrets.NOTION_TOKEN}}
-          NOTION_URL: ${{secrets.NOTION_URL}}
-        run: pytest tests/test_delete_database_entries.py -v -s
+          NOTION_WORKSPACE: ${{ secrets.NOTION_WORKSPACE }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_URL: ${{ secrets.NOTION_URL }}
+        # Disable pytest-vcr plugin (incompatible with urllib3 2.x; no tests here use VCR)
+        run: pytest tests/test_delete_database_entries.py -v -s -p no:vcr

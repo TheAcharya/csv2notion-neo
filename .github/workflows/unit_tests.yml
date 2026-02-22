@@ -70,4 +70,6 @@ jobs:
           poetry install --no-root
 
       - name: Run comprehensive tests
-        run: pytest tests/test_comprehensive.py -v -s --tb=long
+        # Disable pytest-vcr plugin: it imports urllib3.connectionpool.VerifiedHTTPSConnection
+        # which was removed in urllib3 2.x. No tests in this run use VCR.
+        run: pytest tests/test_comprehensive.py -v -s --tb=long -p no:vcr
