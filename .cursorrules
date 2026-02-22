@@ -6,7 +6,7 @@ This is CSV2Notion Neo, an advanced command-line tool for uploading and merging 
 
 ## Version 2.0.0+ Migration
 
-CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (version 2.7.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (version 3.0.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
 
 ### Migration Implementation Details
 
@@ -52,7 +52,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Core Dependencies
 - Python 3.9+ required
 - Poetry for dependency management
-- Key dependencies: notion-client 2.7.0 (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
+- Key dependencies: notion-client 3.0.0 (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
 
 ## Code Style and Standards
 
@@ -133,7 +133,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Notion API
 - Use the Notion API client implementation in csv2notion_neo/notion_client.py
-- Utilise the notion-sdk-py library (v2.7.0) for all Notion API interactions
+- Utilise the notion-sdk-py library (v3.0.0) for all Notion API interactions
 - API Version: 2025-09-03 with data_sources structure for database properties
 - Data Sources: Properties retrieved from data_sources endpoint, schema updates via data_sources.update
 - Handle API responses and error codes properly with comprehensive retry logic

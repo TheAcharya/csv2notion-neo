@@ -1,3 +1,13 @@
+"""
+CSV2Notion Neo - Notion Upload Preparator
+
+This module validates and prepares CSV/JSON data and the target Notion database
+before conversion and upload. It runs a configurable pipeline of steps: image,
+icon, and mandatory column validation; merge and key-column handling; missing or
+unsupported column resolution; relation and status checks; and optional duplicate
+validation, aligning local data with the database schema per ConversionRules.
+"""
+
 import logging
 from typing import Callable, Dict, Iterable, List, Set, Tuple
 

@@ -12,7 +12,7 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - Notion API integration (API version 2025-09-03 with data_sources structure)
 - Error handling and validation
 - CLI argument validation with token format validation and URL validation
-- Notion SDK functionality without credentials (notion-client 2.7.0)
+- Notion SDK functionality without credentials (notion-client 3.0.0)
 - Column type detection and auto-detection
 - Data processing and conversion utilities
 - Advanced multi-feature scenarios
@@ -74,7 +74,7 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | Error Handling | TestErrorHandling | test_critical_error_handling, test_invalid_column_types, test_missing_required_arguments, test_invalid_file_paths | Error scenarios and edge cases | Covered |
 | Version and Help | TestVersionAndHelp | test_version_argument, test_help_argument, test_version_constant | Version and help functionality | Covered |
 | Comprehensive Scenarios | TestComprehensiveScenarios | test_full_upload_scenario, test_ai_captioning_scenario, test_database_deletion_scenario, test_validation_scenario | Complex scenarios combining multiple features | Covered |
-| Notion SDK Testing | TestNotionSDKWithoutCredentials | test_notion_client_initialization, test_notion_client_get_collection, test_notion_client_create_record, test_notion_client_upload_file, test_notion_client_extended_initialization, test_notion_db_initialization, test_notion_row_converter, test_notion_row_uploader, test_notion_db_pagination_large_datasets | Notion SDK functionality without credentials, including pagination for large datasets | Covered |
+| Notion SDK Testing | TestNotionSDKWithoutCredentials | test_notion_client_initialization, test_notion_client_get_collection, test_notion_client_create_record, test_notion_client_upload_file, test_notion_client_extended_initialization, test_notion_db_initialization, test_notion_row_converter, test_notion_row_uploader, test_notion_db_pagination_large_datasets | Notion SDK functionality without credentials (notion-client 3.0.0), including pagination for large datasets | Covered |
 | Column Type Detection | TestColumnTypeDetection | test_type_guessing_numbers, test_type_guessing_urls, test_type_guessing_emails, test_type_guessing_checkboxes, test_type_guessing_by_values | Auto-detection and type guessing functionality | Covered |
 | Column Type Operations | TestColumnTypeOperations | test_column_type_validation, test_column_type_mapping, test_column_type_combinations, test_column_type_edge_cases | All Notion column types and their operations | Covered |
 | Merge Operations | TestMergeOperations | test_merge_argument_parsing, test_merge_validation_scenarios, test_merge_column_validation, test_merge_edge_cases | Database merging and updating operations | Covered |
@@ -411,7 +411,7 @@ cat tests/log.txt
 
 ### Notion API 2025-09-03 Migration
 - API Version: Upgraded to Notion API version 2025-09-03
-- SDK Update: Updated notion-client to version 2.7.0
+- SDK Update: Updated notion-client to version 3.0.0
 - Data Sources: Migrated to new data_sources structure for database properties
 - Property Retrieval: Properties now fetched from data_sources endpoint instead of database object
 - Schema Updates: Database schema modifications use data_sources.update endpoint
@@ -630,4 +630,4 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 
 For more information about CSV2Notion Neo testing, see the main project documentation and AGENT.MD file.
 
-Note: This test suite is compatible with notion-client 2.7.0 and Notion API version 2025-09-03.
+Note: This test suite is compatible with notion-client 3.0.0 and Notion API version 2025-09-03.

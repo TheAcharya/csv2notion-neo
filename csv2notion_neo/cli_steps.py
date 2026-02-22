@@ -1,3 +1,11 @@
+"""
+CSV2Notion Neo - CLI Workflow Steps
+
+This module provides the main workflow steps invoked by the CLI: database deletion,
+new database creation from CSV, conversion of CSV/JSON rows to Notion format, and
+upload of rows (single- or multi-threaded) with progress reporting.
+"""
+
 import logging
 from argparse import Namespace
 from functools import partial

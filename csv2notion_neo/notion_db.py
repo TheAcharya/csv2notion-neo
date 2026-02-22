@@ -485,8 +485,8 @@ class NotionDB:
     ) -> Dict[str, Any]:
         """Add a row to the database."""
         import time
-        from notion_client.errors import APIResponseError
-        
+        from notion_client.errors import APIResponseError, APIErrorCode
+
         max_retries = 3
         retry_delay = 1.0  # Start with 1 second delay
         
@@ -538,7 +538,7 @@ class NotionDB:
                 return response
                 
             except APIResponseError as e:
-                if e.code == "conflict_error" and attempt < max_retries - 1:
+                if e.code == APIErrorCode.ConflictError and attempt < max_retries - 1:
                     # Database might not be ready yet, wait and retry
                     self.logger.warning(f"Database conflict on attempt {attempt + 1}, retrying in {retry_delay}s...")
                     time.sleep(retry_delay)
