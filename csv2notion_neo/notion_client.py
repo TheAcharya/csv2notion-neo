@@ -72,6 +72,11 @@ from notion_client.helpers import get_id
 from csv2notion_neo.utils_exceptions import NotionError, CriticalError
 
 
+def _http_status(exc: Exception) -> Optional[int]:
+    """Get HTTP status from SDK exception (3.0.0 uses .status, older used .status_code)."""
+    return getattr(exc, "status", None) or getattr(exc, "status_code", None)
+
+
 class NotionClient:
     """
     Official Notion SDK client adapter that maintains compatibility
@@ -503,14 +508,15 @@ class NotionClient:
                     # - Network errors: Always retry (temporary connectivity issues)
                     # ====================================================================
                     
-                    if hasattr(e, 'status_code'):
+                    status = _http_status(e)
+                    if status is not None:
                         # Retryable server errors: Service unavailable, Gateway timeout, Rate limited
-                        if e.status_code in [503, 504, 429]:
+                        if status in [503, 504, 429]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
                         # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
-                        elif e.status_code in [400, 401, 403, 404]:
+                        if status in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to upload file {file_path}: {e}") from e
                     
                     # Network issues: Always retry for timeout and connection errors
@@ -622,15 +628,16 @@ class NotionClient:
                     # Formula: base_delay * (2^attempt) + random(0,1) seconds
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
                     
-                    # Smart retry logic based on error type
-                    if hasattr(e, 'status_code'):
+                    # Smart retry logic based on error type (3.0.0 uses .status, older used .status_code)
+                    status = _http_status(e)
+                    if status is not None:
                         # Retryable server errors: Service unavailable, Gateway timeout, Rate limited, Conflict
-                        if e.status_code in [503, 504, 429, 409]:
+                        if status in [503, 504, 429, 409]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
                         # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
-                        elif e.status_code in [400, 401, 403, 404]:
+                        if status in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to create database: {e}") from e
                     
                     # Network issues: Always retry for timeout and connection errors
@@ -720,15 +727,16 @@ class NotionClient:
                     # Formula: base_delay * (2^attempt) + random(0,1) seconds
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
                     
-                    # Smart retry logic based on error type
-                    if hasattr(e, 'status_code'):
+                    # Smart retry logic based on error type (3.0.0 uses .status, older used .status_code)
+                    status = _http_status(e)
+                    if status is not None:
                         # Retryable server errors: Service unavailable, Gateway timeout, Rate limited, Conflict
-                        if e.status_code in [503, 504, 429, 409]:
+                        if status in [503, 504, 429, 409]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
                         # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
-                        elif e.status_code in [400, 401, 403, 404]:
+                        if status in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to create page: {e}") from e
                     
                     # Network issues: Always retry for timeout and connection errors

@@ -1,5 +1,17 @@
 # Changelog
 
+### 2.1.0
+
+**🎉 Released:**
+- TBA
+
+**🔨 Improvements:**
+- Updated notion-client (notion-sdk-py) dependency from 2.7.0 to 3.0.0 ([release notes](https://github.com/ramnes/notion-sdk-py/releases/tag/3.0.0))
+- Retry logic now uses SDK 3.0.0's `status` attribute with fallback to `status_code` for compatibility
+- Conflict error detection in `NotionDB.add_row` now uses `APIErrorCode.ConflictError` for SDK 3.0.0
+
+---
+
 ### 2.0.4
 
 **🎉 Released:**

@@ -367,7 +367,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
         relation_rows = relation.rows.values()
 
         try:
-            return next(r for r in relation_rows if r.id == block_id)
+            return next(r for r in relation_rows if r.get("id") == block_id)
         except StopIteration:
             self._error(
                 f"Row with url '{url}' not found in relation"
