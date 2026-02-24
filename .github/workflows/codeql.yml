@@ -13,7 +13,7 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "dev" ]
     paths-ignore:
       - '**/*.md'           # .md files anywhere in the repo
       - '**/LICENSE'        # LICENSE files anywhere in the repo
@@ -23,7 +23,7 @@ on:
       - '**/*.cursorrules'  # .cursorrules files anywhere in the repo
       
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "dev" ]
     paths-ignore:
       - '**/*.md'           # .md files anywhere in the repo
       - '**/LICENSE'        # LICENSE files anywhere in the repo
