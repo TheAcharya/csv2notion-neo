@@ -83,8 +83,7 @@ def process_iter(
             
             # Process completed futures as they finish with enhanced real-time updates
             completed_count = 0
-            total_tasks = len(future_to_task)
-            
+
             for future in as_completed(future_to_task):
                 try:
                     # Get the result (this will raise an exception if the task failed)

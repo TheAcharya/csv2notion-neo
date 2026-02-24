@@ -32,6 +32,7 @@ class AI:
                 return row
             except Exception as e:
                 logger.error(f"Error during AI process : {e}")
+        return row
 
     def _img2caption(self, token: str, image_url: str, model_url: str) -> str:
         try:

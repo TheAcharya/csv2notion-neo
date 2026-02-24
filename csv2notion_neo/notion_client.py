@@ -705,7 +705,9 @@ class NotionClient:
             except Exception as e:
                 # Non-retryable errors
                 raise NotionError(f"Error uploading file {file_path}: {e}") from e
-    
+
+        raise NotionError(f"Failed to upload file {file_path}: unexpected loop exit")
+
     def _get_content_type(self, file_path: Path) -> str:
         """
         Get content type for file.
@@ -831,7 +833,9 @@ class NotionClient:
             except Exception as e:
                 # Non-retryable errors
                 raise NotionError(f"Error creating database: {e}") from e
-    
+
+        raise NotionError("Failed to create database: unexpected loop exit")
+
     # ============================================================================
     # LOGIC PATH 2: UPLOAD TO EXISTING DATABASE
     # ============================================================================
@@ -930,7 +934,9 @@ class NotionClient:
                     
             except Exception as e:
                 raise NotionError(f"Error creating page: {e}") from e
-    
+
+        raise NotionError("Failed to create page: unexpected loop exit")
+
     def update_page(self, page_id: str, properties: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         """
         Update a page using the official API with retry and 429 handling.

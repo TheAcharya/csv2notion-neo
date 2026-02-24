@@ -199,7 +199,7 @@ class LocalData(Iterable[CSVRowType]):  # noqa:  WPS214
             try:
                 model_url = model_map[model_name]
                 logger.info(f"Using model {model_name}")
-            except:
+            except Exception:
                 logger.error(f"{model_name} is not present! defaulting to vit-gpt2")
                 model_url = model_map["vit-gpt2"]
         else:

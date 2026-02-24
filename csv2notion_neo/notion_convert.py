@@ -228,10 +228,10 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_non_cover_images(self, row: CSVRowType) -> List:
 
-        images = None
+        _ = None
 
         if self.rules.image_column:
-            image_columns = self._remove_cover_image(self.rules.image_caption_column)
+            _ = self._remove_cover_image(self.rules.image_caption_column)
 
         if self.rules.image_column:
             pass

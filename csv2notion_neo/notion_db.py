@@ -549,7 +549,9 @@ class NotionDB:
                     raise NotionError(f"Failed to add row: {e}") from e
             except Exception as e:
                 raise NotionError(f"Failed to add row: {e}") from e
-    
+
+        raise NotionError("Failed to add row after retries")
+
     def add_row_key(self, key: str) -> Dict[str, Any]:
         """Add a row with just a key value."""
         return self.add_row(columns={self.key_column: key})
@@ -875,7 +877,9 @@ def get_collection_id(client: NotionClient, notion_url: str) -> str:
         except Exception as page_error:
             # If it's not a page either, it's an invalid URL
             raise NotionError(f"Invalid URL: {notion_url} - Could not retrieve as database or page") from page_error
-            
+
+        raise NotionError(f"Invalid URL: {notion_url} - Not a database or page")
+
     except NotionError:
         # Re-raise NotionError as-is
         raise

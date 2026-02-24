@@ -684,7 +684,7 @@ class TestDataProcessing:
             properties={},
             columns={"title": "existing_key", "value": "test"}
         )
-        result1 = uploader._get_db_row(row1, is_merge=True)
+        _ = uploader._get_db_row(row1, is_merge=True)
         mock_db.update_row.assert_called()
         
         # Test 2: Merge with new row (no race condition)
@@ -692,7 +692,7 @@ class TestDataProcessing:
             properties={},
             columns={"title": "new_key", "value": "test"}
         )
-        result2 = uploader._get_db_row(row2, is_merge=True)
+        _ = uploader._get_db_row(row2, is_merge=True)
         mock_db.add_row.assert_called()
         
         # Test 3: Merge with race condition (duplicate key)
@@ -738,8 +738,8 @@ class TestDataProcessing:
         )
         
         # This should handle the race condition gracefully
-        result3 = uploader._get_db_row(row3, is_merge=True)
-        
+        _ = uploader._get_db_row(row3, is_merge=True)
+
         # Verify that cache was invalidated and update was called
         mock_db.invalidate_cache.assert_called()
         mock_db.update_row.assert_called()
