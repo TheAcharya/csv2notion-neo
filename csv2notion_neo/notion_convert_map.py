@@ -20,7 +20,6 @@ from csv2notion_neo.notion_type_guess import is_url
 from csv2notion_neo.utils_exceptions import TypeConversionError
 from csv2notion_neo.utils_static import FileType
 from csv2notion_neo.utils_str import split_str
-from icecream import ic
 
 
 def map_checkbox(s: str) -> bool:

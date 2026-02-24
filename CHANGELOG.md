@@ -1,5 +1,21 @@
 # Changelog
 
+### 2.0.6
+
+**🎉 Released:**
+- 25th February 2026
+
+**🔨 Improvements:**
+- Addressed GitHub CodeQL and code quality findings: removed unreachable code in tests, fixed file-not-closed in AI image captioning (`utils_ai.py`), renamed unused loop variables to `_`, removed duplicate and unused imports (e.g. `icecream` where unused, `shutil`, `deepcopy`, `ALLOWED_TYPES`), replaced bare `except:` with `except Exception:`, added explicit returns/raises where paths could fall through, and documented intentionally empty exception handlers
+- Test suite: 94 tests across 21 categories; added rate limit and throttle tests (Retry-After, 429 coordination, proactive throttle) for issue #76
+- Updated tests/README.md, .cursorrules, and AGENT.MD with rate-limit/throttle behaviour and current test coverage
+
+**🐞 Bug Fix:**
+- Rate limiting (HTTP 429) not handled for write operations and concurrent threads: All write/read paths now handle 429 with Retry-After parsing and cross-thread ban coordination; `update_page`, `query_data_source`, `get_collection`, `get_data_source`, `update_data_source` use the shared rate-limit wait; proactive throttle (~3 req/s) applied before each request to reduce 429s; row updates and delete/archive use the client wrapper so they benefit from retry and 429 handling (#76)
+- AI image captioning: image file is now always closed via `with open(...)` to avoid resource leaks and satisfy static analysis
+
+---
+
 ### 2.0.5
 
 **🎉 Released:**

@@ -8,7 +8,6 @@ from csv2notion_neo.version import __version__
 from csv2notion_neo.cli_steps import convert_csv_to_notion_rows, new_database, upload_rows
 from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import get_collection_id, get_notion_client
-from csv2notion_neo.utils_exceptions import CriticalError
 from .input_command import ARGS_DICT
 from argparse import Namespace
 from pathlib import Path

@@ -9,7 +9,6 @@ Notion property types for each column, including dates, numbers, URLs, emails, e
 import math
 import re
 from typing import List
-from icecream import ic
 
 
 def guess_type_by_values(values_str: List[str]) -> str:
@@ -40,7 +39,7 @@ def guess_type_by_values(values_str: List[str]) -> str:
 def is_number(s: str) -> bool:
     try:
         return not math.isnan(float(s))
-    except:
+    except Exception:
         return False
 
 
@@ -49,15 +48,16 @@ def is_multi(s) -> bool:
     try:
         if type(s) == tuple:
             return True
-    except:
+    except Exception:
         return None
+    return None
 
 
 def is_url(s: str) -> bool:
 
     try:
         return re.match("^https?://", s) is not None
-    except:
+    except Exception:
         return None
 
 
@@ -66,14 +66,14 @@ def is_email(s: str) -> bool:
         return (
             re.match(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", s) is not None
         )
-    except:
+    except Exception:
         return None
 
 
 def is_checkbox(s: str) -> bool:
     try:
         return s in {"true", "false"}
-    except:
+    except Exception:
         return None
 
 
@@ -81,5 +81,5 @@ def is_empty(s: str) -> bool:
 
     try:
         return not s.strip()
-    except:
+    except Exception:
         return None

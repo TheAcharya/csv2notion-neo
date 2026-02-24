@@ -33,7 +33,6 @@ from csv2notion_neo.utils_exceptions import (
 )
 from csv2notion_neo.utils_static import ConversionRules, FileType
 from csv2notion_neo.utils_str import split_str
-from icecream import ic
 
 logger = logging.getLogger(__name__)
 
@@ -228,10 +227,10 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
     def _map_non_cover_images(self, row: CSVRowType) -> List:
 
-        images = None
+        _ = None
 
         if self.rules.image_column:
-            image_columns = self._remove_cover_image(self.rules.image_caption_column)
+            _ = self._remove_cover_image(self.rules.image_caption_column)
 
         if self.rules.image_column:
             pass

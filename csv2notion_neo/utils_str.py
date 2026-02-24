@@ -7,7 +7,6 @@ handling multi-value fields in Notion databases.
 """
 
 from typing import List
-from icecream import ic
 
 
 def split_str(s: str, sep: str = ",") -> List[str]:

@@ -106,7 +106,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Renamed: All "_official" suffixed files to clean names without suffixes
 - Enhanced: Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
 - Improved: Clear separation between two distinct logic paths for database operations
-- Enhanced: Comprehensive test suite with 78 test methods across 18 categories
+- Enhanced: Comprehensive test suite with 94 test methods across 21 categories (including rate limit/throttle tests; issue #76)
 
 ## Core Architecture
 
@@ -128,6 +128,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
    - File upload and block operations through API endpoints
    - Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
    - Smart error handling for different error types (server errors, rate limits, network issues)
+   - HTTP 429 handling: Retry-After parsing, cross-thread ban coordination (_rate_limit_set/_rate_limit_wait), proactive throttle (~3 req/s) (issue #76)
    - Two distinct logic paths: creating new databases in pages vs uploading to existing databases
 
 4. Conversion Engine (`csv2notion_neo/notion_convert.py`)
@@ -183,6 +184,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Two distinct logic paths with optimized retry strategies for different scenarios
 - Improved merge functionality for large CSV files with thread-safe cache invalidation and race condition prevention
 - Large dataset pagination support: Complete pagination handling for databases >100 rows to prevent merge duplicates
+- Rate limit and throttle (issue #76): HTTP 429 handling with Retry-After parsing (default 60s, min 1s), cross-thread ban coordination, proactive ~3 req/s sliding-window throttle before each request
 
 ## Development Guidelines
 
@@ -205,9 +207,10 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - VCR-based testing for API responses
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
-- Comprehensive test suite (test_comprehensive.py) for CLI argument validation and Notion SDK testing without credentials, including pagination tests for large datasets
+- Comprehensive test suite (test_comprehensive.py): 21 categories, 94 test methods; CLI argument validation and Notion SDK testing without credentials, including pagination and rate limit/throttle tests
 - Progress bar real-time updates testing with multi-threaded simulation
 - Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
+- Rate limit and throttle tests (TestNotionRateLimitAndThrottle): Retry-After parsing, 429 ban coordination, proactive throttle (issue #76)
 
 ### Code Quality
 - Black formatting with 88 character line length
@@ -229,7 +232,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Support for all Notion API endpoints (databases, pages, blocks, users, file uploads, data_sources)
 - Data Sources: Properties retrieved from data_sources endpoint, schema updates via data_sources.update
 - File upload handling through file_uploads endpoints with comprehensive retry logic
-- Built-in rate limiting and error handling from the SDK with exponential backoff
+- Built-in rate limiting and error handling: exponential backoff; HTTP 429 handling with Retry-After and cross-thread coordination; proactive ~3 req/s throttle (issue #76)
 - Integration token authentication for enhanced security
 - Full compatibility with Notion's API specifications
 - Smart retry logic with 15 attempts, exponential backoff, and jitter for production reliability
@@ -375,7 +378,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Integration tests for API changes
 - Manual testing for UI/UX changes
 - Performance testing for optimization changes
-- Comprehensive test suite for CLI argument validation and Notion SDK functionality
+- Comprehensive test suite (21 categories, 94 methods) for CLI argument validation, Notion SDK, and rate limit/throttle behavior (issue #76)
 
 ## Troubleshooting
 
@@ -383,7 +386,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
 - Invalid token format (resolved with user-friendly validation and guidance)
 - Invalid URL format (resolved with Notion.so domain and protocol validation)
-- Rate limiting from Notion API (resolved with 15-attempt retry logic and exponential backoff)
+- Rate limiting and HTTP 429 from Notion API (resolved with 15-attempt retry, Retry-After parsing, cross-thread ban coordination, and proactive ~3 req/s throttle; issue #76)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - AI model loading issues
 - Column type conversion errors
@@ -399,7 +402,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 78 test methods across 18 categories including progress bar real-time updates testing and pagination for large datasets)
+- Test coverage gaps (resolved with 94 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

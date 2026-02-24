@@ -454,9 +454,10 @@ class NotionDB:
                 for page in all_pages:
                     page_id = page["id"]
                     try:
-                        # Archive the page (soft delete)
-                        self.client.client.pages.update(
-                            page_id=page_id,
+                        # Archive the page (soft delete; via client for 429 retry)
+                        self.client.update_page(
+                            page_id,
+                            {},
                             archived=True
                         )
                         deleted_count += 1
@@ -548,7 +549,9 @@ class NotionDB:
                     raise NotionError(f"Failed to add row: {e}") from e
             except Exception as e:
                 raise NotionError(f"Failed to add row: {e}") from e
-    
+
+        raise NotionError("Failed to add row after retries")
+
     def add_row_key(self, key: str) -> Dict[str, Any]:
         """Add a row with just a key value."""
         return self.add_row(columns={self.key_column: key})
@@ -592,8 +595,8 @@ class NotionDB:
                         if converted_property and converted_property != {}:
                             notion_properties[prop_name] = converted_property
             
-            # Update page
-            response = self.client.client.pages.update(
+            # Update page (via client wrapper for 429 retry and cross-thread rate-limit coordination)
+            response = self.client.update_page(
                 page_id=page_id,
                 properties=notion_properties
             )
@@ -874,7 +877,9 @@ def get_collection_id(client: NotionClient, notion_url: str) -> str:
         except Exception as page_error:
             # If it's not a page either, it's an invalid URL
             raise NotionError(f"Invalid URL: {notion_url} - Could not retrieve as database or page") from page_error
-            
+
+        raise NotionError(f"Invalid URL: {notion_url} - Not a database or page")
+
     except NotionError:
         # Re-raise NotionError as-is
         raise
@@ -1029,10 +1034,9 @@ def _schema_from_csv(
 
 def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
     """Advanced column type detection with smart pattern recognition."""
-    import re
     from datetime import datetime
     from decimal import Decimal, InvalidOperation
-    
+
     try:
         values = csv_data.col_values(col_key)
         if not values:
@@ -1082,7 +1086,8 @@ def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
                 float(v.replace(',', '').replace('%', ''))
                 numeric_count += 1
             except (ValueError, InvalidOperation):
-                pass
+                # Value not numeric; skip for type detection
+                continue
         
         if numeric_count >= len(clean_values) * 0.8:  # 80% are numeric
             return "number"
@@ -1132,16 +1137,12 @@ def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
                                 break
                             except ValueError:
                                 try:
-                                    datetime.strptime(v, '%Y/%m/%d')
+                                    datetime.strptime(v, '%m/%d/%Y')
                                     date_count += 1
                                     break
                                 except ValueError:
-                                    try:
-                                        datetime.strptime(v, '%m/%d/%Y')
-                                        date_count += 1
-                                        break
-                                    except ValueError:
-                                        pass
+                                    # Value not in tried date formats; skip
+                                    pass
         
         if date_count >= len(clean_values) * 0.7:  # 70% are valid dates
             return "date"
@@ -1164,8 +1165,7 @@ def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
         
     except Exception as e:
         # Log the error for debugging but don't fail
-        import logging
-        logging.getLogger(__name__).warning(f"Error analyzing column type for {col_key}: {e}")
+        logger.warning(f"Error analyzing column type for {col_key}: {e}")
         return "rich_text"
 
 

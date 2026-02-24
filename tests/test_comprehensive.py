@@ -144,11 +144,23 @@ TABLE OF CONTENTS:
 20. TestCLIProgrammaticUsage
     - test_cli_swallows_exception_by_default
     - test_cli_raises_exception_when_raise_on_error_true
+
+21. TestNotionRateLimitAndThrottle
+    - test_parse_retry_after_from_header
+    - test_parse_retry_after_default_no_response
+    - test_parse_retry_after_default_no_headers
+    - test_parse_retry_after_minimum_one
+    - test_parse_retry_after_invalid_returns_default
+    - test_rate_limit_set_and_wait_blocks
+    - test_proactive_throttle_enforces_cap
+    - test_rate_limit_wait_includes_proactive_throttle
+    - test_no_ban_wait_is_fast
 """
 
+import os
+import time
 import pytest
 import tempfile
-import os
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 from argparse import Namespace
@@ -157,12 +169,19 @@ from argparse import Namespace
 from csv2notion_neo.cli import cli
 from csv2notion_neo.cli_args import parse_args, _parse_column_types, _parse_default_icon
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
-from csv2notion_neo.utils_static import ALLOWED_TYPES, ConversionRules
+from csv2notion_neo.utils_static import ConversionRules
 from csv2notion_neo.utils_str import split_str
 from csv2notion_neo.version import __version__
 
 # Import Notion SDK modules for testing
-from csv2notion_neo.notion_client import NotionClient, get_notion_client
+from csv2notion_neo import notion_client as notion_client_module
+from csv2notion_neo.notion_client import (
+    NotionClient,
+    _parse_retry_after,
+    _rate_limit_wait,
+    _rate_limit_set,
+    _proactive_throttle_wait,
+)
 from csv2notion_neo.notion_db_client import NotionClientExtended
 from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.local_data import LocalData
@@ -664,7 +683,7 @@ class TestDataProcessing:
             properties={},
             columns={"title": "existing_key", "value": "test"}
         )
-        result1 = uploader._get_db_row(row1, is_merge=True)
+        _ = uploader._get_db_row(row1, is_merge=True)
         mock_db.update_row.assert_called()
         
         # Test 2: Merge with new row (no race condition)
@@ -672,7 +691,7 @@ class TestDataProcessing:
             properties={},
             columns={"title": "new_key", "value": "test"}
         )
-        result2 = uploader._get_db_row(row2, is_merge=True)
+        _ = uploader._get_db_row(row2, is_merge=True)
         mock_db.add_row.assert_called()
         
         # Test 3: Merge with race condition (duplicate key)
@@ -718,8 +737,8 @@ class TestDataProcessing:
         )
         
         # This should handle the race condition gracefully
-        result3 = uploader._get_db_row(row3, is_merge=True)
-        
+        _ = uploader._get_db_row(row3, is_merge=True)
+
         # Verify that cache was invalidated and update was called
         mock_db.invalidate_cache.assert_called()
         mock_db.update_row.assert_called()
@@ -838,21 +857,13 @@ class TestDataProcessing:
         all_processed = created_rows.union(updated_rows)
         assert len(all_processed) == NUM_ROWS, f"Duplicate rows detected: {len(all_processed)} unique vs {NUM_ROWS} expected"
         
-        # Verify race conditions were handled (if any occurred)
-        # Note: Race conditions may not always occur in test environment
-        # The important thing is that the system handles them gracefully when they do
-        if race_conditions_handled > 0:
-            print(f"   - Handled {race_conditions_handled} race conditions")
-        else:
-            print(f"   - No race conditions detected (test environment may be too fast)")
-        
-        # Verify cache invalidation was called (if race conditions occurred)
-        # In a real scenario, cache invalidation would be called during race conditions
-        # For this test, we'll verify the system works correctly regardless
-        if race_conditions_handled > 0:
-            assert mock_db.invalidate_cache.called, "Cache invalidation should have been called"
-        else:
-            print(f"   - Cache invalidation not triggered (no race conditions in test environment)")
+        # Verify race conditions were handled (if any occurred).
+        # Race conditions may not always occur in test environment; the system should handle them when they do.
+        print(f"   - Race conditions handled: {race_conditions_handled}")
+        # When race conditions occurred, cache invalidation should have been called.
+        assert (
+            race_conditions_handled == 0 or mock_db.invalidate_cache.called
+        ), "Cache invalidation should have been called when race conditions were handled"
         
         # Verify all expected rows were processed
         expected_titles = {f"Row_{i:04d}" for i in range(NUM_ROWS)}
@@ -2334,6 +2345,101 @@ class TestCLIProgrammaticUsage:
         ]
         with pytest.raises(CriticalError, match="CSV or JSON file is required"):
             cli(*argv, raise_on_error=True)
+
+
+# ============================================================================
+# 21. TestNotionRateLimitAndThrottle - Rate limit and proactive throttle
+# ============================================================================
+class TestNotionRateLimitAndThrottle:
+    """
+    Test rate-limit coordination and proactive throttling in notion_client.
+    Covers _parse_retry_after, _rate_limit_set/_rate_limit_wait, _proactive_throttle_wait.
+    """
+
+    def _reset_rate_limit_state(self) -> None:
+        """Reset module-level rate limit and throttle state for isolated tests."""
+        with notion_client_module._RATE_LIMIT_LOCK:
+            notion_client_module._RATE_LIMIT_NOT_BEFORE = 0.0
+        with notion_client_module._THROTTLE_LOCK:
+            notion_client_module._THROTTLE_TIMES.clear()
+
+    def test_parse_retry_after_from_header(self):
+        """Retry-After header is parsed and returned (minimum 1.0)."""
+        exc = MagicMock()
+        exc.response = MagicMock()
+        exc.response.headers = {"Retry-After": "30"}
+        assert _parse_retry_after(exc) == 30.0
+
+    def test_parse_retry_after_default_no_response(self):
+        """No response on exception returns default 60."""
+        exc = Exception("no response")
+        assert _parse_retry_after(exc) == 60.0
+
+    def test_parse_retry_after_default_no_headers(self):
+        """Response with headers=None returns default 60."""
+        exc = MagicMock()
+        exc.response = MagicMock()
+        exc.response.headers = None
+        assert _parse_retry_after(exc) == 60.0
+
+    def test_parse_retry_after_minimum_one(self):
+        """Retry-After 0 is clamped to 1.0."""
+        exc = MagicMock()
+        exc.response = MagicMock()
+        exc.response.headers = {"Retry-After": "0"}
+        assert _parse_retry_after(exc) == 1.0
+
+    def test_parse_retry_after_invalid_returns_default(self):
+        """Invalid Retry-After value returns default 60."""
+        exc = MagicMock()
+        exc.response = MagicMock()
+        exc.response.headers = {"Retry-After": "not_a_number"}
+        assert _parse_retry_after(exc) == 60.0
+
+    def test_rate_limit_set_and_wait_blocks(self):
+        """When a ban is set, _rate_limit_wait blocks for at least that duration."""
+        self._reset_rate_limit_state()
+        ban_secs = 0.15
+        _rate_limit_set(ban_secs)
+        start = time.monotonic()
+        _rate_limit_wait()
+        elapsed = time.monotonic() - start
+        assert elapsed >= ban_secs - 0.05
+        self._reset_rate_limit_state()
+
+    def test_proactive_throttle_enforces_cap(self):
+        """Fourth call within 1 second blocks until sliding window allows (3 req/s)."""
+        self._reset_rate_limit_state()
+        start = time.monotonic()
+        _proactive_throttle_wait()
+        _proactive_throttle_wait()
+        _proactive_throttle_wait()
+        _proactive_throttle_wait()
+        elapsed = time.monotonic() - start
+        # Fourth call must wait until 1s after first; so total >= ~0.5s
+        assert elapsed >= 0.4
+        self._reset_rate_limit_state()
+
+    def test_rate_limit_wait_includes_proactive_throttle(self):
+        """_rate_limit_wait applies proactive throttle; 4 quick calls take measurable time."""
+        self._reset_rate_limit_state()
+        start = time.monotonic()
+        _rate_limit_wait()
+        _rate_limit_wait()
+        _rate_limit_wait()
+        _rate_limit_wait()
+        elapsed = time.monotonic() - start
+        assert elapsed >= 0.4
+        self._reset_rate_limit_state()
+
+    def test_no_ban_wait_is_fast(self):
+        """With no ban and no throttle pressure, _rate_limit_wait returns quickly."""
+        self._reset_rate_limit_state()
+        start = time.monotonic()
+        _rate_limit_wait()
+        elapsed = time.monotonic() - start
+        assert elapsed < 0.5
+        self._reset_rate_limit_state()
 
 
 if __name__ == "__main__":

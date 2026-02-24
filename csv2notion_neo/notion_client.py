@@ -1,9 +1,8 @@
 """
 Official Notion SDK Client Adapter for CSV2Notion Neo
 
-This module provides a compatibility layer between the existing CSV2Notion Neo
-codebase and the official Notion SDK, ensuring seamless migration without
-breaking existing functionality.
+This module provides a compatibility layer between the CSV2Notion Neo codebase
+and the official Notion SDK.
 
 RETRY LOGIC ARCHITECTURE:
 ========================
@@ -38,6 +37,11 @@ This module implements a sophisticated retry system with the following character
    - create_database(): Database creation with retry logic
    - create_page(): Page creation with retry logic
 
+6. PROACTIVE THROTTLING:
+   - Before each request, _rate_limit_wait() enforces ~3 req/s (Notion's documented average)
+   - Shared across all threads so combined rate stays under the limit
+   - Reduces 429s and long Retry-After waits; reactive 429 handling remains as backup
+
 TWO DISTINCT LOGIC PATHS:
 ========================
 This module implements two distinct logic paths for different use cases:
@@ -63,13 +67,92 @@ high concurrency, large datasets, and network instability.
 """
 
 import logging
+import threading
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from notion_client import Client, APIResponseError, APIErrorCode
 from notion_client.helpers import get_id
 
-from csv2notion_neo.utils_exceptions import NotionError, CriticalError
+from csv2notion_neo.utils_exceptions import NotionError
+
+# ---------------------------------------------------------------------------
+# Cross-thread rate limit coordination (per Notion docs for HTTP 429).
+# When any thread receives 429, all threads wait before their next request.
+# ---------------------------------------------------------------------------
+_RATE_LIMIT_LOCK = threading.Lock()
+_RATE_LIMIT_NOT_BEFORE: float = 0.0
+
+# ---------------------------------------------------------------------------
+# Proactive throttling: cap request rate to stay under Notion's ~3 req/s
+# so we avoid triggering 429s in the first place (per integration).
+# ---------------------------------------------------------------------------
+_REQUESTS_PER_SECOND = 3.0
+_THROTTLE_LOCK = threading.Lock()
+_THROTTLE_TIMES: List[float] = []
+
+
+def _proactive_throttle_wait() -> None:
+    """
+    Block until we are allowed to send one more request without exceeding
+    REQUESTS_PER_SECOND (sliding window). Shared across all threads.
+    """
+    while True:
+        with _THROTTLE_LOCK:
+            now = time.monotonic()
+            # Drop timestamps older than 1 second
+            while _THROTTLE_TIMES and (now - _THROTTLE_TIMES[0]) >= 1.0:
+                _THROTTLE_TIMES.pop(0)
+            if len(_THROTTLE_TIMES) < int(_REQUESTS_PER_SECOND):
+                _THROTTLE_TIMES.append(now)
+                return
+            # At capacity: wait until oldest request is 1 second old
+            wait_secs = _THROTTLE_TIMES[0] + 1.0 - now
+        if wait_secs > 0:
+            time.sleep(wait_secs)
+
+
+def _rate_limit_wait() -> None:
+    """
+    Block until we are allowed to make a Notion API request:
+    1) Past any shared 429 ban (reactive).
+    2) Under proactive throttle (~3 req/s).
+    """
+    # First: respect 429 ban from any thread
+    wait_secs = 0.0
+    with _RATE_LIMIT_LOCK:
+        now = time.monotonic()
+        if now < _RATE_LIMIT_NOT_BEFORE:
+            wait_secs = _RATE_LIMIT_NOT_BEFORE - now
+    if wait_secs > 0:
+        time.sleep(wait_secs)
+    # Then: proactive throttle so we stay under ~3 req/s
+    _proactive_throttle_wait()
+
+
+def _rate_limit_set(retry_after_secs: float) -> None:
+    """Set shared rate-limit ban end time so all threads wait before next request."""
+    global _RATE_LIMIT_NOT_BEFORE
+    with _RATE_LIMIT_LOCK:
+        _RATE_LIMIT_NOT_BEFORE = time.monotonic() + retry_after_secs
+
+
+def _parse_retry_after(exc: Exception) -> float:
+    """Parse Retry-After from API error; return seconds (default 60)."""
+    try:
+        response = getattr(exc, "response", None)
+        if response is not None:
+            headers = getattr(response, "headers", None)
+            if headers is not None:
+                ra = headers.get("Retry-After")
+                if ra is not None:
+                    return max(1.0, float(int(ra)))
+    except (TypeError, ValueError) as parse_err:
+        logging.getLogger(__name__).debug(
+            "Failed to parse Retry-After header from Notion response: %r", parse_err
+        )
+    return 60.0
 
 
 def _http_status(exc: Exception) -> Optional[int]:
@@ -143,7 +226,7 @@ class NotionClient:
     
     def get_collection(self, collection_id: str, force_refresh: bool = False) -> Optional[Dict[str, Any]]:
         """
-        Get a database/collection by ID - maintains compatibility.
+        Get a database/collection by ID with 429 retry - maintains compatibility.
         
         Args:
             collection_id: Database/collection ID
@@ -152,18 +235,32 @@ class NotionClient:
         Returns:
             Database data or None if not found
         """
-        try:
-            return self.client.databases.retrieve(database_id=collection_id)
-        except APIResponseError as e:
-            if e.code == APIErrorCode.ObjectNotFound:
-                return None
-            raise NotionError(f"Cannot access database {collection_id}") from e
+        from requests.exceptions import Timeout, ConnectionError
+
+        max_retries = 5
+        for attempt in range(max_retries + 1):
+            _rate_limit_wait()
+            try:
+                return self.client.databases.retrieve(database_id=collection_id)
+            except APIResponseError as e:
+                if e.code == APIErrorCode.ObjectNotFound:
+                    return None
+                if _http_status(e) == 429 and attempt < max_retries:
+                    retry_after = _parse_retry_after(e)
+                    _rate_limit_set(retry_after)
+                    self.logger.warning("Rate limited (429) on get_collection, waiting %.0fs", retry_after)
+                    time.sleep(retry_after)
+                    continue
+                raise NotionError(f"Cannot access database {collection_id}") from e
+            except (Timeout, ConnectionError) as e:
+                if attempt < max_retries:
+                    time.sleep(2.0 * (2 ** attempt))
+                    continue
+                raise NotionError(f"Cannot access database {collection_id}") from e
     
     def get_data_source(self, data_source_id: str) -> Optional[Dict[str, Any]]:
         """
-        Get a data source by ID using the new API (2025-09-03).
-        
-        Data sources contain the properties/schema for databases in the new API.
+        Get a data source by ID with 429 retry (API 2025-09-03).
         
         Args:
             data_source_id: Data source ID
@@ -171,12 +268,28 @@ class NotionClient:
         Returns:
             Data source data including properties, or None if not found
         """
-        try:
-            return self.client.data_sources.retrieve(data_source_id=data_source_id)
-        except APIResponseError as e:
-            if e.code == APIErrorCode.ObjectNotFound:
-                return None
-            raise NotionError(f"Cannot access data source {data_source_id}") from e
+        from requests.exceptions import Timeout, ConnectionError
+
+        max_retries = 5
+        for attempt in range(max_retries + 1):
+            _rate_limit_wait()
+            try:
+                return self.client.data_sources.retrieve(data_source_id=data_source_id)
+            except APIResponseError as e:
+                if e.code == APIErrorCode.ObjectNotFound:
+                    return None
+                if _http_status(e) == 429 and attempt < max_retries:
+                    retry_after = _parse_retry_after(e)
+                    _rate_limit_set(retry_after)
+                    self.logger.warning("Rate limited (429) on get_data_source, waiting %.0fs", retry_after)
+                    time.sleep(retry_after)
+                    continue
+                raise NotionError(f"Cannot access data source {data_source_id}") from e
+            except (Timeout, ConnectionError) as e:
+                if attempt < max_retries:
+                    time.sleep(2.0 * (2 ** attempt))
+                    continue
+                raise NotionError(f"Cannot access data source {data_source_id}") from e
     
     def get_primary_data_source(self, database_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -217,7 +330,8 @@ class NotionClient:
         """
         Query a data source for pages/rows using the new API (2025-09-03).
         
-        This replaces the old databases.query() method which was removed in SDK v2.6.0+.
+        Includes retry and 429 handling so initial DB fetch and pagination
+        do not abort the entire upload when rate limited.
         
         Args:
             data_source_id: Data source ID
@@ -226,31 +340,50 @@ class NotionClient:
         Returns:
             Query results with pages/rows
         """
-        try:
-            # Build query and body parameters matching the Notion API spec
-            query_params = {}
-            if "filter_properties" in kwargs:
-                query_params["filter_properties"] = kwargs.pop("filter_properties")
-            
-            body_params = {}
-            for key in ["filter", "sorts", "start_cursor", "page_size", "archived", "in_trash", "result_type"]:
-                if key in kwargs:
-                    body_params[key] = kwargs[key]
-            
-            # Use data_sources.query() endpoint
-            response = self.client.data_sources.query(
-                data_source_id=data_source_id,
-                **body_params
-            )
-            return response
-        except APIResponseError as e:
-            raise NotionError(f"Failed to query data source {data_source_id}: {e}") from e
+        from requests.exceptions import Timeout, ConnectionError
+
+        max_retries = 14
+        base_delay = 2.0
+
+        body_params = {}
+        for key in ["filter", "sorts", "start_cursor", "page_size", "archived", "in_trash", "result_type", "filter_properties"]:
+            if key in kwargs:
+                body_params[key] = kwargs[key]
+
+        for attempt in range(max_retries + 1):
+            _rate_limit_wait()
+            try:
+                response = self.client.data_sources.query(
+                    data_source_id=data_source_id,
+                    **body_params
+                )
+                return response
+            except (APIResponseError, Timeout, ConnectionError) as e:
+                status = _http_status(e)
+                if status == 429 and attempt < max_retries:
+                    retry_after = _parse_retry_after(e)
+                    _rate_limit_set(retry_after)
+                    self.logger.warning(
+                        "Rate limited (429) on query, waiting %.0fs (attempt %d/%d)",
+                        retry_after, attempt + 1, max_retries + 1,
+                    )
+                    time.sleep(retry_after)
+                    continue
+                if status is not None and status in [503, 504] and attempt < max_retries:
+                    delay = base_delay * (2 ** attempt)
+                    self.logger.warning(
+                        "Server error %s on query (attempt %d/%d), retrying in %.1fs",
+                        status, attempt + 1, max_retries + 1, delay,
+                    )
+                    time.sleep(delay)
+                    continue
+                if isinstance(e, APIResponseError):
+                    raise NotionError(f"Failed to query data source {data_source_id}: {e}") from e
+                raise NotionError(f"Failed to query data source {data_source_id}: {e}") from e
     
     def update_data_source(self, data_source_id: str, **kwargs: Any) -> Dict[str, Any]:
         """
-        Update a data source (properties/schema) using the new API (2025-09-03).
-        
-        This is used to add/modify columns in the database schema.
+        Update a data source (properties/schema) with 429 retry (API 2025-09-03).
         
         Args:
             data_source_id: Data source ID
@@ -259,14 +392,36 @@ class NotionClient:
         Returns:
             Updated data source data
         """
-        try:
-            response = self.client.data_sources.update(
-                data_source_id=data_source_id,
-                **kwargs
-            )
-            return response
-        except APIResponseError as e:
-            raise NotionError(f"Failed to update data source {data_source_id}: {e}") from e
+        from requests.exceptions import Timeout, ConnectionError
+
+        max_retries = 14
+        base_delay = 2.0
+        for attempt in range(max_retries + 1):
+            _rate_limit_wait()
+            try:
+                response = self.client.data_sources.update(
+                    data_source_id=data_source_id,
+                    **kwargs
+                )
+                return response
+            except (APIResponseError, Timeout, ConnectionError) as e:
+                status = _http_status(e)
+                if status == 429 and attempt < max_retries:
+                    retry_after = _parse_retry_after(e)
+                    _rate_limit_set(retry_after)
+                    self.logger.warning(
+                        "Rate limited (429) on update_data_source, waiting %.0fs",
+                        retry_after,
+                    )
+                    time.sleep(retry_after)
+                    continue
+                if status in [503, 504] and attempt < max_retries:
+                    delay = base_delay * (2 ** attempt)
+                    time.sleep(delay)
+                    continue
+                if isinstance(e, APIResponseError):
+                    raise NotionError(f"Failed to update data source {data_source_id}: {e}") from e
+                raise NotionError(f"Failed to update data source {data_source_id}: {e}") from e
     
     def create_record(self, table: str, parent: Any, **kwargs) -> str:
         """
@@ -446,6 +601,7 @@ class NotionClient:
         
         # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
+            _rate_limit_wait()
             try:
                 # Check file size (20MB limit for single part upload)
                 file_size = file_path.stat().st_size
@@ -510,8 +666,18 @@ class NotionClient:
                     
                     status = _http_status(e)
                     if status is not None:
-                        # Retryable server errors: Service unavailable, Gateway timeout, Rate limited
-                        if status in [503, 504, 429]:
+                        # Rate limited: coordinate across threads and respect Retry-After
+                        if status == 429:
+                            retry_after = _parse_retry_after(e)
+                            _rate_limit_set(retry_after)
+                            self.logger.warning(
+                                "Rate limited (429), waiting %.0fs (attempt %d/%d)",
+                                retry_after, attempt + 1, max_retries + 1,
+                            )
+                            time.sleep(retry_after)
+                            continue
+                        # Retryable server errors: Service unavailable, Gateway timeout
+                        if status in [503, 504]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
@@ -541,7 +707,9 @@ class NotionClient:
             except Exception as e:
                 # Non-retryable errors
                 raise NotionError(f"Error uploading file {file_path}: {e}") from e
-    
+
+        raise NotionError(f"Failed to upload file {file_path}: unexpected loop exit")
+
     def _get_content_type(self, file_path: Path) -> str:
         """
         Get content type for file.
@@ -609,6 +777,7 @@ class NotionClient:
         
         # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
+            _rate_limit_wait()
             try:
                 # In API 2025-09-03, database creation uses initial_data_source
                 # for properties instead of direct properties parameter
@@ -631,8 +800,17 @@ class NotionClient:
                     # Smart retry logic based on error type (3.0.0 uses .status, older used .status_code)
                     status = _http_status(e)
                     if status is not None:
-                        # Retryable server errors: Service unavailable, Gateway timeout, Rate limited, Conflict
-                        if status in [503, 504, 429, 409]:
+                        if status == 429:
+                            retry_after = _parse_retry_after(e)
+                            _rate_limit_set(retry_after)
+                            self.logger.warning(
+                                "Rate limited (429), waiting %.0fs (attempt %d/%d)",
+                                retry_after, attempt + 1, max_retries + 1,
+                            )
+                            time.sleep(retry_after)
+                            continue
+                        # Retryable server errors: Service unavailable, Gateway timeout, Conflict
+                        if status in [503, 504, 409]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
@@ -657,7 +835,9 @@ class NotionClient:
             except Exception as e:
                 # Non-retryable errors
                 raise NotionError(f"Error creating database: {e}") from e
-    
+
+        raise NotionError("Failed to create database: unexpected loop exit")
+
     # ============================================================================
     # LOGIC PATH 2: UPLOAD TO EXISTING DATABASE
     # ============================================================================
@@ -712,6 +892,7 @@ class NotionClient:
         
         # Main retry loop with exponential backoff and jitter
         for attempt in range(max_retries + 1):
+            _rate_limit_wait()
             try:
                 response = self.client.pages.create(
                     parent=parent,
@@ -723,61 +904,93 @@ class NotionClient:
             except (APIResponseError, Timeout, ConnectionError) as e:
                 # Retry logic: Check if we have attempts remaining
                 if attempt < max_retries:
-                    # Calculate exponential backoff with jitter to prevent thundering herd
-                    # Formula: base_delay * (2^attempt) + random(0,1) seconds
                     delay = base_delay * (2 ** attempt) + random.uniform(0, 1)
-                    
-                    # Smart retry logic based on error type (3.0.0 uses .status, older used .status_code)
                     status = _http_status(e)
                     if status is not None:
-                        # Retryable server errors: Service unavailable, Gateway timeout, Rate limited, Conflict
-                        if status in [503, 504, 429, 409]:
+                        if status == 429:
+                            retry_after = _parse_retry_after(e)
+                            _rate_limit_set(retry_after)
+                            self.logger.warning(
+                                "Rate limited (429), waiting %.0fs (attempt %d/%d)",
+                                retry_after, attempt + 1, max_retries + 1,
+                            )
+                            time.sleep(retry_after)
+                            continue
+                        if status in [503, 504, 409]:
                             self.logger.warning(f"Retryable error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                             time.sleep(delay)
                             continue
-                        # Client errors: Bad request, Unauthorized, Forbidden, Not found - don't retry
                         if status in [400, 401, 403, 404]:
                             raise NotionError(f"Failed to create page: {e}") from e
                     
-                    # Network issues: Always retry for timeout and connection errors
                     if isinstance(e, (Timeout, ConnectionError)):
                         self.logger.warning(f"Network error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                         time.sleep(delay)
                         continue
                     
-                    # Other API errors: Retry with exponential backoff
                     self.logger.warning(f"API error (attempt {attempt + 1}/{max_retries + 1}): {e}")
                     time.sleep(delay)
                     continue
                 else:
-                    # All retry attempts exhausted - fail with detailed error
                     raise NotionError(f"Failed to create page after {max_retries + 1} attempts: {e}") from e
                     
             except Exception as e:
-                # Non-retryable errors
                 raise NotionError(f"Error creating page: {e}") from e
-    
+
+        raise NotionError("Failed to create page: unexpected loop exit")
+
     def update_page(self, page_id: str, properties: Dict[str, Any], **kwargs) -> Dict[str, Any]:
         """
-        Update a page using the official API.
+        Update a page using the official API with retry and 429 handling.
+        
+        Per Notion docs, integrations must handle HTTP 429 and respect Retry-After.
+        When any thread gets 429, the shared rate-limit coordinator ensures all
+        threads pause before their next request.
         
         Args:
             page_id: Page ID
             properties: Page properties to update
-            **kwargs: Additional parameters
+            **kwargs: Additional parameters (e.g. cover, icon, archived)
             
         Returns:
             Updated page data
         """
-        try:
-            response = self.client.pages.update(
-                page_id=page_id,
-                properties=properties,
-                **kwargs
-            )
-            return response
-        except APIResponseError as e:
-            raise NotionError(f"Failed to update page {page_id}: {e}") from e
+        from requests.exceptions import Timeout, ConnectionError
+
+        max_retries = 14
+        base_delay = 2.0
+
+        for attempt in range(max_retries + 1):
+            _rate_limit_wait()
+            try:
+                response = self.client.pages.update(
+                    page_id=page_id,
+                    properties=properties,
+                    **kwargs
+                )
+                return response
+            except (APIResponseError, Timeout, ConnectionError) as e:
+                status = _http_status(e)
+                if status == 429 and attempt < max_retries:
+                    retry_after = _parse_retry_after(e)
+                    _rate_limit_set(retry_after)
+                    self.logger.warning(
+                        "Rate limited (429), waiting %.0fs (attempt %d/%d)",
+                        retry_after, attempt + 1, max_retries + 1,
+                    )
+                    time.sleep(retry_after)
+                    continue
+                if status is not None and status in [503, 504] and attempt < max_retries:
+                    delay = base_delay * (2 ** attempt)
+                    self.logger.warning(
+                        "Server error %s (attempt %d/%d), retrying in %.1fs",
+                        status, attempt + 1, max_retries + 1, delay,
+                    )
+                    time.sleep(delay)
+                    continue
+                if isinstance(e, APIResponseError):
+                    raise NotionError(f"Failed to update page {page_id}: {e}") from e
+                raise NotionError(f"Failed to update page {page_id}: {e}") from e
     
     def query_database(self, database_id: str, data_source_id: Optional[str] = None, **kwargs: Any) -> Dict[str, Any]:
         """
