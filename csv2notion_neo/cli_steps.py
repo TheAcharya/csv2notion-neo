@@ -123,6 +123,6 @@ def upload_rows(
             )
             
             # Process with enhanced real-time updates
-            for result in process_iter(worker, notion_rows, max_workers=max_threads):
+            for _ in process_iter(worker, notion_rows, max_workers=max_threads):
                 pbar.update(1)
                 pbar.refresh()  # Force immediate display update

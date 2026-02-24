@@ -858,21 +858,13 @@ class TestDataProcessing:
         all_processed = created_rows.union(updated_rows)
         assert len(all_processed) == NUM_ROWS, f"Duplicate rows detected: {len(all_processed)} unique vs {NUM_ROWS} expected"
         
-        # Verify race conditions were handled (if any occurred)
-        # Note: Race conditions may not always occur in test environment
-        # The important thing is that the system handles them gracefully when they do
-        if race_conditions_handled > 0:
-            print(f"   - Handled {race_conditions_handled} race conditions")
-        else:
-            print(f"   - No race conditions detected (test environment may be too fast)")
-        
-        # Verify cache invalidation was called (if race conditions occurred)
-        # In a real scenario, cache invalidation would be called during race conditions
-        # For this test, we'll verify the system works correctly regardless
-        if race_conditions_handled > 0:
-            assert mock_db.invalidate_cache.called, "Cache invalidation should have been called"
-        else:
-            print(f"   - Cache invalidation not triggered (no race conditions in test environment)")
+        # Verify race conditions were handled (if any occurred).
+        # Race conditions may not always occur in test environment; the system should handle them when they do.
+        print(f"   - Race conditions handled: {race_conditions_handled}")
+        # When race conditions occurred, cache invalidation should have been called.
+        assert (
+            race_conditions_handled == 0 or mock_db.invalidate_cache.called
+        ), "Cache invalidation should have been called when race conditions were handled"
         
         # Verify all expected rows were processed
         expected_titles = {f"Row_{i:04d}" for i in range(NUM_ROWS)}

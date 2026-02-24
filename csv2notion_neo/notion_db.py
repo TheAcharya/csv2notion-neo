@@ -1030,10 +1030,9 @@ def _schema_from_csv(
 
 def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
     """Advanced column type detection with smart pattern recognition."""
-    import re
     from datetime import datetime
     from decimal import Decimal, InvalidOperation
-    
+
     try:
         values = csv_data.col_values(col_key)
         if not values:
@@ -1083,7 +1082,8 @@ def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
                 float(v.replace(',', '').replace('%', ''))
                 numeric_count += 1
             except (ValueError, InvalidOperation):
-                pass
+                # Value not numeric; skip for type detection
+                continue
         
         if numeric_count >= len(clean_values) * 0.8:  # 80% are numeric
             return "number"
@@ -1133,16 +1133,12 @@ def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
                                 break
                             except ValueError:
                                 try:
-                                    datetime.strptime(v, '%Y/%m/%d')
+                                    datetime.strptime(v, '%m/%d/%Y')
                                     date_count += 1
                                     break
                                 except ValueError:
-                                    try:
-                                        datetime.strptime(v, '%m/%d/%Y')
-                                        date_count += 1
-                                        break
-                                    except ValueError:
-                                        pass
+                                    # Value not in tried date formats; skip
+                                    pass
         
         if date_count >= len(clean_values) * 0.7:  # 70% are valid dates
             return "date"
@@ -1165,8 +1161,7 @@ def _analyze_column_type(csv_data: LocalData, col_key: str) -> str:
         
     except Exception as e:
         # Log the error for debugging but don't fail
-        import logging
-        logging.getLogger(__name__).warning(f"Error analyzing column type for {col_key}: {e}")
+        logger.warning(f"Error analyzing column type for {col_key}: {e}")
         return "rich_text"
 
 
