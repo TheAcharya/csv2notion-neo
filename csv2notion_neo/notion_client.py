@@ -148,8 +148,10 @@ def _parse_retry_after(exc: Exception) -> float:
                 ra = headers.get("Retry-After")
                 if ra is not None:
                     return max(1.0, float(int(ra)))
-    except (TypeError, ValueError):
-        pass
+    except (TypeError, ValueError) as parse_err:
+        logging.getLogger(__name__).debug(
+            "Failed to parse Retry-After header from Notion response: %r", parse_err
+        )
     return 60.0
 
 

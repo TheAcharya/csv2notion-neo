@@ -177,7 +177,6 @@ from csv2notion_neo.version import __version__
 from csv2notion_neo import notion_client as notion_client_module
 from csv2notion_neo.notion_client import (
     NotionClient,
-    get_notion_client,
     _parse_retry_after,
     _rate_limit_wait,
     _rate_limit_set,
