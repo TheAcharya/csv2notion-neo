@@ -33,7 +33,6 @@ from csv2notion_neo.utils_exceptions import (
 )
 from csv2notion_neo.utils_static import ConversionRules, FileType
 from csv2notion_neo.utils_str import split_str
-from icecream import ic
 
 logger = logging.getLogger(__name__)
 

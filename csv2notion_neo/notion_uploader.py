@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from typing import Any, Dict
 
 from csv2notion_neo.notion_db import NotionDB
-from icecream import ic
 from csv2notion_neo.utils_ai import AI
 
 logger = logging.getLogger(__name__)

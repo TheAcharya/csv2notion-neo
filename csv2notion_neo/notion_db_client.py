@@ -5,7 +5,6 @@ This module provides a drop-in replacement for the existing NotionClientExtended
 using the official Notion SDK while maintaining full compatibility.
 """
 
-from copy import deepcopy
 from typing import Any, Dict, Optional
 
 from csv2notion_neo.notion_client import NotionClient

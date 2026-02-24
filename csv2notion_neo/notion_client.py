@@ -75,7 +75,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from notion_client import Client, APIResponseError, APIErrorCode
 from notion_client.helpers import get_id
 
-from csv2notion_neo.utils_exceptions import NotionError, CriticalError
+from csv2notion_neo.utils_exceptions import NotionError
 
 # ---------------------------------------------------------------------------
 # Cross-thread rate limit coordination (per Notion docs for HTTP 429).

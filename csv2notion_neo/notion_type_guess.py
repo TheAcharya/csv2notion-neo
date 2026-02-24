@@ -9,7 +9,6 @@ Notion property types for each column, including dates, numbers, URLs, emails, e
 import math
 import re
 from typing import List
-from icecream import ic
 
 
 def guess_type_by_values(values_str: List[str]) -> str:

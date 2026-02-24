@@ -169,7 +169,7 @@ from argparse import Namespace
 from csv2notion_neo.cli import cli
 from csv2notion_neo.cli_args import parse_args, _parse_column_types, _parse_default_icon
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
-from csv2notion_neo.utils_static import ALLOWED_TYPES, ConversionRules
+from csv2notion_neo.utils_static import ConversionRules
 from csv2notion_neo.utils_str import split_str
 from csv2notion_neo.version import __version__
 

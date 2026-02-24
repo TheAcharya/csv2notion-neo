@@ -10,7 +10,6 @@ import logging
 from argparse import Namespace
 from functools import partial
 from typing import List
-from icecream import ic
 
 from tqdm import tqdm
 

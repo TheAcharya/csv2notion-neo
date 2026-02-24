@@ -15,7 +15,6 @@ from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import NotionDB
 from csv2notion_neo.utils_exceptions import NotionError
 from csv2notion_neo.utils_static import UNSETTABLE_TYPES, ConversionRules
-from icecream import ic
 
 logger = logging.getLogger(__name__)
 

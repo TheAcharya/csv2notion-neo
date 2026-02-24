@@ -15,7 +15,6 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional
 
 from csv2notion_neo.notion_type_guess import guess_type_by_values
 from csv2notion_neo.utils_exceptions import CriticalError
-from icecream import ic
 
 CSVRowType = Dict[str, str]
 
