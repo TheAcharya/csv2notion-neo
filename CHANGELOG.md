@@ -6,8 +6,8 @@
 - 25th February 2026
 
 **🔨 Improvements:**
-- Addressed GitHub CodeQL and code quality findings: removed unreachable code in tests, fixed file-not-closed in AI image captioning (`utils_ai.py`), renamed unused loop variables to `_`, removed duplicate and unused imports (e.g. `icecream` where unused, `shutil`, `deepcopy`, `ALLOWED_TYPES`), replaced bare `except:` with `except Exception:`, added explicit returns/raises where paths could fall through, and documented intentionally empty exception handlers
-- Test suite: 94 tests across 21 categories; added rate limit and throttle tests (Retry-After, 429 coordination, proactive throttle) for issue #76
+- Addressed various GitHub CodeQL and code quality findings: removed unreachable code in tests, fixed file-not-closed in AI image captioning (`utils_ai.py`), renamed unused loop variables to `_`, removed duplicate and unused imports (e.g. `icecream` where unused, `shutil`, `deepcopy`, `ALLOWED_TYPES`), replaced bare `except:` with `except Exception:`, added explicit returns/raises where paths could fall through, and documented intentionally empty exception handlers
+- Test suite: 94 tests across 21 categories; added rate limit and throttle tests (Retry-After, 429 coordination, proactive throttle) for issue (#76)
 - Updated tests/README.md, .cursorrules, and AGENT.MD with rate-limit/throttle behaviour and current test coverage
 
 **🐞 Bug Fix:**
