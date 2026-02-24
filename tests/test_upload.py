@@ -10,12 +10,11 @@ from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_db import get_collection_id, get_notion_client
 from .input_command import ARGS_DICT
 from argparse import Namespace
-from pathlib import Path
 
-# Use this ficture to load the client and load the data, use yield to load client more than once with different parameters
+# Use this fixture to load the client and load the data, use yield to load client more than once with different parameters
 
 @pytest.fixture(scope="session")
-def load_client_and_data() -> Generator[Union[LocalData,NotionClient,Namespace],None,None]:
+def load_client_and_data() -> Generator[Union[LocalData, NotionClient, Namespace], None, None]:
     
     args = Namespace(**ARGS_DICT)
     
@@ -64,4 +63,5 @@ def test_upload_rows(load_client_and_data) -> None:
         max_threads=args.max_threads,
     )
 
-    assert 1 == 1
+    # Verify we had rows to upload and upload_rows completed without raising
+    assert len(notion_rows) > 0, "Should have notion rows; upload completed without exception"

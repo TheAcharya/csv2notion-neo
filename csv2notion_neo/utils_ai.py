@@ -83,3 +83,4 @@ class AI:
             tqdm.write(f"Error generating caption for {filename}")
             logger.error(e, exc_info=1)
             logger.error(caption.json())
+            raise

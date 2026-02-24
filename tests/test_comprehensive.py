@@ -184,7 +184,6 @@ from csv2notion_neo.notion_client import (
 )
 from csv2notion_neo.notion_db_client import NotionClientExtended
 from csv2notion_neo.notion_db import NotionDB
-from csv2notion_neo.local_data import LocalData
 from csv2notion_neo.notion_convert import NotionRowConverter
 from csv2notion_neo.notion_uploader import NotionRowUploader
 

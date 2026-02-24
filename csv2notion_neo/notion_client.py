@@ -70,7 +70,7 @@ import logging
 import threading
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 from notion_client import Client, APIResponseError, APIErrorCode
 from notion_client.helpers import get_id
@@ -257,7 +257,9 @@ class NotionClient:
                     time.sleep(2.0 * (2 ** attempt))
                     continue
                 raise NotionError(f"Cannot access database {collection_id}") from e
-    
+
+        raise NotionError(f"Cannot access database {collection_id}: unexpected loop exit")
+
     def get_data_source(self, data_source_id: str) -> Optional[Dict[str, Any]]:
         """
         Get a data source by ID with 429 retry (API 2025-09-03).
@@ -290,7 +292,9 @@ class NotionClient:
                     time.sleep(2.0 * (2 ** attempt))
                     continue
                 raise NotionError(f"Cannot access data source {data_source_id}") from e
-    
+
+        raise NotionError(f"Cannot access data source {data_source_id}: unexpected loop exit")
+
     def get_primary_data_source(self, database_id: str) -> Optional[Dict[str, Any]]:
         """
         Get the primary data source for a database.
@@ -380,7 +384,9 @@ class NotionClient:
                 if isinstance(e, APIResponseError):
                     raise NotionError(f"Failed to query data source {data_source_id}: {e}") from e
                 raise NotionError(f"Failed to query data source {data_source_id}: {e}") from e
-    
+
+        raise NotionError(f"Failed to query data source {data_source_id}: unexpected loop exit")
+
     def update_data_source(self, data_source_id: str, **kwargs: Any) -> Dict[str, Any]:
         """
         Update a data source (properties/schema) with 429 retry (API 2025-09-03).
@@ -422,7 +428,9 @@ class NotionClient:
                 if isinstance(e, APIResponseError):
                     raise NotionError(f"Failed to update data source {data_source_id}: {e}") from e
                 raise NotionError(f"Failed to update data source {data_source_id}: {e}") from e
-    
+
+        raise NotionError(f"Failed to update data source {data_source_id}: unexpected loop exit")
+
     def create_record(self, table: str, parent: Any, **kwargs) -> str:
         """
         Create a record - maintains compatibility with existing code.
@@ -991,7 +999,9 @@ class NotionClient:
                 if isinstance(e, APIResponseError):
                     raise NotionError(f"Failed to update page {page_id}: {e}") from e
                 raise NotionError(f"Failed to update page {page_id}: {e}") from e
-    
+
+        raise NotionError(f"Failed to update page {page_id}: unexpected loop exit")
+
     def query_database(self, database_id: str, data_source_id: Optional[str] = None, **kwargs: Any) -> Dict[str, Any]:
         """
         Query a database using the official API (2025-09-03).
