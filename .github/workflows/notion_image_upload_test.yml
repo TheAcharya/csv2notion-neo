@@ -1,5 +1,8 @@
 name: notion_image_upload_test
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   

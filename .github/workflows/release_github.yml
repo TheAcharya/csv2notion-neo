@@ -1,5 +1,8 @@
 name: release_github
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
     inputs:
@@ -258,6 +261,8 @@ jobs:
     if: github.event_name == 'push' || github.event.inputs.release == 'yes'
     needs: [build_binaries]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # required to create release and upload assets
     steps:
       - uses: actions/checkout@v4
       - name: Get tag version

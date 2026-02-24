@@ -1,5 +1,8 @@
 name: notion_delete_database_entries_test
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   
