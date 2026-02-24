@@ -17,6 +17,7 @@ The test suite is designed to validate CSV2Notion Neo's functionality across dif
 - Data processing and conversion utilities
 - Advanced multi-feature scenarios
 - Edge cases and boundary conditions
+- Rate limit coordination and proactive throttling (HTTP 429 handling, Retry-After, ~3 req/s throttle)
 
 ## Directory Structure
 
@@ -62,6 +63,9 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 - File Operations: Tests file upload and media handling operations
 - Advanced Scenarios: Tests complex multi-feature scenarios
 - Edge Cases: Tests edge cases and boundary conditions
+- Notion DB Cache Behavior: Tests cache set/clear and fetch-failure behavior
+- CLI Programmatic Usage: Tests cli() with raise_on_error for programmatic use
+- Rate Limit and Throttle: Tests Retry-After parsing, 429 ban coordination, and proactive ~3 req/s throttle (issue #76)
 
 #### Complete Test Coverage for test_comprehensive.py
 
@@ -85,6 +89,9 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | File Operations | TestFileOperations | test_file_validation, test_file_extension_validation, test_file_size_validation | File upload and media handling operations | Covered |
 | Advanced Scenarios | TestAdvancedScenarios | test_full_feature_scenario, test_ai_captioning_scenario, test_merge_with_relations_scenario, test_database_deletion_scenario, test_validation_scenario | Complex multi-feature scenarios | Covered |
 | Edge Cases | TestEdgeCases | test_empty_arguments, test_whitespace_handling, test_special_characters | Edge cases and boundary conditions | Covered |
+| Notion DB Cache Behavior | TestNotionDBCacheBehavior | test_rows_cache_not_set_on_fetch_failure, test_rows_cache_set_on_successful_fetch, test_rows_cache_prevents_duplicate_fetch, test_invalidate_cache_allows_refetch, test_partial_fetch_failure_doesnt_cache | Cache behavior on fetch success/failure | Covered |
+| CLI Programmatic Usage | TestCLIProgrammaticUsage | test_cli_swallows_exception_by_default, test_cli_raises_exception_when_raise_on_error_true | Programmatic cli() with raise_on_error | Covered |
+| Rate Limit and Throttle | TestNotionRateLimitAndThrottle | test_parse_retry_after_from_header, test_parse_retry_after_default_no_response, test_parse_retry_after_default_no_headers, test_parse_retry_after_minimum_one, test_parse_retry_after_invalid_returns_default, test_rate_limit_set_and_wait_blocks, test_proactive_throttle_enforces_cap, test_rate_limit_wait_includes_proactive_throttle, test_no_ban_wait_is_fast | Retry-After parsing, 429 ban coordination, proactive throttle (~3 req/s) | Covered |
 
 ### 2. Upload Tests (test_upload.py)
 
@@ -373,34 +380,40 @@ cat tests/log.txt
 - Boundary condition testing
 - Error scenario validation
 
-### 9. Basic Upload Testing
+### 9. Rate Limit and Throttle (issue #76)
+- Retry-After parsing from API error (header, default 60, minimum 1.0, invalid fallback)
+- 429 ban coordination: _rate_limit_set and _rate_limit_wait block for ban duration
+- Proactive throttle: ~3 req/s sliding window; fourth call within 1s blocks
+- _rate_limit_wait applies both ban and proactive throttle
+
+### 10. Basic Upload Testing
 - CSV/JSON file upload to new database
 - Column type detection and mapping
 - Data validation and error handling
 
-### 10. Image Upload Testing
+### 11. Image Upload Testing
 - Single and multiple image uploads
 - Icon and cover image handling
 - Image format validation
 
-### 11. Database Merging
+### 12. Database Merging
 - Existing database updates
 - Key-based row matching
 - Partial column updates
 
-### 12. Database Deletion Testing
+### 13. Database Deletion Testing
 - Delete all database entries
 - Database URL validation (Notion.so domain and protocol validation)
 - Error handling for invalid URLs
 
-### 13. Error Handling
+### 14. Error Handling
 - Invalid data scenarios
 - Invalid token format scenarios
 - Invalid URL format scenarios (non-Notion.so domains, invalid protocols)
 - API error responses
 - Network connectivity issues
 
-### 14. Performance Testing
+### 15. Performance Testing
 - Large dataset uploads
 - Concurrent upload operations
 - Memory usage validation
@@ -430,6 +443,7 @@ cat tests/log.txt
 - Large Dataset Simulation: `test_large_dataset_merge_simulation` tests 1000-row scenarios
 - Race Condition Testing: Validates thread-safe operations for concurrent uploads
 - Real-time Progress: Tests progress bar updates during multi-threaded operations
+- Rate Limit and Throttle (issue #76): `TestNotionRateLimitAndThrottle` (9 tests) covers Retry-After parsing, 429 ban coordination, and proactive ~3 req/s throttle
 
 ## Test Data Management
 
@@ -586,15 +600,15 @@ For test-related issues:
 
 ## Complete Test Coverage Summary
 
-The CSV2Notion Neo test suite provides comprehensive coverage across 18 test categories with 78 individual test methods:
+The CSV2Notion Neo test suite provides comprehensive coverage across 21 test categories with 94 individual test methods:
 
 ### Test Statistics
-- Total Test Classes: 18
-- Total Test Methods: 78
-- Test Execution Time: ~0.88 seconds
+- Total Test Classes: 21
+- Total Test Methods: 94
+- Test Execution Time: ~5 seconds (comprehensive suite)
 - Coverage: 100% of CLI arguments and core functionality
 - External Dependencies: None (all tests use mocking)
-- Recent Updates: Added pagination tests for large datasets (PR #66)
+- Recent Updates: Rate limit and throttle tests (issue #76); pagination and cache behavior tests
 
 ### Test Categories Breakdown
 1. CLI Argument Parsing (10 tests) - All command-line arguments and switches
@@ -615,6 +629,9 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 16. File Operations (3 tests) - File upload and media handling
 17. Advanced Scenarios (5 tests) - Complex multi-feature scenarios
 18. Edge Cases (3 tests) - Boundary conditions and special characters
+19. Notion DB Cache Behavior (5 tests) - Cache set/clear and fetch-failure behavior
+20. CLI Programmatic Usage (2 tests) - cli() with raise_on_error
+21. Rate Limit and Throttle (9 tests) - Retry-After, 429 ban coordination, proactive throttle (issue #76)
 
 ### Key Testing Features
 - No External API Calls: All tests use mocking to avoid Notion API dependencies
@@ -626,6 +643,7 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 18 test cat
 - Large Dataset Support: Pagination testing for databases >100 rows (PR #66)
 - Thread Safety: Race condition prevention for concurrent operations
 - Real-time Updates: Progress bar testing during multi-threaded uploads
+- Rate Limit and Throttle: Retry-After parsing, 429 ban coordination, proactive ~3 req/s throttle (issue #76)
 - Documentation: Each test method is clearly documented and searchable
 
 For more information about CSV2Notion Neo testing, see the main project documentation and AGENT.MD file.

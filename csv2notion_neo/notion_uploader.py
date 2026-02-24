@@ -196,9 +196,10 @@ class NotionRowUploader(object):
                             "external": {"url": cover_url}
                         }
                     
-                    # Set page cover
-                    self.db.client.client.pages.update(
-                        page_id=page_id,
+                    # Set page cover (via client for 429 retry and rate-limit coordination)
+                    self.db.client.update_page(
+                        page_id,
+                        {},
                         cover=cover_data
                     )
                 except Exception as e:
@@ -240,9 +241,10 @@ class NotionRowUploader(object):
                                 "emoji": str(icon)
                             }
                     
-                    # Set page icon
-                    self.db.client.client.pages.update(
-                        page_id=page_id,
+                    # Set page icon (via client for 429 retry and rate-limit coordination)
+                    self.db.client.update_page(
+                        page_id,
+                        {},
                         icon=icon_data
                     )
                 except Exception as e:

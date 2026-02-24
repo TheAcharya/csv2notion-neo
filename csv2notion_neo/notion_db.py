@@ -454,9 +454,10 @@ class NotionDB:
                 for page in all_pages:
                     page_id = page["id"]
                     try:
-                        # Archive the page (soft delete)
-                        self.client.client.pages.update(
-                            page_id=page_id,
+                        # Archive the page (soft delete; via client for 429 retry)
+                        self.client.update_page(
+                            page_id,
+                            {},
                             archived=True
                         )
                         deleted_count += 1
@@ -592,8 +593,8 @@ class NotionDB:
                         if converted_property and converted_property != {}:
                             notion_properties[prop_name] = converted_property
             
-            # Update page
-            response = self.client.client.pages.update(
+            # Update page (via client wrapper for 429 retry and cross-thread rate-limit coordination)
+            response = self.client.update_page(
                 page_id=page_id,
                 properties=notion_properties
             )
