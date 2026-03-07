@@ -239,7 +239,11 @@ class NotionPreparator(object):  # noqa: WPS214
         csv_columns = set(self.csv.columns)
         db_columns = set(self.db.columns)
 
-        if self.rules.image_column and not self.rules.image_column_keep:
+        if (
+            self.rules.image_column
+            and not self.rules.image_column_keep
+            and self.rules.image_column_mode != "file"
+        ):
             for image_column in self.rules.image_column:
                 csv_columns -= {image_column}
 

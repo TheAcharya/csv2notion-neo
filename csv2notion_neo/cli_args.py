@@ -202,10 +202,11 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
                 "help": "keep image CSV or JSON column as a Notion DB column",
             },
             "--image-column-mode": {
-                "choices": ["cover", "block"],
+                "choices": ["cover", "block", "file"],
                 "default": "block",
                 "help": (
-                    "upload image as [cover] or insert it as [block]"
+                    "upload image as [cover], insert it as [block],"
+                    " or assign to Notion [file] property"
                     " (default: block)"
                 ),
             },

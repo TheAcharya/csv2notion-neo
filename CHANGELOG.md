@@ -1,5 +1,19 @@
 # Changelog
 
+### 2.1.0
+
+**🎉 Released:**
+- 7th March 2026
+
+**🔨 Improvements:**
+- Added `--image-column-mode file` to support uploading/attaching values from `--image-column` into Notion `files` properties (#44, #78)
+- Updated files property mapping to official Notion API payloads: local paths are uploaded via `file_uploads` and sent as `file_upload` items; URLs are sent as `external` items (notion-sdk-py compatible)
+- Improved schema/type handling for file properties by supporting both `file` and `files` mapping paths during conversion and database schema creation
+- Updated project documentation (`README.md`, `tests/README.md`, `.cursorrules`, `AGENT.MD`) with new `file` mode behaviour and guidance
+- Expanded comprehensive test coverage to 96 methods across 21 categories, including new tests for files-property mapping from URLs and local file paths
+
+---
+
 ### 2.0.6
 
 **🎉 Released:**

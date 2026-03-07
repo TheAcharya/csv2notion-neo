@@ -9,6 +9,7 @@ import logging
 import random
 import re
 import threading
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from csv2notion_neo.notion_client import NotionClient
@@ -311,6 +312,9 @@ class NotionDB:
     def add_column(self, column_name: str, column_type: str) -> None:
         """Add a column to the database via data source (API 2025-09-03)."""
         try:
+            if column_type == "file":
+                column_type = "files"
+
             if not self._data_source_id:
                 raise NotionError("No data source available for this database")
             
@@ -623,6 +627,47 @@ class NotionDB:
         else:
             return data
 
+    def _to_notion_file_item(self, file_ref: Any) -> Optional[Dict[str, Any]]:
+        """Convert a file reference to Notion 'files' property item format."""
+        from csv2notion_neo.notion_row_upload_file import upload_filetype
+
+        if hasattr(file_ref, "__fspath__"):
+            file_path = Path(file_ref)
+            try:
+                file_url, metadata = upload_filetype(self.client, file_path)
+            except Exception as e:
+                self.logger.warning(f"Failed to upload file '{file_path}': {e}")
+                return None
+
+            if "file_id" in metadata:
+                return {
+                    "name": file_path.name,
+                    "type": "file_upload",
+                    "file_upload": {"id": metadata["file_id"]},
+                }
+
+            return {
+                "name": file_path.name,
+                "type": "external",
+                "external": {"url": file_url},
+            }
+
+        file_url = str(file_ref).strip()
+        if not file_url:
+            return None
+
+        if not file_url.startswith(("http://", "https://")):
+            self.logger.warning(f"Skipping invalid file URL value: '{file_url}'")
+            return None
+
+        url_path = file_url.split("?", 1)[0]
+        file_name = Path(url_path).name or "file"
+        return {
+            "name": file_name,
+            "type": "external",
+            "external": {"url": file_url},
+        }
+
     def _convert_value_to_notion_property(self, value: Any, prop_type: str, prop_name: str = None) -> Dict[str, Any]:
         """Convert a value to Notion property format."""
         # Convert PosixPath objects to strings
@@ -746,21 +791,15 @@ class NotionDB:
         elif prop_type == "files":
             if value is None or value == "":
                 return {"files": []}
-            if isinstance(value, list):
-                # Convert any Path objects in the list to strings
-                converted_files = []
-                for item in value:
-                    if hasattr(item, '__fspath__'):
-                        converted_files.append(str(item))
-                    else:
-                        converted_files.append(item)
-                return {"files": converted_files}
-            else:
-                # Convert single Path object to string
-                if hasattr(value, '__fspath__'):
-                    return {"files": [str(value)]}
-                else:
-                    return {"files": [value]}
+
+            file_values = value if isinstance(value, list) else [value]
+            notion_files = []
+            for file_ref in file_values:
+                notion_file = self._to_notion_file_item(file_ref)
+                if notion_file and notion_file not in notion_files:
+                    notion_files.append(notion_file)
+
+            return {"files": notion_files}
         elif prop_type == "people":
             if value is None or value == "":
                 return {"people": []}
@@ -1025,6 +1064,8 @@ def _schema_from_csv(
                 schema[col_key] = {"phone_number": {}}
             elif col_type == "date":
                 schema[col_key] = {"date": {}}
+            elif col_type in {"file", "files"}:
+                schema[col_key] = {"files": {}}
             else:
                 # Default to rich_text for all other types
                 schema[col_key] = {"rich_text": {}}

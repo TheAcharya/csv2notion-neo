@@ -78,11 +78,11 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | Error Handling | TestErrorHandling | test_critical_error_handling, test_invalid_column_types, test_missing_required_arguments, test_invalid_file_paths | Error scenarios and edge cases | Covered |
 | Version and Help | TestVersionAndHelp | test_version_argument, test_help_argument, test_version_constant | Version and help functionality | Covered |
 | Comprehensive Scenarios | TestComprehensiveScenarios | test_full_upload_scenario, test_ai_captioning_scenario, test_database_deletion_scenario, test_validation_scenario | Complex scenarios combining multiple features | Covered |
-| Notion SDK Testing | TestNotionSDKWithoutCredentials | test_notion_client_initialization, test_notion_client_get_collection, test_notion_client_create_record, test_notion_client_upload_file, test_notion_client_extended_initialization, test_notion_db_initialization, test_notion_row_converter, test_notion_row_uploader, test_notion_db_pagination_large_datasets | Notion SDK functionality without credentials (notion-client 3.0.0), including pagination for large datasets | Covered |
+| Notion SDK Testing | TestNotionSDKWithoutCredentials | test_notion_client_initialization, test_notion_client_get_collection, test_notion_client_create_record, test_notion_client_upload_file, test_notion_client_extended_initialization, test_notion_db_initialization, test_notion_row_converter, test_notion_row_uploader, test_notion_db_files_property_from_urls, test_notion_db_files_property_from_local_path, test_notion_db_pagination_large_datasets | Notion SDK functionality without credentials (notion-client 3.0.0), including files property payload mapping and pagination for large datasets | Covered |
 | Column Type Detection | TestColumnTypeDetection | test_type_guessing_numbers, test_type_guessing_urls, test_type_guessing_emails, test_type_guessing_checkboxes, test_type_guessing_by_values | Auto-detection and type guessing functionality | Covered |
 | Column Type Operations | TestColumnTypeOperations | test_column_type_validation, test_column_type_mapping, test_column_type_combinations, test_column_type_edge_cases | All Notion column types and their operations | Covered |
 | Merge Operations | TestMergeOperations | test_merge_argument_parsing, test_merge_validation_scenarios, test_merge_column_validation, test_merge_edge_cases | Database merging and updating operations | Covered |
-| Image Operations | TestImageOperations | test_image_column_arguments, test_image_caption_arguments, test_image_mode_validation, test_image_column_edge_cases | Image upload and processing operations | Covered |
+| Image Operations | TestImageOperations | test_image_column_arguments, test_image_caption_arguments, test_image_mode_validation, test_image_column_edge_cases | Image upload and processing operations (cover, block, and file mode validation) | Covered |
 | Icon Operations | TestIconOperations | test_icon_column_arguments, test_default_icon_validation, test_icon_column_edge_cases | Icon assignment and processing operations | Covered |
 | Relation Operations | TestRelationOperations | test_relation_argument_parsing, test_relation_validation_scenarios, test_relation_edge_cases | Database relations and linking operations | Covered |
 | Validation Operations | TestValidationOperations | test_mandatory_column_validation, test_validation_error_handling, test_validation_scenarios | Data validation and error handling operations | Covered |
@@ -600,15 +600,15 @@ For test-related issues:
 
 ## Complete Test Coverage Summary
 
-The CSV2Notion Neo test suite provides comprehensive coverage across 21 test categories with 94 individual test methods:
+The CSV2Notion Neo test suite provides comprehensive coverage across 21 test categories with 96 individual test methods:
 
 ### Test Statistics
 - Total Test Classes: 21
-- Total Test Methods: 94
+- Total Test Methods: 96
 - Test Execution Time: ~5 seconds (comprehensive suite)
 - Coverage: 100% of CLI arguments and core functionality
 - External Dependencies: None (all tests use mocking)
-- Recent Updates: Rate limit and throttle tests (issue #76); pagination and cache behavior tests
+- Recent Updates: Rate limit and throttle tests (issue #76); pagination and cache behavior tests; files property mapping tests for `--image-column-mode file`
 
 ### Test Categories Breakdown
 1. CLI Argument Parsing (10 tests) - All command-line arguments and switches
@@ -618,7 +618,7 @@ The CSV2Notion Neo test suite provides comprehensive coverage across 21 test cat
 5. Error Handling (4 tests) - CriticalError scenarios and validation
 6. Version and Help (3 tests) - Version constants and help functionality
 7. Comprehensive Scenarios (4 tests) - Multi-feature combinations
-8. Notion SDK Testing (9 tests) - Mocked API interactions, including pagination for large datasets
+8. Notion SDK Testing (11 tests) - Mocked API interactions, including files property payload mapping and pagination for large datasets
 9. Column Type Detection (5 tests) - Auto-detection and type guessing
 10. Column Type Operations (4 tests) - All Notion column types
 11. Merge Operations (4 tests) - Database merging and updating

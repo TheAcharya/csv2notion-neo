@@ -33,6 +33,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Schema Updates: Database schema modifications use data_sources.update endpoint
 - Database Creation: Uses initial_data_source for new database property definitions
 - File Uploads: Notion file_uploads API endpoints with comprehensive retry logic
+- Files Property Support: `--image-column-mode file` maps values to Notion `files` property items (`file_upload` for local files, `external` for URLs)
 - Error Handling: Notion API error codes and responses with smart retry strategies
 - Rate Limiting: Built-in API rate limiting with exponential backoff; HTTP 429 handling with Retry-After parsing and cross-thread ban coordination; proactive throttle (~3 req/s) to reduce 429s (issue #76)
 - Property Validation: API property type validation with intelligent schema detection
@@ -119,7 +120,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Use VCR for API response testing
 - Test both success and failure scenarios
 - Use ephemeral environment for local testing
-- Comprehensive test suite (test_comprehensive.py): 21 categories, 94 test methods; CLI argument validation and Notion SDK testing without credentials
+- Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials
 - Progress bar real-time updates testing with multi-threaded simulation
 - Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
 - Rate limit and throttle testing (TestNotionRateLimitAndThrottle): Retry-After parsing, 429 ban coordination, proactive throttle (issue #76)
@@ -225,6 +226,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - URL validation (Notion.so domain and protocol validation) with clear error messages
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
 - Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py
+- `--image-column-mode` supports `cover`, `block`, and `file`; use `file` when CSV/JSON image columns should populate Notion `files` properties
+- `relation` is intentionally excluded from `--column-types` allowed values because relation schema creation requires target database/data source metadata
 
 ### Environment Variables
 - Use python-dotenv for environment configuration
@@ -253,7 +256,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Mock external dependencies
 - Test both success and failure paths
 - Maintain high test coverage
-- Comprehensive test suite: 21 categories, 94 methods; CLI arguments, Notion SDK, rate limit/throttle (issue #76)
+- Comprehensive test suite: 21 categories, 96 methods; CLI arguments, Notion SDK, rate limit/throttle (issue #76)
 
 ### Integration Tests
 - Test API integrations with real endpoints
@@ -379,7 +382,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 94 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
+- Test coverage gaps (resolved with 96 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
 
 ### Performance Issues
 - Monitor thread usage

@@ -133,89 +133,89 @@ $ poetry run csv2notion_neo
 $ csv2notion_neo --help
 usage: csv2notion_neo [-h] --token TOKEN --url URL [OPTION]... FILE
 
-https://github.com/TheAcharya/csv2notion-neo
+https://github.com/TheAcharya/csv2notion-neo 
 
 Upload & Merge CSV or JSON Data with Images to Notion Database
 
 positional arguments:
-  FILE                               CSV or JSON file to upload
+  FILE                              CSV or JSON file to upload
 
 general options:
-  --workspace                        active Notion workspace name
-  --token                            Notion integration token (create at https://www.notion.so/my-integrations)
-  --url                              Notion database URL or page URL (required);
-                                     If page URL provided, database will be created within the page
-  --max-threads                      upload threads (default: 5)
-  --log FILE                         file to store program log
-  --verbose                          output debug information
-  --version                          show program's version number and exit
-  -h, --help                         show this help message and exit
+  --workspace                       active Notion workspace name
+  --token                           Notion integration token (create at https://www.notion.so/my-integrations)
+  --url                             Notion database URL or page URL (required);
+                                    If page URL provided, database will be created within the page
+  --max-threads                     upload threads (default: 5)
+  --log                             file to store program log
+  --verbose                         output debug information
+  --version                         show program's version number and exit
+  -h, --help                        show this help message and exit
 
 machine learning options:
   --hugging-face-token              Hugging Face token to use image captioning model online
-  --hf-model                        Provide the model used for generating caption <vit-gpt2 | blip-image| git-large> (defaults: vit-gpt2)
+  --hf-model                        Provide the model used for generating caption <vit-gpt2 | blip-image | git-large> (defaults: vit-gpt2)
   --caption-column                  Provide both image column and column where caption would be written
 
 column options:
-  --column-types                     comma-separated list of column types to use for non-key columns;
-                                     if none is provided, types will be guessed from CSV values
-                                     (can also be used with --add-missing-columns flag)
-  --delimiter                        Delimiter that is used to seperate columns and rows in csv file if none is provided, ',' is taken as default
-  --add-missing-columns              if columns are present in CSV but not in Notion DB, add them to Notion DB
-  --rename-notion-key-column         rename the key column in the file to a different key column in Airtable
-  --randomize-select-colors          randomize colors for added options in select and multi select columns
+  --column-types                    comma-separated list of column types to use for non-key columns;
+                                    if none is provided, types will be guessed from CSV values
+                                    (can also be used with --add-missing-columns flag)
+  --delimiter                       Delimiter that is used to seperate columns and rows in csv file
+                                    if none is provided, ',' is taken as default
+  --add-missing-columns             if columns are present in CSV or JSON but not in Notion DB, add them to Notion DB
+  --rename-notion-key-column        rename the key column in the file to a different key column in Notion DB
+  --randomize-select-colors         randomize colors for added options in select and multi select columns
 
 merge options:
-  --merge                            merge CSV or JSON with existing Notion DB rows, first column will be used as a key
-  --merge-only-column                CSV or JSON column that should be updated on merge;
-                                     when provided, other columns will be ignored
-                                     (use multiple times for multiple columns)
-  --merge-skip-new                   skip new rows in CSV or JSON that are not already in Notion DB during merge
+  --merge                           merge CSV or JSON with existing Notion DB rows, first column will be used as a key
+  --merge-only-column               CSV or JSON column that should be updated on merge;
+                                    when provided, other columns will be ignored
+                                    (use multiple times for multiple columns)
+  --merge-skip-new                  skip new rows in CSV or JSON that are not already in Notion DB during merge
 
 relations options:
-  --add-missing-relations            add missing entries into linked Notion DB
+  --add-missing-relations           add missing entries into linked Notion DB
 
 database management options:
   --delete-all-database-entries     delete (archive) all entries in the specified database;
                                     WARNING: This action cannot be undone!
 
 page cover options:
-  --image-column COLUMN              one or more CSV or JSON column that points to URL or image file that will be embedded for that row
-  --image-column-keep                keep image CSV or JSON column as a Notion DB column
-  --image-column-mode {cover,block}  upload image as [cover] or insert it as [block] (default: block)
-  --image-caption-column             CSV or JSON column that points to text caption that will be added to the image block
-                                     if --image-column-mode is set to 'block'
-  --image-caption-column-keep        keep image caption CSV or JSON column as a Notion DB column
+  --image-column                    One or more CSV or JSON column that points to URL or image file that will be embedded for that row
+  --image-column-keep               keep image CSV or JSON column as a Notion DB column
+  --image-column-mode               upload image as [cover], insert it as [block], or assign to Notion [file] property (default: block)
+  --image-caption-column            CSV or JSON column that points to text caption that will be added to the image block
+                                    if --image-column-mode is set to 'block'
+  --image-caption-column-keep       keep image caption CSV column as a Notion DB column
 
 page icon options:
-  --icon-column                      CSV or JSON column that points to emoji, URL or image file
-                                     that will be used as page icon for that row
-  --icon-column-keep                 keep icon CSV or JSON column as a Notion DB column
-  --default-icon ICON                Emoji, URL or image file that will be used as page icon for every row by default
+  --icon-column                     CSV or JSON column that points to emoji, URL or image file
+                                    that will be used as page icon for that row
+  --icon-column-keep                keep icon CSV or JSON column as a Notion DB column
+  --default-icon                    Emoji, URL or image file that will be used as page icon for every row by default
 
 validation options:
-  --mandatory-column                 CSV or JSON column that cannot be empty (use multiple times for multiple columns)
-  --payload-key-column               JSON object that is the key in Notion DB;
-                                     if JSON file is used, this cannot be empty
-  --fail-on-relation-duplicates      fail if any linked DBs in relation columns have duplicate entries;
-                                     otherwise, first entry in alphabetical order
-                                     will be treated as unique when looking up relations
-  --fail-on-duplicates               fail if Notion DB or CSV or JSON has duplicates in key column,
-                                     useful when sanitizing before merge to avoid ambiguous mapping
-  --fail-on-duplicate-csv-columns    fail if CSV or JSON has duplicate columns;
-                                     otherwise last column will be used
-  --fail-on-conversion-error         fail if any column type conversion error occurs;
-                                     otherwise errors will be replaced with empty strings
-  --fail-on-inaccessible-relations   fail if any relation column points to a Notion DB that
-                                     is not accessible to the current user;
-                                     otherwise those columns will be ignored
-  --fail-on-missing-columns          fail if columns are present in CSV but not in Notion DB;
-                                     otherwise those columns will be ignored
-  --fail-on-unsettable-columns       fail if DB has columns that don't support assigning value to them;
-                                     otherwise those columns will be ignored
-                                     (columns with type created_by, last_edited_by, rollup or formula)
-  --fail-on-wrong-status-values      fail if values for 'status' columns don't have matching option in DB;
-                                     otherwise those values will be replaced with default status
+  --mandatory-column                CSV or JSON column that cannot be empty (use multiple times for multiple columns)
+  --payload-key-column              JSON object that is the key in notion db. if json file is used, this cannot be empty!
+  --fail-on-relation-duplicates     fail if any linked DBs in relation columns have duplicate entries;
+                                    otherwise, first entry in alphabetical order
+                                    will be treated as unique when looking up relations
+  --fail-on-duplicates              fail if Notion DB or CSV has duplicates in key column,
+                                    useful when sanitizing before merge to avoid ambiguous mapping
+  --fail-on-duplicate-csv-columns   fail if CSV or JSON has duplicate columns;
+                                    otherwise last column will be used
+  --fail-on-conversion-error        fail if any column type conversion error occurs;
+                                    otherwise errors will be replaced with empty strings
+  --fail-on-inaccessible-relations  fail if any relation column points to a Notion DB that
+                                    is not accessible to the current user;
+                                    otherwise those columns will be ignored
+  --fail-on-missing-columns         fail if columns are present in CSV or JSON but not in Notion DB;
+                                    otherwise those columns will be ignored
+  --fail-on-unsettable-columns      fail if DB has columns that don't support assigning value to them;
+                                    otherwise those columns will be ignored
+                                    (columns with type created_by, last_edited_by, rollup or formula)
+  --fail-on-wrong-status-values     fail if values for 'status' columns don't have matching option in DB;
+                                    otherwise those values will be replaced with default status
 ```
 
 ### macOS Release
@@ -388,9 +388,9 @@ If linked DB is not accessible (linked DB is deleted or your account doesn't hav
 
 The tool allows you to add an image to each row with the `--image-column` option. It will use one column from CSV as a data source for the image. It can be either a URL or a file name. The file name must be either an absolute path or a path relative to the CSV file. The tool will upload the file to the Notion server.
 
-By default, the tool will embed an image inside the row page. If you want it to use the image as a page cover, then set the `--image-column-mode` option to `cover`.
+By default, the tool will embed an image inside the row page. If you want it to use the image as a page cover, set `--image-column-mode cover`. If your target Notion column is a `files` property, use `--image-column-mode file` to upload local files (or attach external URLs) directly to that property.
 
-Column specified with the `--image-column` option will not be treated as a regular column by default. If you want it to appear in Notion DB, use the `--image-column-keep` flag.
+Column specified with the `--image-column` option will not be treated as a regular column by default in `block`/`cover` mode. In `file` mode, the column is treated as a regular Notion property input so it can populate `files` columns.
 
 To add custom caption to image block uploaded with `--image-column-mode` set to `block`, use `--image-caption-column` option. To also keep the caption as a Notion DB column, use `--image-caption-column-keep` flag.
 

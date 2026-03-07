@@ -11,6 +11,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
+# NOTE:
+# "relation" is intentionally excluded from ALLOWED_TYPES used by --column-types.
+# Unlike scalar property types, relation columns require additional Notion metadata
+# (target database/data source linkage). The current --column-types flow only
+# accepts plain type names and cannot safely create relation schema from that
+# alone. Relation values are supported when the relation column already exists in
+# the target database.
 ALLOWED_TYPES = frozenset(
     (
         "checkbox",
