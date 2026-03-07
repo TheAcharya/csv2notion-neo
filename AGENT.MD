@@ -106,7 +106,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Renamed: All "_official" suffixed files to clean names without suffixes
 - Enhanced: Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
 - Improved: Clear separation between two distinct logic paths for database operations
-- Enhanced: Comprehensive test suite with 94 test methods across 21 categories (including rate limit/throttle tests; issue #76)
+- Enhanced: Comprehensive test suite with 96 test methods across 21 categories (including rate limit/throttle tests; issue #76)
 
 ## Core Architecture
 
@@ -207,7 +207,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - VCR-based testing for API responses
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
-- Comprehensive test suite (test_comprehensive.py): 21 categories, 94 test methods; CLI argument validation and Notion SDK testing without credentials, including pagination and rate limit/throttle tests
+- Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials, including pagination and rate limit/throttle tests
 - Progress bar real-time updates testing with multi-threaded simulation
 - Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
 - Rate limit and throttle tests (TestNotionRateLimitAndThrottle): Retry-After parsing, 429 ban coordination, proactive throttle (issue #76)
@@ -232,6 +232,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Support for all Notion API endpoints (databases, pages, blocks, users, file uploads, data_sources)
 - Data Sources: Properties retrieved from data_sources endpoint, schema updates via data_sources.update
 - File upload handling through file_uploads endpoints with comprehensive retry logic
+- Files property support: `--image-column-mode file` maps to Notion `files` items (`file_upload` for local paths, `external` for URLs)
 - Built-in rate limiting and error handling: exponential backoff; HTTP 429 handling with Retry-After and cross-thread coordination; proactive ~3 req/s throttle (issue #76)
 - Integration token authentication for enhanced security
 - Full compatibility with Notion's API specifications
@@ -252,6 +253,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Database URL or page URL specification (mandatory) with Notion.so domain and protocol validation - supports both existing databases and page URLs for creating new databases
 - Column type mapping
 - Image and icon handling options
+- `--image-column-mode` supports `cover`, `block`, and `file`; use `file` for dedicated Notion `files` columns
+- `relation` is intentionally excluded from `--column-types` allowed values because relation schema creation needs target DB/data source metadata
 - Merge and validation flags
 - AI model configuration
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
@@ -378,7 +381,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Integration tests for API changes
 - Manual testing for UI/UX changes
 - Performance testing for optimization changes
-- Comprehensive test suite (21 categories, 94 methods) for CLI argument validation, Notion SDK, and rate limit/throttle behavior (issue #76)
+- Comprehensive test suite (21 categories, 96 methods) for CLI argument validation, Notion SDK, and rate limit/throttle behavior (issue #76)
 
 ## Troubleshooting
 
@@ -402,7 +405,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 94 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
+- Test coverage gaps (resolved with 96 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

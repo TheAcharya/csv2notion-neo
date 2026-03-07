@@ -110,10 +110,9 @@ class NotionRowConverter(object):  # noqa:  WPS214
         if self.rules.image_column_mode == "block":
             properties["cover_block"] = self._map_image(row)
             properties["cover_block_caption"] = self._map_image_caption(row)
-        else:
-            # properties["cover_block"] = self._map_image(row)
-            # properties["cover_block_caption"] = self._map_image_caption(row)
+        elif self.rules.image_column_mode == "cover":
             properties["cover"] = self._map_image(row)
+        # In "file" mode, image columns are treated as regular DB columns.
 
         properties["icon"] = self._map_icon(row)
 
@@ -147,6 +146,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
             "multi_select": split_str,
             "number": map_number,
             "file": self._map_file,
+            "files": self._map_file,
             "person": self._map_person,
         }
 

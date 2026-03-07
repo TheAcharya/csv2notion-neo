@@ -50,7 +50,11 @@ def new_database(
     args: Namespace, client: NotionClient, csv_data: LocalData
 ) -> str:
     skip_columns = []
-    if args.image_column and not args.image_column_keep:
+    if (
+        args.image_column
+        and not args.image_column_keep
+        and args.image_column_mode != "file"
+    ):
         skip_columns.append(args.image_column)
     if args.icon_column and not args.icon_column_keep:
         skip_columns.append(args.icon_column)

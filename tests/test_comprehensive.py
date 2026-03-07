@@ -1295,6 +1295,60 @@ class TestNotionSDKWithoutCredentials:
         uploader = NotionRowUploader(db)
         
         assert uploader.db == db
+
+    def test_notion_db_files_property_from_urls(self):
+        """Test Notion 'files' property conversion for external URLs."""
+        db = NotionDB.__new__(NotionDB)
+        db.logger = Mock()
+        db.client = Mock()
+
+        result = db._convert_value_to_notion_property(
+            ["https://example.com/a.png", "https://example.com/docs/file.pdf"],
+            "files",
+            "Assets",
+        )
+
+        assert result == {
+            "files": [
+                {
+                    "name": "a.png",
+                    "type": "external",
+                    "external": {"url": "https://example.com/a.png"},
+                },
+                {
+                    "name": "file.pdf",
+                    "type": "external",
+                    "external": {"url": "https://example.com/docs/file.pdf"},
+                },
+            ]
+        }
+
+    @patch("csv2notion_neo.notion_row_upload_file.upload_filetype")
+    def test_notion_db_files_property_from_local_path(self, mock_upload_filetype):
+        """Test Notion 'files' property conversion uploads local files."""
+        db = NotionDB.__new__(NotionDB)
+        db.logger = Mock()
+        db.client = Mock()
+        mock_upload_filetype.return_value = (
+            "attachment:file-id:sample.png",
+            {"file_id": "file-id"},
+        )
+
+        result = db._convert_value_to_notion_property(
+            [Path("/tmp/sample.png")],
+            "files",
+            "Assets",
+        )
+
+        assert result == {
+            "files": [
+                {
+                    "name": "sample.png",
+                    "type": "file_upload",
+                    "file_upload": {"id": "file-id"},
+                }
+            ]
+        }
     
     def test_notion_db_pagination_large_datasets(self):
         """Test NotionDB.rows property handles pagination correctly for large datasets.
@@ -1694,6 +1748,18 @@ class TestImageOperations:
         ])
         
         assert args.image_column_mode == "block"
+
+        # Test file mode
+        args = parse_args([
+            "--workspace", "Test Workspace",
+            "--token", "ntn_test_token_12345678901234567890",
+            "--url", "https://www.notion.so/test-workspace/test-database-id",
+            "--image-column", "Image",
+            "--image-column-mode", "file",
+            "test.csv"
+        ])
+
+        assert args.image_column_mode == "file"
     
     def test_image_column_edge_cases(self):
         """Test image column edge cases."""
