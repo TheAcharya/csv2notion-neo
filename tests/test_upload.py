@@ -1,5 +1,12 @@
-# Starting from this file, we have to start writing tests for basic functions of neo
-# Testing must be written in pytest best in class practices and run using pytest
+"""Pytest-based tests for the CSV-to-Notion upload flow.
+
+This module exercises the integration between LocalData, NotionClient, and the
+upload utilities. It uses a function-scoped fixture to construct a Notion
+client and CSV-backed LocalData instance, optionally creating a new Notion
+database when no URL is provided. The tests verify that CSV rows can be
+converted to Notion rows and uploaded successfully, and, when possible, that
+the row count in the target collection does not decrease after an upload.
+"""
 
 import logging
 from typing import Generator, Tuple
@@ -13,11 +20,13 @@ from csv2notion_neo.notion_db import NotionDB, get_collection_id, get_notion_cli
 from .input_command import ARGS_DICT
 from argparse import Namespace
 
-# Use this fixture to load the client and load the data, use yield to load client more than once with different parameters
+logger = logging.getLogger(__name__)
 
-@pytest.fixture(scope="session")
+
+@pytest.fixture
 def load_client_and_data() -> Generator[Tuple[LocalData, NotionClient, Namespace], None, None]:
-    
+    """Initialize client/data per test function and yield them with args."""
+
     args = Namespace(**ARGS_DICT)
     
     # Skip test if Notion credentials are not available
@@ -57,7 +66,7 @@ def test_upload_rows(load_client_and_data) -> None:
         pre_upload_count = len(db.rows)
     except Exception:
         # Pre-upload count is optional; log and continue so the test can still run.
-        logging.exception("Failed to get pre-upload row count from NotionDB")
+        logger.exception("Failed to get pre-upload row count from NotionDB")
 
     notion_rows = convert_csv_to_notion_rows(
         data,
@@ -89,6 +98,6 @@ def test_upload_rows(load_client_and_data) -> None:
             # or validation failures may result in fewer new rows than len(notion_rows).
         except Exception:
             # Row-count verification is optional; log and skip so the test still passes.
-            logging.exception(
+            logger.exception(
                 "Failed to verify post-upload row count in NotionDB; skipping count-based assertions"
             )
