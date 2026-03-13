@@ -40,10 +40,10 @@ jobs:
       POETRY_VIRTUALENVS_CREATE: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
 
@@ -78,7 +78,7 @@ jobs:
             OS_CODE: win
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Get version
         if: matrix.os == 'macos-latest'
@@ -95,7 +95,7 @@ jobs:
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
 
       - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: 1
         with:

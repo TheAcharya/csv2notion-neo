@@ -26,10 +26,10 @@ jobs:
       POETRY_VIRTUALENVS_CREATE: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
 
@@ -76,7 +76,7 @@ jobs:
             OS_CODE: win
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Get version
         if: matrix.os == 'macos-latest'
@@ -93,12 +93,12 @@ jobs:
           echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
 
       - name: Load release python requirements
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release_dist_reqs
 
       - name: Set up Python ${{ env.BUILD_PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         env:
           PIP_DISABLE_PIP_VERSION_CHECK: 1
         with:
@@ -264,38 +264,38 @@ jobs:
     permissions:
       contents: write  # required to create release and upload assets
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Get tag version
         run: |
           APP_VERSION=$(sed -n 's/^__version__ = "\([^"]\+\)"$/\1/p' ${{ env.PACKAGE_NAME }}/version.py)
           echo "TAG_VERSION=v$APP_VERSION" >> $GITHUB_ENV
 
       - name: Load release python packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release_dist_python
           path: dist
 
       - name: Load release binaries for linux
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release_dist_bin_linux
           path: dist
 
       - name: Load release binaries for windows
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release_dist_bin_win
           path: dist
 
       - name: Load release binaries for macos
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release_dist_bin_macos
           path: dist
       
       - name: Load release pkg
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: release_csv2notion_neo_pkg
           path: dist
