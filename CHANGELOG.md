@@ -13,6 +13,7 @@
 - Enhanced ephemeral build `local-test-build.sh` reliability (fully self-contained local toolchain)
 - Updated GitHub Actions workflows for build, release, and integration tests
 - Leaner install footprint by removing unused legacy dependencies
+- Improved live Notion upload integration test (`test_upload.py`): skips only when credentials or the API are unavailable (so real setup bugs fail the test), with clearer optional row-count checks after upload
 
 ---
 
