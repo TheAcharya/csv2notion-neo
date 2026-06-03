@@ -42,6 +42,11 @@ This module implements a sophisticated retry system with the following character
    - Shared across all threads so combined rate stays under the limit
    - Reduces 429s and long Retry-After waits; reactive 429 handling remains as backup
 
+7. SDK + NEO RETRIES (notion-client 3.1+):
+   - SDK (inner): default retries on 429; 5xx on GET/DELETE only (~2 attempts, short backoff).
+   - Neo (outer): _rate_limit_wait, cross-thread 429 ban, 409 on writes, up to 15 attempts.
+   - Neo remains the authoritative policy for multithreaded uploads; SDK softens brief blips per call.
+
 TWO DISTINCT LOGIC PATHS:
 ========================
 This module implements two distinct logic paths for different use cases:
@@ -180,10 +185,12 @@ class NotionClient:
         self.options = options
         
         # Initialize official Notion client with API version 2025-09-03
-        # This uses the new data_sources structure for database properties
+        # This uses the new data_sources structure for database properties.
+        # SDK retries (3.1+, default on) run inside each call; Neo adds throttle,
+        # cross-thread 429 coordination, and outer retry loops (issue #76).
         self.client = Client(
             auth=integration_token,
-            notion_version="2025-09-03"
+            notion_version="2025-09-03",
         )
         
         # Set up logging
