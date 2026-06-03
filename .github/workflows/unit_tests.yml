@@ -72,5 +72,4 @@ jobs:
         run: poetry install --no-root
 
       - name: Run comprehensive tests
-        # Disable pytest-vcr plugin: incompatible with urllib3 2.x; no tests in this run use VCR.
-        run: pytest tests/test_comprehensive.py -v -s --tb=long -p no:vcr
+        run: pytest tests/test_comprehensive.py -v -s --tb=long

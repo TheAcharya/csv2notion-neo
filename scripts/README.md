@@ -297,7 +297,7 @@ ls -la .build/
 .build/python/bin/poetry run pyinstaller --version
 
 # Run comprehensive tests manually
-.build/python/bin/poetry run pytest tests/test_comprehensive.py -v --tb=long -p no:vcr
+.build/python/bin/poetry run pytest tests/test_comprehensive.py -v --tb=long
 ```
 
 ## Cleanup

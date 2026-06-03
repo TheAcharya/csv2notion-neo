@@ -204,7 +204,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Testing Strategy
 - Unit tests for core functionality
 - Integration tests for Notion API interactions
-- VCR-based testing for API responses
+- Unit tests with mocks; optional live Notion API integration tests in CI
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
 - Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials, including pagination and rate limit/throttle tests
@@ -438,7 +438,7 @@ The dev toolchain covers the local/CI development stack (not production runtime 
 | pytest | ^9 |
 | pytest-cov | ^7 |
 | pyfakefs | ^6 |
-| testfixtures | ^12 (requires Python 3.11+) |
+| python-dotenv | ^1 (tests / `input_command.py` only) |
 | black | ^26 |
 | isort | ^8 |
 | pre-commit | ^4 |

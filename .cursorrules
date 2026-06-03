@@ -117,7 +117,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Write unit tests for all new functionality
 - Use pytest for testing framework
 - Maintain good test coverage
-- Use VCR for API response testing
+- Unit tests use mocks; integration tests may hit live Notion API in CI
 - Test both success and failure scenarios
 - Use ephemeral environment for local testing
 - Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials
@@ -260,7 +260,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Integration Tests
 - Test API integrations with real endpoints
-- Use VCR for recording API responses
+- Integration tests use real endpoints in CI where secrets are configured
 - Test end-to-end workflows
 - Validate error handling in real scenarios
 
@@ -392,6 +392,6 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ## Dev Toolchain
 
-Dev dependencies: pytest ^9, flake8 ^7.3, wemake-python-styleguide ^1.6, black ^26, isort ^8, mypy ^2, etc. Python **3.11+** required (`testfixtures` ^12). Lint: `setup.cfg` (flakehell removed — incompatible with flake8 7+). See AGENT.MD for the full table.
+Dev dependencies: pytest ^9, flake8 ^7.3, wemake-python-styleguide ^1.6, black ^26, isort ^8, mypy ^2, etc. Python **3.11+** required. Lint: `setup.cfg` (flakehell removed — incompatible with flake8 7+). See AGENT.MD for the full table.
 
 This cursorrule file should be kept in sync with the AGENT.MD file to ensure consistent development practices and project understanding. 

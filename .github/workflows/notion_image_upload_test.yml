@@ -58,5 +58,4 @@ jobs:
           NOTION_WORKSPACE: ${{ secrets.NOTION_WORKSPACE }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_URL: ${{ secrets.NOTION_URL }}
-        # Disable pytest-vcr plugin (incompatible with urllib3 2.x; no tests here use VCR)
-        run: pytest tests/test_upload.py -v -s -p no:vcr
+        run: pytest tests/test_upload.py -v -s
