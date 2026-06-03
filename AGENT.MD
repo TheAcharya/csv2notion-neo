@@ -64,7 +64,7 @@ CSV2Notion Neo is an advanced command-line tool for uploading and merging CSV or
 
 ## Version 2.0.0+ Migration
 
-CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (version 3.0.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (`notion-client` ^3.1.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
 
 ### Migration Details
 
@@ -75,7 +75,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 #### API Implementation Changes
 - Previous: Custom implementation using unofficial private Notion APIs
-- Current: Official [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library integration (v3.0.0)
+- Current: Official [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library integration (`notion-client` ^3.1.0)
 - API Version: Notion API 2025-09-03 with data_sources structure
 - Data Sources: Database properties retrieved from data_sources endpoint instead of database object
 - Schema Updates: Database schema modifications use data_sources.update endpoint
@@ -116,6 +116,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
    - Entry point for the application
    - Handles argument parsing and logging setup
    - Orchestrates the main workflow
+   - Enables `icecream` debug output via `ic.enable()` (consistent with Airlift tooling)
 
 2. Data Processing (`csv2notion_neo/local_data.py`)
    - Reads and validates CSV/JSON files
@@ -195,11 +196,12 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Maintain comprehensive logging
 
 ### Local Development Workflow
-- Use the ephemeral build script (`scripts/local-test-build.sh`) for local development
-- Creates self-contained build environment in `.build/` directory
-- No system-level installations required
-- Supports dependency updates and testing workflows
-- Produces identical builds to CI/CD pipeline
+- Use `scripts/local-test-build.sh` for all local builds (no system Python/Poetry required)
+- Installs **python-build-standalone** CPython **3.14.5** under `.build/python/`
+- Pins: pip **26.1.2**, Poetry **2.4.1**, setuptools **82.0.1**, poetry-plugin-export **1.10.0**
+- Poetry venv: `.build/venv/`; PyInstaller binary: `test-build/csv2notion_neo`
+- Key flags: `--clean`, `--comprehensive-test`, `--lock-only`, `--update <package>`, `--show-outdated`
+- Matches GitHub Actions `BUILD_PYTHON_VERSION` / `BUILD_POETRY_VERSION` in workflow env blocks
 
 ### Testing Strategy
 - Unit tests for core functionality
@@ -213,21 +215,34 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Rate limit and throttle tests (TestNotionRateLimitAndThrottle): Retry-After parsing, 429 ban coordination, proactive throttle (issue #76)
 
 ### Code Quality
-- Black formatting with 88 character line length
-- isort for import organization
-- flake8 and wemake-python-styleguide for linting
-- mypy for type checking
-- Pre-commit hooks for automated quality checks
+- **Lint:** `setup.cfg` — flake8 + wemake-python-styleguide (`select = WPS`); `flakehell` removed (incompatible with flake8 7+)
+- Command: `poetry run flake8 csv2notion_neo tests` (after `./scripts/local-test-build.sh`)
+- **Format:** Black (88 cols), isort (black profile)
+- **Types:** mypy ^2 with strict `[tool.mypy]` in `pyproject.toml` (optional locally; not run in CI)
+- Optional: pre-commit hooks
 
 ### Dependencies
-- Python 3.11+ required (dev toolchain; local builds use 3.14.5)
-- Poetry for dependency management
-- Key dependencies: notion-client 3.0.0 (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
+- **Python:** `>=3.11,<3.15` in `pyproject.toml`; local builds and CI use **3.14.5**
+- **Poetry** for lock/install; see [Dev Toolchain](#dev-toolchain) for full tables
+
+#### Runtime dependencies
+| Package | Role |
+|---------|------|
+| `notion-client` ^3.1 | Official Notion SDK |
+| `requests` | HTTP (AI captioning, etc.) |
+| `tqdm` | Progress bars |
+| `emoji` | Icon/column emoji handling |
+| `python-dateutil` | Date parsing |
+| `icecream` | Debug helper (Airlift consistency; `cli.py`, `utils_threading.py`) |
+
+#### Removed from runtime (cleanup; not used in current code)
+`ratelimit`, `commonmark`, `dictdiffer`, `python-slugify`, `bs4`, `cached-property`, `tzlocal` — custom rate limiting lives in `notion_client.py`
 
 ## API Integration
 
 ### Notion API
-- Notion API client implementation using notion-sdk-py library (v3.0.0)
+- Notion API client implementation using notion-sdk-py (`notion-client` ^3.1.0)
+- SDK inner retries + Neo outer retry/throttle policy — documented in `notion_client.py`
 - API Version: 2025-09-03 with data_sources structure for database properties
 - Support for all Notion API endpoints (databases, pages, blocks, users, file uploads, data_sources)
 - Data Sources: Properties retrieved from data_sources endpoint, schema updates via data_sources.update
@@ -261,9 +276,10 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py
 
 ### Environment Variables
-- Notion integration tokens (starts with 'secret_' or 'ntn_')
-- Hugging Face API tokens
-- Test configuration for CI/CD
+- **CLI:** `--token`, `--url`, etc. (no runtime `python-dotenv`)
+- **Local integration tests:** dev dependency `python-dotenv` loads `.env` via `tests/input_command.py` (`NOTION_TOKEN`, `NOTION_URL`, `NOTION_WORKSPACE`)
+- **CI:** GitHub Actions secrets for live Notion upload/delete workflows
+- Hugging Face tokens via CLI when using AI captioning
 
 ## Error Handling
 
@@ -313,11 +329,11 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Docker support for containerized deployment
 
 ### CI/CD Pipeline
-- Automated testing on multiple Python versions
-- Code quality checks with pre-commit hooks
-- Automated releases with GitHub Actions
-- Docker image building and publishing
-- Ephemeral local build system for development and testing
+- Workflows on `master` and `dev`: `build`, `unit_tests`, `notion_image_upload_test`, `notion_delete_database_entries_test`, `release_github`, `release_pypi`
+- **Python 3.14** and **Poetry 2.4.1** in workflow env (aligned with `local-test-build.sh`)
+- Unit tests: `pytest tests/test_comprehensive.py` — 96 tests, mocked Notion (no credentials)
+- Integration tests: real Notion API when repository secrets are set
+- No VCR/pytest-vcr (removed); do not use `-p no:vcr`
 
 ## Maintenance and Updates
 
@@ -328,7 +344,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### API Compatibility
 - Full compatibility with official Notion API specifications (version 2025-09-03)
-- Uses notion-sdk-py v3.0.0 with data_sources structure support
+- Uses `notion-client` ^3.1.0 with data_sources structure support
 - Regular dependency updates for notion-sdk-py
 - Compatibility testing with official Notion API versions
 - Official API stability and backward compatibility guarantees
@@ -343,31 +359,20 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 5. Configure environment variables for testing
 
 ### Ephemeral Build System
-- Script: `scripts/local-test-build.sh`
-- Environment: Self-contained in `.build/` directory
-- Features:
-  - Automatic Python virtual environment setup
-  - Poetry installation and configuration
-  - Dependency management with update options
-  - PyInstaller binary creation
-  - Testing integration
-  - Clean build artifacts management
+- Script: `scripts/local-test-build.sh` (see `scripts/README.md`)
+- Host requirements: `curl`, `tar` only
+- Layout:
+  - `.build/python/` — standalone CPython 3.14.5
+  - `.build/venv/` — Poetry project environment
+  - `test-build/csv2notion_neo` — PyInstaller binary
 - Usage:
   ```bash
-  # Basic build
-  ./scripts/local-test-build.sh
-  
-  # Build with tests
-  ./scripts/local-test-build.sh --test
-  
-  # Run comprehensive test suite
-  ./scripts/local-test-build.sh --comprehensive-test
-  
-  # Update dependencies
-  ./scripts/local-test-build.sh --update-deps
-  
-  # Clean build environment
-  ./scripts/local-test-build.sh --clean
+  ./scripts/local-test-build.sh --clean              # remove .build/, test-build/, .pytest_cache/
+  ./scripts/local-test-build.sh                      # full build + default tests
+  ./scripts/local-test-build.sh --comprehensive-test # 96 unit tests
+  ./scripts/local-test-build.sh --lock-only          # refresh poetry.lock only
+  ./scripts/local-test-build.sh --lock-only --update requests  # bump one package
+  ./scripts/local-test-build.sh --show-outdated      # list outdated packages
   ```
 
 ### Code Review Process
@@ -427,23 +432,50 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Performance benchmarking
 - Documentation improvements
 
-This documentation should be kept in sync with the cursorrule file to ensure consistent development practices and project understanding. 
-
 ## Dev Toolchain
 
-The dev toolchain covers the local/CI development stack (not production runtime deps). Lint config lives in `setup.cfg` (`flakehell` was removed — incompatible with flake8 7+).
+The dev toolchain is everything in `[tool.poetry.group.dev.dependencies]` plus CI/build pins. **Lint** config is in `setup.cfg` (not `pyproject.toml`; `flakehell` was removed — incompatible with flake8 7+).
 
-| Package | Constraint (pyproject) |
-|---------|-------------------------|
-| pytest | ^9 |
-| pytest-cov | ^7 |
-| pyfakefs | ^6 |
-| python-dotenv | ^1 (tests / `input_command.py` only) |
-| black | ^26 |
-| isort | ^8 |
-| pre-commit | ^4 |
-| flake8 | ^7.3 |
-| wemake-python-styleguide | ^1.6 |
-| mypy | ^2 (optional locally; not run in CI; strict config may report many issues) |
+### Build pins (local script + GitHub Actions)
+| Tool | Version |
+|------|---------|
+| CPython (standalone) | 3.14.5 (`20260510`) |
+| pip | 26.1.2 |
+| Poetry | 2.4.1 |
+| setuptools | 82.0.1 |
+| poetry-plugin-export | 1.10.0 |
 
-Run lint: `poetry run flake8 csv2notion_neo tests` (after `./scripts/local-test-build.sh`). Tests are configured with relaxed `per-file-ignores`; `csv2notion_neo/` may still report WPS violations under wemake 1.6 until addressed incrementally. 
+### Dev dependencies (`pyproject.toml`)
+| Package | Constraint | Notes |
+|---------|------------|-------|
+| pytest | ^9 | Unit + comprehensive suite |
+| pytest-cov | ^7 | Coverage |
+| pytest-mock | ^3.14 | Mocks |
+| pyfakefs | ^6 | Filesystem tests |
+| python-dotenv | ^1 | Dev/tests only — `tests/input_command.py` |
+| types-requests | ^2.33 | Typing stubs |
+| types-python-dateutil | ^2.9 | Typing stubs |
+| types-emoji | ^2.1 | Typing stubs |
+| black | ^26 | Formatter |
+| isort | ^8 | Import sort |
+| flake8 | ^7.3 | Linter driver |
+| wemake-python-styleguide | ^1.6 | WPS rules (`setup.cfg`) |
+| mypy | ^2 | Optional locally; not in CI |
+| pre-commit | ^4 | Optional hooks |
+| mdformat | ^1 | Markdown format |
+
+### Removed dev dependencies
+- `flakehell` — use `setup.cfg` instead
+- `pytest-vcr` / `vcrpy` — no cassettes in repo; was disabled with `-p no:vcr`
+- `testfixtures` — unused in test code
+
+### Lint
+```bash
+./scripts/local-test-build.sh
+poetry run flake8 csv2notion_neo tests
+```
+`tests/*` has relaxed `per-file-ignores` in `setup.cfg`; `csv2notion_neo/` may still report WPS findings under wemake 1.6.
+
+---
+
+This documentation should be kept in sync with **`.cursorrules`**. 
