@@ -1,22 +1,26 @@
 name: notion_delete_database_entries_test
 
-permissions:
-  contents: read
-
 on:
   workflow_dispatch:
-  
+
   schedule:
     - cron: '0 0 * * *' # Runs at 8 AM Singapore time (00:00 UTC) daily
-      
+
 env:
-  BUILD_PYTHON_VERSION: 3.9
-  BUILD_POETRY_VERSION: 2.1.3
+  BUILD_PYTHON_VERSION: "3.14"
+  BUILD_POETRY_VERSION: "2.4.1"
+  BUILD_SETUPTOOLS_VERSION: "82.0.1"
+  BUILD_POETRY_PLUGIN_EXPORT_VERSION: "1.10.0"
   PACKAGE_NAME: csv2notion_neo
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_CREATE: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -27,30 +31,26 @@ jobs:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
 
       - name: Install setuptools
-        run: pip install setuptools==80.9.0
+        run: pip install setuptools==${{ env.BUILD_SETUPTOOLS_VERSION }}
 
       - name: Set up Poetry ${{ env.BUILD_POETRY_VERSION }}
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v3.0.2
         with:
           poetry-version: ${{ env.BUILD_POETRY_VERSION }}
-      
-      - name: Install poetry-plugin-export
-        run: poetry self add poetry-plugin-export==1.9.0
-      
+          poetry-plugins: poetry-plugin-export==${{ env.BUILD_POETRY_PLUGIN_EXPORT_VERSION }}
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v5
-        with: 
+        with:
           path: |
             .venv
             ~/.cache/pypoetry
           key: ${{ runner.os }}-${{ hashFiles('poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-
-              
+
       - name: Install the necessary libraries to run csv2notion_neo
-        run: |
-          poetry config virtualenvs.create false
-          poetry install --no-root
+        run: poetry install --no-root
 
       - name: Run tests
         env:
@@ -58,5 +58,4 @@ jobs:
           NOTION_WORKSPACE: ${{ secrets.NOTION_WORKSPACE }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_URL: ${{ secrets.NOTION_URL }}
-        # Disable pytest-vcr plugin (incompatible with urllib3 2.x; no tests here use VCR)
-        run: pytest tests/test_delete_database_entries.py -v -s -p no:vcr
+        run: pytest tests/test_delete_database_entries.py -v -s

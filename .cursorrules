@@ -2,11 +2,11 @@
 
 ## Project Context
 
-This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.9+ and uses Poetry for dependency management.
+This is CSV2Notion Neo, an advanced command-line tool for uploading and merging CSV or JSON files with images to Notion databases. The project is written in Python 3.11+ and uses Poetry for dependency management.
 
 ## Version 2.0.0+ Migration
 
-CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (version 3.0.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
+CSV2Notion Neo has been fully migrated to use the official [Notion API](https://developers.notion.com/) (version 2025-09-03) and the [notion-sdk-py](https://github.com/ramnes/notion-sdk-py) library (`notion-client` ^3.1.0). This migration provides better reliability, security, and future compatibility. The application now uses Notion integration tokens instead of session cookies and requires database URLs to be provided for all operations.
 
 ### Migration Implementation Details
 
@@ -50,10 +50,22 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ## Dependencies
 
-### Core Dependencies
-- Python 3.9+ required
-- Poetry for dependency management
-- Key dependencies: notion-client 3.0.0 (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
+### Runtime (`[tool.poetry.dependencies]`)
+- Python `>=3.11,<3.15` (local builds and CI use **3.14.5** via `scripts/local-test-build.sh`)
+- `notion-client` ^3.1.0 (notion-sdk-py), `requests`, `tqdm`, `emoji`, `python-dateutil`, `icecream`
+- `icecream`: debug helper aligned with Airlift (`ic.enable()` in `cli.py`; `ic(...)` on thread-pool errors in `utils_threading.py`)
+
+### Dev-only (`[tool.poetry.group.dev.dependencies]`)
+- Testing: `pytest` ^9, `pytest-cov` ^7, `pytest-mock`, `pyfakefs` ^6
+- Lint/format: `black` ^26, `isort` ^8, `flake8` ^7.3, `wemake-python-styleguide` ^1.6, `mypy` ^2
+- Types: `types-requests`, `types-python-dateutil`, `types-emoji`
+- `python-dotenv` ^1 — tests only (`tests/input_command.py` for integration test env)
+- `pre-commit` ^4, `mdformat` ^1
+
+### Removed legacy runtime deps (no longer in `pyproject.toml`)
+- Unused in codebase: `ratelimit`, `commonmark`, `dictdiffer`, `python-slugify`, `bs4`, `cached-property`, `tzlocal` (rate limiting is implemented in `notion_client.py`)
+- Dev-only now: `python-dotenv`
+- Removed dev deps: `flakehell` (incompatible with flake8 7+), `pytest-vcr`, `testfixtures`
 
 ## Code Style and Standards
 
@@ -100,24 +112,25 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ## Development Workflow
 
 ### Local Development Environment
-- Use the ephemeral build script (`scripts/local-test-build.sh`) for consistent local development
-- Creates isolated build environment in `.build/` directory
-- No system-level Python or Poetry installation required
-- Supports dependency management, testing, and binary creation
-- Produces identical builds to CI/CD pipeline
+- Use `scripts/local-test-build.sh` for all local builds (no system Python/Poetry required)
+- Downloads **python-build-standalone** CPython **3.14.5** into `.build/python/`
+- Pins: pip **26.1.2**, Poetry **2.4.1**, setuptools **82.0.1**, poetry-plugin-export **1.10.0**
+- Project venv under `.build/venv/`; binary output under `test-build/`
+- Common commands: `--clean`, `--comprehensive-test`, `--lock-only`, `--update <pkg>`, `--show-outdated`
+- Aligns with GitHub Actions `BUILD_PYTHON_VERSION` / `BUILD_POETRY_VERSION` env blocks
 
 ### Code Quality Tools
-- Run Black for code formatting
-- Use isort for import sorting
-- Apply flake8 and wemake-python-styleguide for linting
-- Use mypy for type checking
-- Maintain pre-commit hooks
+- **Lint:** `setup.cfg` — flake8 + wemake (`select = WPS`); flakehell removed (incompatible with flake8 7+)
+- Run: `poetry run flake8 csv2notion_neo tests` (after `./scripts/local-test-build.sh`)
+- **Format:** Black (88 cols), isort (black profile)
+- **Types:** mypy ^2 in `pyproject.toml` (strict; not run in CI today)
+- Optional: pre-commit hooks
 
 ### Testing Requirements
 - Write unit tests for all new functionality
 - Use pytest for testing framework
 - Maintain good test coverage
-- Use VCR for API response testing
+- Unit tests use mocks; integration tests may hit live Notion API in CI
 - Test both success and failure scenarios
 - Use ephemeral environment for local testing
 - Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials
@@ -135,7 +148,8 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Notion API
 - Use the Notion API client implementation in csv2notion_neo/notion_client.py
-- Utilise the notion-sdk-py library (v3.0.0) for all Notion API interactions
+- Utilise the notion-sdk-py library (`notion-client` ^3.1.0) for all Notion API interactions
+- Dual retry layers: SDK inner retries + Neo outer policy (`_rate_limit_wait`, 429 ban, up to 15 attempts) — see `notion_client.py` module docstring
 - API Version: 2025-09-03 with data_sources structure for database properties
 - Data Sources: Properties retrieved from data_sources endpoint, schema updates via data_sources.update
 - Handle API responses and error codes properly with comprehensive retry logic
@@ -230,10 +244,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - `relation` is intentionally excluded from `--column-types` allowed values because relation schema creation requires target database/data source metadata
 
 ### Environment Variables
-- Use python-dotenv for environment configuration
-- Provide clear documentation for required variables
-- Implement fallback values where appropriate
-- Validate environment configuration on startup
+- CLI: pass `--token` and credentials via args; no runtime `python-dotenv`
+- Integration tests: `python-dotenv` (dev dep) loads `.env` in `tests/input_command.py` (`NOTION_TOKEN`, `NOTION_URL`, etc.)
+- CI: GitHub secrets for live Notion integration workflows
 
 ## Documentation Standards
 
@@ -260,7 +273,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Integration Tests
 - Test API integrations with real endpoints
-- Use VCR for recording API responses
+- Integration tests use real endpoints in CI where secrets are configured
 - Test end-to-end workflows
 - Validate error handling in real scenarios
 
@@ -279,11 +292,10 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Provide pre-compiled binaries
 
 ### CI/CD
-- Automate testing and quality checks
-- Use GitHub Actions for CI/CD
-- Implement automated releases
-- Monitor build and test status
-- Support ephemeral local build system for development
+- GitHub Actions on `master` and `dev`: `build`, `unit_tests`, Notion integration tests, `release_github`, `release_pypi`
+- CI Python **3.14**, Poetry **2.4.1** (match `local-test-build.sh` pins)
+- Unit tests: `pytest tests/test_comprehensive.py` (96 tests; mocks, no live Notion credentials)
+- No `pytest-vcr` / `-p no:vcr` (removed; tests do not use VCR cassettes)
 
 ## Maintenance Guidelines
 
@@ -390,34 +402,16 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Analyze API call patterns
 - Optimize data processing
 
-## Outdated Packages Held Back Due to Dependency Constraints
+## Dev Toolchain
 
-The following packages are currently outdated but have not been updated because doing so would break compatibility with other dependencies in the project (such as flake8 plugins, wemake-python-styleguide, etc.):
+See **AGENT.MD** for the full dependency tables. Summary:
 
-| Package                  | Installed | Latest   | Reason Held Back                                 |
-|--------------------------|-----------|----------|-------------------------------------------------|
-| click                    | 8.1.8     | 8.2.1    | Transitive, constrained by parent dependencies   |
-| eradicate                | 2.3.0     | 3.0.0    | Required by flake8-eradicate/wemake-styleguide   |
-| flake8                   | 3.9.0     | 7.3.0    | Required by wemake-python-styleguide             |
-| flake8-bandit            | 3.0.0     | 4.1.1    | Plugin, version tied to flake8                   |
-| flake8-broken-line       | 0.4.0     | 1.0.0    | Plugin, version tied to flake8                   |
-| flake8-bugbear           | 22.12.6   | 24.12.12 | Plugin, version tied to flake8                   |
-| flake8-commas            | 2.1.0     | 4.0.0    | Plugin, version tied to flake8                   |
-| flake8-eradicate         | 1.4.0     | 1.5.0    | Plugin, version tied to eradicate/flak8          |
-| flake8-isort             | 4.2.0     | 6.1.2    | Plugin, version tied to flake8/isort             |
-| flake8-rst-docstrings    | 0.2.7     | 0.3.1    | Plugin, version tied to flake8                   |
-| isort                    | 5.13.2    | 6.0.1    | Required by flake8-isort                         |
-| mccabe                   | 0.6.1     | 0.7.0    | Required by flake8 <5                            |
-| pep8-naming              | 0.11.1    | 0.15.1   | Latest requires flake8 >=5                       |
-| pre-commit               | 2.21.0    | 4.2.0    | Not updated to avoid breaking hooks              |
-| pycodestyle              | 2.7.0     | 2.14.0   | Required by flake8 <5                            |
-| pyfakefs                 | 4.7.0     | 5.9.1    | Not updated to avoid breaking tests              |
-| pyflakes                 | 2.3.1     | 3.4.0    | Required by flake8 <5                            |
-| pytest                   | 7.4.4     | 8.4.1    | Not updated to avoid breaking test compatibility |
-| pytest-cov               | 3.0.0     | 6.2.1    | Not updated to avoid breaking test compatibility |
-| testfixtures             | 7.2.2     | 9.1.0    | Not updated to avoid breaking test compatibility |
-| wemake-python-styleguide | 0.16.1    | 1.3.0    | Latest requires Python >=3.10                    |
+| Area | Versions / notes |
+|------|------------------|
+| Python | `>=3.11,<3.15`; local/CI build with **3.14.5** standalone |
+| Runtime | `notion-client` ^3.1, `requests`, `tqdm`, `emoji`, `python-dateutil`, `icecream` |
+| Test | `pytest` ^9, `pytest-cov` ^7, `pyfakefs` ^6, `pytest-mock` |
+| Lint | `flake8` ^7.3 + `wemake-python-styleguide` ^1.6 via `setup.cfg` |
+| Format | `black` ^26, `isort` ^8 |
 
-> These packages will be updated when their dependencies allow, or when the project drops support for Python 3.9 or older plugin versions.
-
-This cursorrule file should be kept in sync with the AGENT.MD file to ensure consistent development practices and project understanding. 
+This cursorrule file should be kept in sync with **AGENT.MD**. 

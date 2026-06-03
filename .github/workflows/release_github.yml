@@ -1,8 +1,5 @@
 name: release_github
 
-permissions:
-  contents: read
-
 on:
   workflow_dispatch:
     inputs:
@@ -15,9 +12,14 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
 
 env:
-  BUILD_PYTHON_VERSION: 3.9
-  BUILD_POETRY_VERSION: 2.1.3
+  BUILD_PYTHON_VERSION: "3.14"
+  BUILD_POETRY_VERSION: "2.4.1"
+  BUILD_SETUPTOOLS_VERSION: "82.0.1"
+  BUILD_POETRY_PLUGIN_EXPORT_VERSION: "1.10.0"
   PACKAGE_NAME: csv2notion_neo
+
+permissions:
+  contents: read
 
 jobs:
   build_python:
@@ -34,15 +36,13 @@ jobs:
           python-version: ${{ env.BUILD_PYTHON_VERSION }}
 
       - name: Install setuptools
-        run: pip install setuptools==80.9.0
+        run: pip install setuptools==${{ env.BUILD_SETUPTOOLS_VERSION }}
 
       - name: Set up Poetry ${{ env.BUILD_POETRY_VERSION }}
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v3.0.2
         with:
           poetry-version: ${{ env.BUILD_POETRY_VERSION }}
-      
-      - name: Install poetry-plugin-export
-        run: poetry self add poetry-plugin-export==1.9.0
+          poetry-plugins: poetry-plugin-export==${{ env.BUILD_POETRY_PLUGIN_EXPORT_VERSION }}
 
       - name: Export requirements
         run: poetry export --without-hashes -f requirements.txt --output requirements.txt
@@ -51,13 +51,13 @@ jobs:
         run: poetry build
 
       - name: Save release python requirements
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release_dist_reqs
           path: requirements.txt
 
       - name: Save release python packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release_dist_python
           path: dist
@@ -123,7 +123,7 @@ jobs:
 
       - name: Pack up binary for macos
         if: matrix.os == 'macos-latest'
-        env: 
+        env:
           APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
           APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
@@ -134,41 +134,40 @@ jobs:
           mkdir -p dist
           PARENT=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
           mkdir -p "$PARENT/dist/bin"
+          mkdir -p "$PARENT/dist/pkg-build"
           cp -R ./dist/${{ env.PACKAGE_NAME }} "$PARENT/dist/bin"
           cp -R ./bin/entitlements.plist "$PARENT/dist/bin"
 
           APP="$PARENT/dist/bin/${{ env.PACKAGE_NAME }}"
           ENTITLE="$PARENT/dist/bin/entitlements.plist"
           ls -l "$PARENT/dist/bin"
-  
+
           echo $APPLE_CERT_DATA | base64 --decode > certificate.p12
           security create-keychain -p $KEYCHAIN_PASSWORD build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p $KEYCHAIN_PASSWORD build.keychain
           security import certificate.p12 -k build.keychain -P $APPLE_CERT_PASSWORD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $KEYCHAIN_PASSWORD build.keychain
-          
+
           chmod +x "$ENTITLE"
-          
+
           /usr/bin/codesign --force -s $APPLE_TEAM_ID --identifier "co.theacharya.CSV2Notion-Neo" --options runtime --entitlements "$ENTITLE" "$APP" -v
 
           echo "Create Keychain Profile"
           xcrun notarytool store-credentials "notarytool-profile" --apple-id $APPLE_DEV_ID --password $APPLE_DEV_ID_PASSWORD --team-id $APPLE_TEAM_ID
-            
+
           echo "Creating Temp Notarization Archive"
           ditto -c -k --keepParent "$APP" "csv2notion_neo.zip"
-            
+
           echo "Notarize App"
           xcrun notarytool submit "csv2notion_neo.zip" --keychain-profile "notarytool-profile" --progress --wait
-
 
           cp -R "$PARENT/dist/bin/${{ env.PACKAGE_NAME }}" dist/
           cp -R  ./bin/entitlements.plist dist/
           cp ./LICENSE dist/
 
-
           zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_arm64.zip "dist/"
-      
+
       - name: Create pkg and productsign it
         if: matrix.os == 'macos-latest'
         env:
@@ -187,7 +186,7 @@ jobs:
           PACKAGE_NAME="CSV2Notion-Neo-unsigned"
           OUTPUT_DIR="$PARENT/dist/pkg-build"
           VERSION=${{ env.APP_VERSION }}
-          
+
           echo "Creating Temp Dir"
           TMP_DIR="$OUTPUT_DIR/tmp_pkgbuild"
           mkdir -p "$TMP_DIR"
@@ -203,7 +202,7 @@ jobs:
           PKG="$PARENT/dist/pkg-build/CSV2Notion-Neo-unsigned.pkg"
           SPKG="$PARENT/dist/pkg-build/CSV2Notion-Neo_${{env.APP_VERSION}}.pkg"
           SIGNING_IDENTITY="$APPLE_TEAM_ID_INSTALL"
-          
+
           echo "sign pkg"
           echo $APPLE_INSTALL_CERT_DATA | base64 --decode > certificate.p12
           security create-keychain -p $KEYCHAIN_PASSWORD_IN build-i.keychain
@@ -211,23 +210,23 @@ jobs:
           security unlock-keychain -p $KEYCHAIN_PASSWORD_IN build-i.keychain
           security import certificate.p12 -k build-i.keychain -P $APPLE_INSTALL_CERT_PASSWORD -T /usr/bin/productsign
           security set-key-partition-list -S apple-tool:,apple:,productsign: -s -k $KEYCHAIN_PASSWORD_IN build-i.keychain
-        
+
           /usr/bin/productsign --sign "$SIGNING_IDENTITY" "$PKG" "$SPKG"
 
           SPKG="$PARENT/dist/pkg-build/CSV2Notion-Neo_${{env.APP_VERSION}}.pkg"
-        
+
           echo "SPKG=$SPKG" >> $GITHUB_ENV
           echo "Create Keychain Profile"
           xcrun notarytool store-credentials "notarytool-profile" --apple-id $APPLE_DEV_ID --password $APPLE_DEV_ID_PASSWORD --team-id $APPLE_TEAM_ID
-          
+
           echo "Notarize csv2notion_neo PKG"
           xcrun notarytool submit "$SPKG" --keychain-profile "notarytool-profile" --progress --wait
-          
+
           echo "Attach staple"
           xcrun stapler staple "$SPKG"
 
           cp "$SPKG" "dist/"
-          
+
           ls "dist"
           rm -rf "$TMP_DIR"
 
@@ -244,25 +243,25 @@ jobs:
           copy ./LICENSE dist/
           zip -q -r dist_bin/bin_${{ env.PACKAGE_NAME }}_${{ env.APP_VERSION }}_${{ matrix.OS_CODE }}_x64.zip "dist/"
 
-      - name: Save release binaries for ${{ matrix.OS_CODE }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: release_dist_bin_${{ matrix.OS_CODE }}
-          path: dist_bin
-
       - name: Save release binaries for macos
         if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release_csv2notion_neo_pkg
           path: ${{ env.SPKG }}
+
+      - name: Save release binaries for ${{ matrix.OS_CODE }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: release_dist_bin_${{ matrix.OS_CODE }}
+          path: dist_bin
 
   release:
     if: github.event_name == 'push' || github.event.inputs.release == 'yes'
     needs: [build_binaries]
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # required to create release and upload assets
+      contents: write
     steps:
       - uses: actions/checkout@v6
       - name: Get tag version
@@ -293,7 +292,7 @@ jobs:
         with:
           name: release_dist_bin_macos
           path: dist
-      
+
       - name: Load release pkg
         uses: actions/download-artifact@v8
         with:
