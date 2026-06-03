@@ -97,7 +97,7 @@ $ brew uninstall --cask csv2notion-neo
 $ pip install --user csv2notion_neo
 ```
 
-**Python 3.10 or later required** (local builds use 3.14.5 via `scripts/local-test-build.sh`).
+**Python 3.11 or later required** (local builds use 3.14.5 via `scripts/local-test-build.sh`).
 
 ### From source
 

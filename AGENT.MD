@@ -56,7 +56,7 @@
 - [Future Roadmap](#future-roadmap)
   - [Planned Features](#planned-features)
   - [Technical Debt](#technical-debt)
-- [Outdated Packages Held Back Due to Dependency Constraints](#outdated-packages-held-back-due-to-dependency-constraints)
+- [Dev Toolchain](#dev-toolchain)
 
 ## Project Overview
 
@@ -220,7 +220,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Pre-commit hooks for automated quality checks
 
 ### Dependencies
-- Python 3.9+ required
+- Python 3.11+ required (dev toolchain; local builds use 3.14.5)
 - Poetry for dependency management
 - Key dependencies: notion-client 3.0.0 (notion-sdk-py), requests, tqdm, emoji, python-dateutil, icecream
 
@@ -429,32 +429,21 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 This documentation should be kept in sync with the cursorrule file to ensure consistent development practices and project understanding. 
 
-## Outdated Packages Held Back Due to Dependency Constraints
+## Dev Toolchain
 
-The following packages are currently outdated but have not been updated because doing so would break compatibility with other dependencies in the project (such as flake8 plugins, wemake-python-styleguide, etc.):
+The dev toolchain covers the local/CI development stack (not production runtime deps). Lint config lives in `setup.cfg` (`flakehell` was removed — incompatible with flake8 7+).
 
-| Package                  | Installed | Latest   | Reason Held Back                                 |
-|--------------------------|-----------|----------|-------------------------------------------------|
-| click                    | 8.1.8     | 8.2.1    | Transitive, constrained by parent dependencies   |
-| eradicate                | 2.3.0     | 3.0.0    | Required by flake8-eradicate/wemake-styleguide   |
-| flake8                   | 3.9.0     | 7.3.0    | Required by wemake-python-styleguide             |
-| flake8-bandit            | 3.0.0     | 4.1.1    | Plugin, version tied to flake8                   |
-| flake8-broken-line       | 0.4.0     | 1.0.0    | Plugin, version tied to flake8                   |
-| flake8-bugbear           | 22.12.6   | 24.12.12 | Plugin, version tied to flake8                   |
-| flake8-commas            | 2.1.0     | 4.0.0    | Plugin, version tied to flake8                   |
-| flake8-eradicate         | 1.4.0     | 1.5.0    | Plugin, version tied to eradicate/flak8          |
-| flake8-isort             | 4.2.0     | 6.1.2    | Plugin, version tied to flake8/isort             |
-| flake8-rst-docstrings    | 0.2.7     | 0.3.1    | Plugin, version tied to flake8                   |
-| isort                    | 5.13.2    | 6.0.1    | Required by flake8-isort                         |
-| mccabe                   | 0.6.1     | 0.7.0    | Required by flake8 <5                            |
-| pep8-naming              | 0.11.1    | 0.15.1   | Latest requires flake8 >=5                       |
-| pre-commit               | 2.21.0    | 4.2.0    | Not updated to avoid breaking hooks              |
-| pycodestyle              | 2.7.0     | 2.14.0   | Required by flake8 <5                            |
-| pyfakefs                 | 4.7.0     | 5.9.1    | Not updated to avoid breaking tests              |
-| pyflakes                 | 2.3.1     | 3.4.0    | Required by flake8 <5                            |
-| pytest                   | 7.4.4     | 8.4.1    | Not updated to avoid breaking test compatibility |
-| pytest-cov               | 3.0.0     | 6.2.1    | Not updated to avoid breaking test compatibility |
-| testfixtures             | 7.2.2     | 9.1.0    | Not updated to avoid breaking test compatibility |
-| wemake-python-styleguide | 0.16.1    | 1.3.0    | Latest requires Python >=3.10                    |
+| Package | Constraint (pyproject) |
+|---------|-------------------------|
+| pytest | ^9 |
+| pytest-cov | ^7 |
+| pyfakefs | ^6 |
+| testfixtures | ^12 (requires Python 3.11+) |
+| black | ^26 |
+| isort | ^8 |
+| pre-commit | ^4 |
+| flake8 | ^7.3 |
+| wemake-python-styleguide | ^1.6 |
+| mypy | ^2 (optional locally; not run in CI; strict config may report many issues) |
 
-> These packages will be updated when their dependencies allow, or when the project drops support for Python 3.9 or older plugin versions. 
+Run lint: `poetry run flake8 csv2notion_neo tests` (after `./scripts/local-test-build.sh`). Tests are configured with relaxed `per-file-ignores`; `csv2notion_neo/` may still report WPS violations under wemake 1.6 until addressed incrementally. 
