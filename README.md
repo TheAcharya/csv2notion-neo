@@ -97,17 +97,34 @@ $ brew uninstall --cask csv2notion-neo
 $ pip install --user csv2notion_neo
 ```
 
-**Python 3.11 or later required** (local builds use 3.14.5 via `scripts/local-test-build.sh`).
+**Python 3.11 or later required.**
 
 ### From source
 
-This project uses [poetry](https://python-poetry.org/) for dependency management and packaging. You will have to install it first. See [poetry official documentation](https://python-poetry.org/docs/) for instructions.
+Requires **Python 3.11+** (local builds use **3.14**). Recommended: use the project build script — it sets up an isolated toolchain under `.build/` (no system Python or Poetry install). You only need `curl` and `tar` on your machine.
 
 ```shell
 $ git clone https://github.com/TheAcharya/csv2notion-neo.git
-$ cd csv2notion_neo/
-$ poetry install --no-dev
-$ poetry run csv2notion_neo
+$ cd csv2notion-neo/
+$ ./scripts/local-test-build.sh
+$ ./test-build/csv2notion_neo --help
+```
+
+To run from source without building the binary (after the script has installed dependencies):
+
+```shell
+$ .build/venv/bin/csv2notion_neo --help
+```
+
+For development and testing, see [`scripts/README.md`](scripts/README.md) and [`tests/README.md`](tests/README.md).
+
+**Alternative:** If you already have [Poetry](https://python-poetry.org/) and Python 3.11+ installed:
+
+```shell
+$ git clone https://github.com/TheAcharya/csv2notion-neo.git
+$ cd csv2notion-neo/
+$ poetry install --only main
+$ poetry run csv2notion_neo --help
 ```
 
 ## Migration Guide (v2.0.0+)

@@ -1,5 +1,21 @@
 # Changelog
 
+### 2.2.0
+
+**🎉 Released:**
+- 3rd June 2026
+
+**🔨 Improvements:**
+- Upgraded from Python 3.10 to Python 3.14
+- Updated to the latest Notion API client library and project dependencies
+- Updated to latest security patches across all dependencies
+- Improved build reproducibility across environments
+- Enhanced ephemeral build `local-test-build.sh` reliability (fully self-contained local toolchain)
+- Updated GitHub Actions workflows for build, release, and integration tests
+- Leaner install footprint by removing unused legacy dependencies
+
+---
+
 ### 2.1.0
 
 **🎉 Released:**
