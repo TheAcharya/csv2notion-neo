@@ -110,11 +110,13 @@ $ ./scripts/local-test-build.sh
 $ ./test-build/csv2notion_neo --help
 ```
 
-To run from source without building the binary (after the script has installed dependencies):
+To run from source without building the binary (after `./scripts/local-test-build.sh` has installed dependencies):
 
 ```shell
-$ .build/venv/bin/csv2notion_neo --help
+$ .build/python/bin/poetry run csv2notion_neo --help
 ```
+
+The project virtualenv lives under `.build/venv/` in a Poetry-managed subdirectory (not directly at `.build/venv/bin/`). To use that interpreter explicitly: `$(.build/python/bin/poetry env info --path)/bin/csv2notion_neo --help`
 
 For development and testing, see [`scripts/README.md`](scripts/README.md) and [`tests/README.md`](tests/README.md).
 

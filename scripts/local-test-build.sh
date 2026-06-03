@@ -599,8 +599,6 @@ main() {
             setup_poetry
             configure_poetry
             install_poetry_plugin_export
-
-            install_dependencies "$UPDATE_FLAG" "$PACKAGES"
         else
             print_status "Using existing build environment"
             setup_build_environment_exports
