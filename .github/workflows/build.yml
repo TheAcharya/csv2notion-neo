@@ -66,8 +66,6 @@ jobs:
   build_binaries:
     needs: build_python
     runs-on: ${{ matrix.os }}
-    env:
-      POETRY_VIRTUALENVS_CREATE: false
     strategy:
       matrix:
         include:
@@ -109,9 +107,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pyinstaller
           poetry install --no-root
+          poetry run pip install pyinstaller
 
       - name: Build with pyinstaller
-        run: pyinstaller ${{ env.PACKAGE_NAME }}.spec
+        run: poetry run pyinstaller ${{ env.PACKAGE_NAME }}.spec

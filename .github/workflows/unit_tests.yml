@@ -38,8 +38,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      POETRY_VIRTUALENVS_CREATE: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -72,4 +70,4 @@ jobs:
         run: poetry install --no-root
 
       - name: Run comprehensive tests
-        run: pytest tests/test_comprehensive.py -v -s --tb=long
+        run: poetry run pytest tests/test_comprehensive.py -v -s --tb=long

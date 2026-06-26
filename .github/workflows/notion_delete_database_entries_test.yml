@@ -19,8 +19,6 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      POETRY_VIRTUALENVS_CREATE: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -58,4 +56,4 @@ jobs:
           NOTION_WORKSPACE: ${{ secrets.NOTION_WORKSPACE }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_URL: ${{ secrets.NOTION_URL }}
-        run: pytest tests/test_delete_database_entries.py -v -s
+        run: poetry run pytest tests/test_delete_database_entries.py -v -s
