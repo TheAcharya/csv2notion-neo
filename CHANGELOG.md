@@ -1,5 +1,21 @@
 # Changelog
 
+### 2.2.1
+
+**🎉 Released:**
+- 27th July 2026
+
+**🐞 Bug Fix:**
+- `--url` validation rejected valid Notion links after Notion's migration from `notion.so` to `notion.com` / `app.notion.com`; Notion app hosts on both domains are now accepted (`notion.so`, `www.notion.so`, `app.notion.so`, `notion.com`, `www.notion.com`, `app.notion.com`) while non-app hosts (e.g. `developers.notion.com`) remain rejected
+
+**🔨 Improvements:**
+- Added shared Notion host allowlist (`notion.so`, `www.notion.so`, `app.notion.so`, `notion.com`, `www.notion.com`, `app.notion.com`) used by CLI URL validation and relation URL resolution
+- Improved database/page ID extraction for migrated URL shapes such as `https://app.notion.com/p/{page-id}`, hyphenated UUIDs, and slug-suffix IDs
+- Updated `--url` help text and README usage notes for dual-domain support
+- Expanded comprehensive test coverage to 98 methods, including Notion URL validation and ID extraction for `.so` and `.com` links
+
+---
+
 ### 2.2.0
 
 **🎉 Released:**

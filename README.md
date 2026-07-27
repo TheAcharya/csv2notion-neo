@@ -163,7 +163,8 @@ general options:
   --workspace                       active Notion workspace name
   --token                           Notion integration token (create at https://www.notion.so/my-integrations)
   --url                             Notion database URL or page URL (required);
-                                    If page URL provided, database will be created within the page
+                                    accepts notion.so / app.notion.so and notion.com / app.notion.com links;
+                                    if page URL provided, database will be created within the page
   --max-threads                     upload threads (default: 5)
   --log                             file to store program log
   --verbose                         output debug information

@@ -37,6 +37,8 @@ TABLE OF CONTENTS:
    - test_default_icon_validation
    - test_max_threads_validation
    - test_notion_token_validation
+   - test_notion_url_validation
+   - test_notion_url_id_extraction
 
 3. TestConversionRules
    - test_conversion_rules_creation
@@ -169,7 +171,7 @@ from argparse import Namespace
 from csv2notion_neo.cli import cli
 from csv2notion_neo.cli_args import parse_args, _parse_column_types, _parse_default_icon
 from csv2notion_neo.utils_exceptions import CriticalError, NotionError
-from csv2notion_neo.utils_static import ConversionRules
+from csv2notion_neo.utils_static import ConversionRules, is_notion_hostname, is_notion_url
 from csv2notion_neo.utils_str import split_str
 from csv2notion_neo.version import __version__
 
@@ -478,6 +480,123 @@ class TestArgumentValidation:
                 "--url", "https://www.notion.so/test-workspace/test-database-id",
                 "test.csv"
             ])
+
+    def test_notion_url_validation(self):
+        """Test Notion URL validation for notion.so and notion.com hosts."""
+        token = "ntn_ntn_test_token_12345678901234567890_12345678901234567890"
+        page_id = "8511b9fc522249f79b90768b832599cc"
+        hyphen_id = "8511b9fc-5222-49f7-9b90-768b832599cc"
+
+        allowed_urls = [
+            f"https://www.notion.so/test-workspace/{page_id}",
+            f"https://notion.so/test-workspace/{page_id}",
+            f"https://www.notion.com/test-workspace/{page_id}",
+            f"https://notion.com/test-workspace/{page_id}",
+            f"https://app.notion.com/p/{page_id}",
+            f"https://app.notion.com/p/{hyphen_id}",
+            f"http://app.notion.com/p/{page_id}",
+            f"https://app.notion.so/p/{page_id}",
+        ]
+
+        for url in allowed_urls:
+            args = parse_args([
+                "--workspace", "Test Workspace",
+                "--token", token,
+                "--url", url,
+                "test.csv",
+            ])
+            assert args.url == url
+
+        assert is_notion_hostname("app.notion.com")
+        assert is_notion_hostname("app.notion.so")
+        assert is_notion_hostname("www.notion.so")
+        assert is_notion_hostname("www.notion.com")
+        assert not is_notion_hostname("developers.notion.com")
+        assert not is_notion_hostname("evilnotion.com")
+        assert not is_notion_hostname("notion.com.evil.example")
+        assert is_notion_url(f"https://app.notion.com/p/{page_id}")
+        assert is_notion_url(f"https://app.notion.so/p/{page_id}")
+        assert is_notion_url(f"https://www.notion.so/workspace/{page_id}")
+        assert not is_notion_url("https://developers.notion.com/reference")
+        assert not is_notion_url(f"ftp://app.notion.com/p/{page_id}")
+
+        with pytest.raises(CriticalError, match="Only Notion app URLs are supported"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", token,
+                "--url", f"https://example.com/workspace/{page_id}",
+                "test.csv",
+            ])
+
+        with pytest.raises(CriticalError, match="Only Notion app URLs are supported"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", token,
+                "--url", f"https://developers.notion.com/p/{page_id}",
+                "test.csv",
+            ])
+
+        with pytest.raises(CriticalError, match="Notion URLs must start with"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", token,
+                "--url", f"ftp://app.notion.com/p/{page_id}",
+                "test.csv",
+            ])
+
+        with pytest.raises(CriticalError, match="Invalid Notion URL structure"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", token,
+                "--url", "https://app.notion.com",
+                "test.csv",
+            ])
+
+        with pytest.raises(CriticalError, match="Notion URL cannot be empty"):
+            parse_args([
+                "--workspace", "Test Workspace",
+                "--token", token,
+                "--url", "",
+                "test.csv",
+            ])
+
+    def test_notion_url_id_extraction(self):
+        """Test database/page ID extraction from .so and .com Notion URLs."""
+        from csv2notion_neo.notion_db import _extract_database_id_from_url
+
+        page_id = "8511b9fc522249f79b90768b832599cc"
+        hyphen_id = "8511b9fc-5222-49f7-9b90-768b832599cc"
+
+        assert (
+            _extract_database_id_from_url(
+                f"https://www.notion.so/workspace/{page_id}"
+            )
+            == page_id
+        )
+        assert (
+            _extract_database_id_from_url(f"https://app.notion.com/p/{page_id}")
+            == page_id
+        )
+        assert (
+            _extract_database_id_from_url(f"https://app.notion.so/p/{page_id}")
+            == page_id
+        )
+        assert (
+            _extract_database_id_from_url(f"https://app.notion.com/p/{hyphen_id}")
+            == hyphen_id
+        )
+        assert (
+            _extract_database_id_from_url(
+                f"https://www.notion.com/workspace/Page-Title-{page_id}"
+            )
+            == page_id
+        )
+        assert (
+            _extract_database_id_from_url(
+                f"https://app.notion.com/workspace/{page_id}?v=view"
+            )
+            == page_id
+        )
 
 
 # ============================================================================

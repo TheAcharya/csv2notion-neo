@@ -29,6 +29,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Authentication: Integration tokens with format validation instead of session cookies
 - API Version: Notion API 2025-09-03 with data_sources structure for database properties
 - Database Operations: Notion databases API endpoints with page URL support for creating databases within existing pages
+- URL Hosts: `--url` accepts Notion app hosts on both `notion.so` / `app.notion.so` and `notion.com` / `app.notion.com` (`ALLOWED_NOTION_HOSTS` in `utils_static.py`); shared `is_notion_hostname` / `is_notion_url` helpers for CLI and relation URLs
 - Data Sources: Database properties retrieved from data_sources endpoint instead of database object
 - Schema Updates: Database schema modifications use data_sources.update endpoint
 - Database Creation: Uses initial_data_source for new database property definitions
@@ -133,10 +134,11 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Unit tests use mocks; integration tests may hit live Notion API in CI
 - Test both success and failure scenarios
 - Use ephemeral environment for local testing
-- Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials
+- Comprehensive test suite (test_comprehensive.py): 21 categories, 98 test methods; CLI argument validation and Notion SDK testing without credentials
 - Progress bar real-time updates testing with multi-threaded simulation
 - Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
 - Rate limit and throttle testing (TestNotionRateLimitAndThrottle): Retry-After parsing, 429 ban coordination, proactive throttle (issue #76)
+- Notion URL validation: notion.so / app.notion.so and notion.com / app.notion.com allowlist; ID extraction for migrated URL shapes
 
 ### Git Workflow
 - Use descriptive commit messages
@@ -237,9 +239,11 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Support both required and optional arguments
 - Note: --token (integration token) and --url (database URL or page URL) are now mandatory
 - Token format validation with user-friendly error messages
-- URL validation (Notion.so domain and protocol validation) with clear error messages
+- URL validation: http(s) plus Notion app-host allowlist (`notion.so`, `www.notion.so`, `app.notion.so`, `notion.com`, `www.notion.com`, `app.notion.com` via `ALLOWED_NOTION_HOSTS` / `is_notion_hostname` / `is_notion_url`); rejects non-app hosts; clear error messages
+- Relation URL resolution uses the same Notion host helpers (not `notion.so`-only prefixes)
+- Database/page ID extraction supports workspace URLs, `app.notion.com/p/{id}`, hyphenated UUIDs, and slug-suffix IDs
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
-- Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py
+- Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py (98 methods)
 - `--image-column-mode` supports `cover`, `block`, and `file`; use `file` when CSV/JSON image columns should populate Notion `files` properties
 - `relation` is intentionally excluded from `--column-types` allowed values because relation schema creation requires target database/data source metadata
 
@@ -269,7 +273,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Mock external dependencies
 - Test both success and failure paths
 - Maintain high test coverage
-- Comprehensive test suite: 21 categories, 96 methods; CLI arguments, Notion SDK, rate limit/throttle (issue #76)
+- Comprehensive test suite: 21 categories, 98 methods; CLI arguments, Notion SDK, rate limit/throttle (issue #76), dual-domain Notion URL validation
 
 ### Integration Tests
 - Test API integrations with real endpoints
@@ -294,7 +298,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### CI/CD
 - GitHub Actions on `master` and `dev`: `build`, `unit_tests`, Notion integration tests, `release_github`, `release_pypi`
 - CI Python **3.14**, Poetry **2.4.1** (match `local-test-build.sh` pins)
-- Unit tests: `pytest tests/test_comprehensive.py` (96 tests; mocks, no live Notion credentials)
+- Unit tests: `pytest tests/test_comprehensive.py` (98 tests; mocks, no live Notion credentials)
 - No `pytest-vcr` / `-p no:vcr` (removed; tests do not use VCR cassettes)
 
 ## Maintenance Guidelines
@@ -376,7 +380,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Common Issues
 - Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
 - Invalid token format (resolved with user-friendly validation and guidance)
-- Invalid URL format (resolved with Notion.so domain and protocol validation)
+- Invalid URL format (resolved with Notion app-host allowlist for notion.so / app.notion.so and notion.com / app.notion.com, plus http/https protocol validation)
 - API rate limiting and HTTP 429 (resolved with 15-attempt retry, Retry-After parsing, cross-thread ban coordination, and proactive ~3 req/s throttle; issue #76)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - Network connectivity issues (resolved with comprehensive retry mechanism)
@@ -394,7 +398,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 96 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
+- Test coverage gaps (resolved with 98 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, rate limit/throttle testing (issue #76), and notion.so / notion.com URL validation)
 
 ### Performance Issues
 - Monitor thread usage

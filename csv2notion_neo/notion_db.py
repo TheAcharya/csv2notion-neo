@@ -858,7 +858,9 @@ def _extract_database_id_from_url(notion_url: str) -> str:
     path_parts = parsed_url.path.split('/')
     
     database_id = None
-    # Look for ID in path (e.g., notion.so/database_id)
+    # Look for ID in path segments:
+    # - classic: notion.so/workspace/{32-char-id}
+    # - migrated: app.notion.com/p/{page-id} (32-char or hyphenated UUID)
     for part in path_parts:
         if len(part) == 32:  # Notion IDs are 32 chars long without hyphens
             database_id = part
@@ -867,13 +869,22 @@ def _extract_database_id_from_url(notion_url: str) -> str:
             database_id = part
             break
 
-    if not database_id:
+    if not database_id and path_parts:
         # Fallback for URLs like https://www.notion.so/myorg/8511b9fc522249f79b90768b832599cc?v=...
-        # The ID is usually the last part before '?' or '/'
+        # or https://app.notion.com/workspace/Title-8511b9fc522249f79b90768b832599cc
+        # The ID is usually the last part before '?' or '/' (or a 32-char suffix of it)
         if len(path_parts[-1]) == 32 or (len(path_parts[-1]) == 36 and '-' in path_parts[-1]):
             database_id = path_parts[-1]
-        elif len(path_parts[-2]) == 32 or (len(path_parts[-2]) == 36 and '-' in path_parts[-2]):
+        elif len(path_parts) >= 2 and (
+            len(path_parts[-2]) == 32
+            or (len(path_parts[-2]) == 36 and '-' in path_parts[-2])
+        ):
             database_id = path_parts[-2]
+        elif len(path_parts[-1]) > 32:
+            # Slug with trailing 32-char hex id: "Page-Title-<32hex>"
+            trailing = path_parts[-1][-32:]
+            if all(c in "0123456789abcdefABCDEF" for c in trailing):
+                database_id = trailing
 
     if not database_id:
         raise NotionError("Could not extract database ID from the provided URL.")

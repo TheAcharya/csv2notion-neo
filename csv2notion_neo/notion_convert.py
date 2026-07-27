@@ -31,7 +31,7 @@ from csv2notion_neo.utils_exceptions import (
     TypeConversionError,
     CriticalError,
 )
-from csv2notion_neo.utils_static import ConversionRules, FileType
+from csv2notion_neo.utils_static import ConversionRules, FileType, is_notion_url
 from csv2notion_neo.utils_str import split_str
 
 logger = logging.getLogger(__name__)
@@ -326,7 +326,7 @@ class NotionRowConverter(object):  # noqa:  WPS214
 
         resolved_relations = []
         for v in col_values:
-            if v.startswith("https://www.notion.so/"):
+            if is_notion_url(v):
                 resolved_relation = self._resolve_relation_by_url(relation_column, v)
             else:
                 resolved_relation = self._resolve_relation_by_key(relation_column, v)
