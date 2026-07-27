@@ -85,7 +85,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 #### Database URL Requirements
 - Previous: Optional database URL with automatic database creation
 - Current: Mandatory database URL for all operations (supports both database URLs and page URLs)
+- Hosts: Accepts Notion app hosts on both `notion.so` / `app.notion.so` and `notion.com` / `app.notion.com` (June 2026 domain migration); existing `.so` links continue to work
 - Benefits: Clearer workflow, explicit database targeting, better error handling, ability to create databases within existing pages
+- Validation: `ALLOWED_NOTION_HOSTS` / `is_notion_hostname` / `is_notion_url` in `utils_static.py`; used by `cli_args._validate_notion_url` and relation URL resolution in `notion_convert.py`
 
 #### File Upload Implementation
 - Previous: Custom file upload logic with signed URLs
@@ -106,7 +108,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Renamed: All "_official" suffixed files to clean names without suffixes
 - Enhanced: Comprehensive retry logic with 15 attempts, exponential backoff, and jitter
 - Improved: Clear separation between two distinct logic paths for database operations
-- Enhanced: Comprehensive test suite with 96 test methods across 21 categories (including rate limit/throttle tests; issue #76)
+- Enhanced: Comprehensive test suite with 98 test methods across 21 categories (including rate limit/throttle and dual-domain Notion URL validation tests; issue #76)
 
 ## Core Architecture
 
@@ -209,10 +211,11 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Unit tests with mocks; optional live Notion API integration tests in CI
 - Coverage reporting for quality assurance
 - Local testing with ephemeral environment
-- Comprehensive test suite (test_comprehensive.py): 21 categories, 96 test methods; CLI argument validation and Notion SDK testing without credentials, including pagination and rate limit/throttle tests
+- Comprehensive test suite (test_comprehensive.py): 21 categories, 98 test methods; CLI argument validation and Notion SDK testing without credentials, including pagination, rate limit/throttle, and notion.so / notion.com URL validation tests
 - Progress bar real-time updates testing with multi-threaded simulation
 - Large dataset merge simulation testing (1000 rows) to validate merge functionality under high-volume scenarios
 - Rate limit and throttle tests (TestNotionRateLimitAndThrottle): Retry-After parsing, 429 ban coordination, proactive throttle (issue #76)
+- Notion URL validation tests (`test_notion_url_validation`, `test_notion_url_id_extraction`): dual-domain hosts and ID extraction for `/p/{id}` and slug-suffix URLs
 
 ### Code Quality
 - **Lint:** `setup.cfg` — flake8 + wemake-python-styleguide (`select = WPS`); `flakehell` removed (incompatible with flake8 7+)
@@ -265,7 +268,9 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### Command Line Arguments
 - Workspace and integration token authentication (mandatory) with format validation
-- Database URL or page URL specification (mandatory) with Notion.so domain and protocol validation - supports both existing databases and page URLs for creating new databases
+- Database URL or page URL specification (mandatory) with http(s) and Notion app-host validation — supports `notion.so` / `app.notion.so` and `notion.com` / `app.notion.com` (allowlist in `utils_static.ALLOWED_NOTION_HOSTS`); rejects non-app hosts (e.g. `developers.notion.com`); supports existing database URLs and page URLs for creating new databases
+- Shared helpers `is_notion_hostname` / `is_notion_url` used by CLI `--url` validation and relation URL resolution
+- ID extraction supports classic workspace URLs, `https://app.notion.com/p/{page-id}`, hyphenated UUIDs, and slug-suffix IDs
 - Column type mapping
 - Image and icon handling options
 - `--image-column-mode` supports `cover`, `block`, and `file`; use `file` for dedicated Notion `files` columns
@@ -273,7 +278,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Merge and validation flags
 - AI model configuration
 - Database management: --delete-all-database-entries for archiving all pages in a database (database URL required, page URLs not supported)
-- Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py
+- Comprehensive test coverage: All 50+ CLI arguments and switches validated through test_comprehensive.py (98 methods)
 
 ### Environment Variables
 - **CLI:** `--token`, `--url`, etc. (no runtime `python-dotenv`)
@@ -331,7 +336,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### CI/CD Pipeline
 - Workflows on `master` and `dev`: `build`, `unit_tests`, `notion_image_upload_test`, `notion_delete_database_entries_test`, `release_github`, `release_pypi`
 - **Python 3.14** and **Poetry 2.4.1** in workflow env (aligned with `local-test-build.sh`)
-- Unit tests: `pytest tests/test_comprehensive.py` — 96 tests, mocked Notion (no credentials)
+- Unit tests: `pytest tests/test_comprehensive.py` — 98 tests, mocked Notion (no credentials)
 - Integration tests: real Notion API when repository secrets are set
 - No VCR/pytest-vcr (removed); do not use `-p no:vcr`
 
@@ -369,7 +374,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
   ```bash
   ./scripts/local-test-build.sh --clean              # remove .build/, test-build/, .pytest_cache/
   ./scripts/local-test-build.sh                      # full build + default tests
-  ./scripts/local-test-build.sh --comprehensive-test # 96 unit tests
+  ./scripts/local-test-build.sh --comprehensive-test # 98 unit tests
   ./scripts/local-test-build.sh --lock-only          # refresh poetry.lock only
   ./scripts/local-test-build.sh --lock-only --update requests  # bump one package
   ./scripts/local-test-build.sh --show-outdated      # list outdated packages
@@ -386,14 +391,14 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Integration tests for API changes
 - Manual testing for UI/UX changes
 - Performance testing for optimization changes
-- Comprehensive test suite (21 categories, 96 methods) for CLI argument validation, Notion SDK, and rate limit/throttle behavior (issue #76)
+- Comprehensive test suite (21 categories, 98 methods) for CLI argument validation, Notion SDK, rate limit/throttle behavior (issue #76), and dual-domain Notion URL validation
 
 ## Troubleshooting
 
 ### Common Issues
 - Integration token expiration or invalid tokens (resolved with format validation and clear error messages)
 - Invalid token format (resolved with user-friendly validation and guidance)
-- Invalid URL format (resolved with Notion.so domain and protocol validation)
+- Invalid URL format (resolved with Notion app-host allowlist for notion.so / app.notion.so and notion.com / app.notion.com, plus http/https protocol validation)
 - Rate limiting and HTTP 429 from Notion API (resolved with 15-attempt retry, Retry-After parsing, cross-thread ban coordination, and proactive ~3 req/s throttle; issue #76)
 - File upload failures through API endpoints (resolved with enhanced retry logic)
 - AI model loading issues
@@ -410,7 +415,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 - Large file uploads (resolved with extended retry windows)
 - Rate limit scenarios (resolved with exponential backoff and extended retry attempts)
 - Test execution issues (resolved with comprehensive test suite covering all functionality)
-- Test coverage gaps (resolved with 96 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, and rate limit/throttle testing; issue #76)
+- Test coverage gaps (resolved with 98 test methods across 21 categories including progress bar real-time updates, pagination for large datasets, cache behavior, CLI programmatic usage, rate limit/throttle testing (issue #76), and notion.so / notion.com URL validation)
 
 ### Debug Mode
 - Enable verbose logging with --verbose flag

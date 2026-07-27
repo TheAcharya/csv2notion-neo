@@ -46,7 +46,7 @@ tests/
 The comprehensive test suite that validates all CLI arguments and Notion SDK functionality:
 
 - CLI Argument Testing: Validates all 50+ CLI arguments and switches
-- Argument Validation: Tests argument parsing, type conversion, token format validation, and URL validation
+- Argument Validation: Tests argument parsing, type conversion, token format validation, and dual-domain Notion URL validation (notion.so and notion.com / app.notion.com)
 - Error Handling: Tests various error scenarios and edge cases
 - Notion SDK Testing: Tests Notion SDK functionality without credentials using mocking
 - Data Processing: Tests string splitting, data conversion utilities, and real-time progress bar updates
@@ -72,7 +72,7 @@ The comprehensive test suite that validates all CLI arguments and Notion SDK fun
 | Test Category | Test Class | Test Methods | Coverage | Status |
 |---------------|------------|--------------|----------|---------|
 | CLI Argument Parsing | TestCLIArgumentParsing | test_required_arguments, test_general_options, test_machine_learning_options, test_column_options, test_merge_options, test_relations_options, test_database_management_options, test_page_cover_options, test_page_icon_options, test_validation_options | All 50+ CLI arguments and switches | Covered |
-| Argument Validation | TestArgumentValidation | test_column_types_validation, test_default_icon_validation, test_max_threads_validation, test_notion_token_validation | Argument parsing, type conversion, token format validation, and URL validation | Covered |
+| Argument Validation | TestArgumentValidation | test_column_types_validation, test_default_icon_validation, test_max_threads_validation, test_notion_token_validation, test_notion_url_validation, test_notion_url_id_extraction | Argument parsing, type conversion, token format validation, and dual-domain Notion URL validation (notion.so and notion.com / app.notion.com) | Covered |
 | Conversion Rules | TestConversionRules | test_conversion_rules_creation, test_files_search_path_property | ConversionRules dataclass functionality | Covered |
 | Data Processing | TestDataProcessing | test_string_splitting, test_date_conversion, test_merge_race_condition_prevention, test_large_dataset_merge_simulation, test_progress_bar_real_time_updates | String splitting, data conversion utilities, and real-time progress bar updates | Covered |
 | Error Handling | TestErrorHandling | test_critical_error_handling, test_invalid_column_types, test_missing_required_arguments, test_invalid_file_paths | Error scenarios and edge cases | Covered |
@@ -108,7 +108,7 @@ The upload test suite that validates CSV/JSON upload functionality:
 The delete test suite that validates database entry deletion functionality:
 
 - Delete Testing: Validates deletion of all database entries
-- URL Validation: Tests proper database URL requirements and Notion.so domain validation
+- URL Validation: Tests proper database URL requirements and Notion app-host allowlist (notion.so and notion.com / app.notion.com)
 - Error Handling: Tests various deletion error scenarios
 - API Integration: Tests Notion API delete operations
 
@@ -324,7 +324,7 @@ cat tests/log.txt
 - All 50+ CLI arguments and switches validation
 - Argument parsing and type conversion
 - Token format validation (ntn_ and secret_ prefixes)
-- URL validation (Notion.so domain and protocol validation)
+- URL validation (Notion app-host allowlist for notion.so and notion.com / app.notion.com, plus http/https protocol validation)
 - Error handling for invalid arguments
 - Edge cases and boundary conditions
 - Version and help functionality
@@ -403,13 +403,13 @@ cat tests/log.txt
 
 ### 13. Database Deletion Testing
 - Delete all database entries
-- Database URL validation (Notion.so domain and protocol validation)
+- Database URL validation (Notion app-host allowlist for notion.so and notion.com / app.notion.com, plus http/https protocol validation)
 - Error handling for invalid URLs
 
 ### 14. Error Handling
 - Invalid data scenarios
 - Invalid token format scenarios
-- Invalid URL format scenarios (non-Notion.so domains, invalid protocols)
+- Invalid URL format scenarios (non-Notion app hosts, invalid protocols)
 - API error responses
 - Network connectivity issues
 
@@ -511,8 +511,8 @@ mv tests/log.txt tests/log_$(date +%Y%m%d_%H%M%S).txt
 
 3. Invalid URL Format
    ```bash
-   # Check URL format (must be Notion.so domain with http/https protocol)
-   echo $NOTION_URL | grep -E '^https?://.*notion\.so'
+   # Check URL format (must be a Notion app host with http/https protocol)
+   echo $NOTION_URL | grep -E '^https?://([^/]+\.)?(notion\.so|notion\.com)/'
    ```
 
 4. Test Database Access
@@ -600,19 +600,19 @@ For test-related issues:
 
 ## Complete Test Coverage Summary
 
-The CSV2Notion Neo test suite provides comprehensive coverage across 21 test categories with 96 individual test methods:
+The CSV2Notion Neo test suite provides comprehensive coverage across 21 test categories with 98 individual test methods:
 
 ### Test Statistics
 - Total Test Classes: 21
-- Total Test Methods: 96
+- Total Test Methods: 98
 - Test Execution Time: ~5 seconds (comprehensive suite)
 - Coverage: 100% of CLI arguments and core functionality
 - External Dependencies: None (all tests use mocking)
-- Recent Updates: Rate limit and throttle tests (issue #76); pagination and cache behavior tests; files property mapping tests for `--image-column-mode file`
+- Recent Updates: Dual-domain Notion URL validation (notion.so and notion.com / app.notion.com); rate limit and throttle tests (issue #76); pagination and cache behavior tests; files property mapping tests for `--image-column-mode file`
 
 ### Test Categories Breakdown
 1. CLI Argument Parsing (10 tests) - All command-line arguments and switches
-2. Argument Validation (4 tests) - Token, URL, and type validation
+2. Argument Validation (6 tests) - Token, URL (`.so` / `.com`), type validation, and ID extraction
 3. Conversion Rules (2 tests) - Dataclass functionality and properties
 4. Data Processing (5 tests) - String operations, utilities, and real-time progress bar updates
 5. Error Handling (4 tests) - CriticalError scenarios and validation

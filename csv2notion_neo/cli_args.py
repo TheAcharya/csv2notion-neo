@@ -10,9 +10,11 @@ import argparse
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
+from urllib.parse import urlparse
+
 from csv2notion_neo.notion_convert_map import map_icon
 from csv2notion_neo.utils_exceptions import CriticalError
-from csv2notion_neo.utils_static import ALLOWED_TYPES, FileType
+from csv2notion_neo.utils_static import ALLOWED_TYPES, FileType, is_notion_hostname
 from csv2notion_neo.utils_str import split_str
 from csv2notion_neo.version import __version__
 
@@ -61,7 +63,8 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
             "--url": {
                 "help": (
                     "Notion database URL or page URL (required);"
-                    "\nIf page URL provided, database will be created within the page"
+                    "\naccepts notion.so / app.notion.so and notion.com / app.notion.com links;"
+                    "\nif page URL provided, database will be created within the page"
                 ),
                 "metavar": "URL",
                 "required": True,
@@ -396,13 +399,16 @@ def _validate_notion_token(token: str) -> str:
 def _validate_notion_url(url: str) -> str:
     """
     Validate Notion URL format.
-    
+
+    Accepts first-party Notion app hosts on both notion.so and notion.com
+    (including app.notion.com / app.notion.so after Notion's June 2026 domain migration).
+
     Args:
         url: The URL string to validate
-        
+
     Returns:
         The validated URL string
-        
+
     Raises:
         CriticalError: If URL format is invalid
     """
@@ -411,31 +417,38 @@ def _validate_notion_url(url: str) -> str:
             "Notion URL cannot be empty. "
             "Please provide a valid Notion database or page URL."
         )
-    
-    # Check if URL starts with http/https
-    if not (url.startswith("http://") or url.startswith("https://")):
+
+    try:
+        parsed = urlparse(url)
+    except ValueError as e:
+        raise CriticalError(f"Invalid URL format: '{url}'") from e
+
+    if parsed.scheme not in {"http", "https"}:
         raise CriticalError(
             f"Invalid URL format: '{url}'\n"
             "Notion URLs must start with 'http://' or 'https://'."
         )
-    
-    # Check if URL contains notion.so domain
-    if "notion.so" not in url:
+
+    if not is_notion_hostname(parsed.hostname):
         raise CriticalError(
             f"Invalid Notion URL: '{url}'\n"
-            "Only Notion.so URLs are supported. "
-            "Please provide a valid Notion database or page URL from notion.so domain."
+            "Only Notion app URLs are supported "
+            "(notion.so / app.notion.so or notion.com / app.notion.com).\n"
+            "Please provide a valid Notion database or page URL."
         )
-    
-    # Additional validation for URL structure
-    if not ("/" in url and len(url.split("/")) >= 4):
+
+    # Path must include at least one segment beyond the host
+    # e.g. /workspace/id or /p/{page-id}
+    path_parts = [part for part in parsed.path.split("/") if part]
+    if not path_parts:
         raise CriticalError(
             f"Invalid Notion URL structure: '{url}'\n"
             "Notion URLs should have the format: "
-            "https://www.notion.so/workspace/database-id or "
-            "https://www.notion.so/workspace/page-id"
+            "https://www.notion.so/workspace/database-id, "
+            "https://www.notion.com/workspace/page-id, or "
+            "https://app.notion.com/p/page-id"
         )
-    
+
     return url
 
 

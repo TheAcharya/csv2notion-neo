@@ -55,7 +55,7 @@ This will:
 # Build and run tests
 ./scripts/local-test-build.sh --test
 
-# Run comprehensive test suite (96 tests, mocked Notion API)
+# Run comprehensive test suite (98 tests, mocked Notion API)
 ./scripts/local-test-build.sh --comprehensive-test
 
 # Clean .build/, test-build/, .pytest_cache/ and exit
@@ -191,7 +191,7 @@ Local macOS builds download a standalone CPython tarball; CI runners typically u
 
 ## Comprehensive Testing
 
-The `--comprehensive-test` option runs `tests/test_comprehensive.py` (96 tests) with mocked Notion API calls—no integration token required.
+The `--comprehensive-test` option runs `tests/test_comprehensive.py` (98 tests) with mocked Notion API calls—no integration token required.
 
 - CLI validation: 50+ arguments and switches
 - Notion SDK adapter tests (mocked `notion_client.Client`)

@@ -10,6 +10,22 @@ from argparse import Namespace
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional, Union
+from urllib.parse import urlparse
+
+# Notion app hosts after the June 2026 migration from notion.so → notion.com.
+# Existing notion.so links continue to work; API-generated links use app.notion.com.
+# Include app.notion.so for transitional/legacy bookmarks during the migration.
+# Keep this allowlist explicit so docs hosts (e.g. developers.notion.com) are rejected.
+ALLOWED_NOTION_HOSTS = frozenset(
+    (
+        "notion.so",
+        "www.notion.so",
+        "app.notion.so",
+        "notion.com",
+        "www.notion.com",
+        "app.notion.com",
+    )
+)
 
 # NOTE:
 # "relation" is intentionally excluded from ALLOWED_TYPES used by --column-types.
@@ -44,6 +60,24 @@ ALLOWED_TYPES = frozenset(
 UNSETTABLE_TYPES = frozenset(("created_by", "last_edited_by", "rollup", "formula"))
 
 FileType = Union[str, Path]
+
+
+def is_notion_hostname(hostname: Optional[str]) -> bool:
+    """Return True if hostname is a first-party Notion app host (.so or .com)."""
+    if not hostname:
+        return False
+    return hostname.lower().rstrip(".") in ALLOWED_NOTION_HOSTS
+
+
+def is_notion_url(url: str) -> bool:
+    """Return True if url is an http(s) link on an allowed Notion app host."""
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"}:
+        return False
+    return is_notion_hostname(parsed.hostname)
 
 
 @dataclass
