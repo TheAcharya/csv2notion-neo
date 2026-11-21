@@ -115,7 +115,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Local Development Environment
 - Use `scripts/local-test-build.sh` for all local builds (no system Python/Poetry required)
 - Downloads **python-build-standalone** CPython **3.14.5** into `.build/python/`
-- Pins: pip **26.1.2**, Poetry **2.4.1**, setuptools **82.0.1**, poetry-plugin-export **1.10.0**
+- Pins: pip **26.3**, Poetry **2.4.3**, setuptools **82.0.1**, poetry-plugin-export **1.10.0**
 - Project venv under `.build/venv/`; binary output under `test-build/`
 - Common commands: `--clean`, `--comprehensive-test`, `--lock-only`, `--update <pkg>`, `--show-outdated`
 - Aligns with GitHub Actions `BUILD_PYTHON_VERSION` / `BUILD_POETRY_VERSION` env blocks
@@ -297,7 +297,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### CI/CD
 - GitHub Actions on `master` and `dev`: `build`, `unit_tests`, Notion integration tests, `release_github`, `release_pypi`
-- CI Python **3.14**, Poetry **2.4.1** (match `local-test-build.sh` pins)
+- CI Python **3.14**, Poetry **2.4.3** (match `local-test-build.sh` pins)
 - Unit tests: `pytest tests/test_comprehensive.py` (98 tests; mocks, no live Notion credentials)
 - No `pytest-vcr` / `-p no:vcr` (removed; tests do not use VCR cassettes)
 
