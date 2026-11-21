@@ -200,7 +200,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 ### Local Development Workflow
 - Use `scripts/local-test-build.sh` for all local builds (no system Python/Poetry required)
 - Installs **python-build-standalone** CPython **3.14.5** under `.build/python/`
-- Pins: pip **26.1.2**, Poetry **2.4.1**, setuptools **82.0.1**, poetry-plugin-export **1.10.0**
+- Pins: pip **26.3**, Poetry **2.4.3**, setuptools **82.0.1**, poetry-plugin-export **1.10.0**
 - Poetry venv: `.build/venv/`; PyInstaller binary: `test-build/csv2notion_neo`
 - Key flags: `--clean`, `--comprehensive-test`, `--lock-only`, `--update <package>`, `--show-outdated`
 - Matches GitHub Actions `BUILD_PYTHON_VERSION` / `BUILD_POETRY_VERSION` in workflow env blocks
@@ -335,7 +335,7 @@ CSV2Notion Neo has been fully migrated to use the official [Notion API](https://
 
 ### CI/CD Pipeline
 - Workflows on `master` and `dev`: `build`, `unit_tests`, `notion_image_upload_test`, `notion_delete_database_entries_test`, `release_github`, `release_pypi`
-- **Python 3.14** and **Poetry 2.4.1** in workflow env (aligned with `local-test-build.sh`)
+- **Python 3.14** and **Poetry 2.4.3** in workflow env (aligned with `local-test-build.sh`)
 - Unit tests: `pytest tests/test_comprehensive.py` — 98 tests, mocked Notion (no credentials)
 - Integration tests: real Notion API when repository secrets are set
 - No VCR/pytest-vcr (removed); do not use `-p no:vcr`
@@ -445,8 +445,8 @@ The dev toolchain is everything in `[tool.poetry.group.dev.dependencies]` plus C
 | Tool | Version |
 |------|---------|
 | CPython (standalone) | 3.14.5 (`20260510`) |
-| pip | 26.1.2 |
-| Poetry | 2.4.1 |
+| pip | 26.3 |
+| Poetry | 2.4.3 |
 | setuptools | 82.0.1 |
 | poetry-plugin-export | 1.10.0 |
 
